@@ -318,6 +318,14 @@ body > section, body > footer {
   overflow: hidden;
   pointer-events: none;
   contain: strict;
+  transition: opacity 1.2s ease, visibility 1.2s;
+}
+
+/* Pause/hide background tumbling mini cards during hero intro so GPU runs at rock-solid 60fps */
+body.play-intro .falling-cards,
+body.cards-extracting .falling-cards {
+  opacity: 0;
+  visibility: hidden;
 }
 
 .gold-needle {
@@ -786,35 +794,8 @@ h1, h2, h3 {
 }
 
 .hero__corner {
-  position: absolute;
-  width: 140px;
-  height: 140px;
-  opacity: 0.55;
-  pointer-events: none;
+  display: none !important;
 }
-
-.hero__corner::before, .hero__corner::after {
-  content: "";
-  position: absolute;
-  background: var(--gold);
-}
-
-.hero__corner::before {
-  width: 100%;
-  height: 1px;
-  top: 26px;
-}
-
-.hero__corner::after {
-  width: 1px;
-  height: 100%;
-  left: 26px;
-}
-
-.hero__corner--tl { top: 22px; left: 22px; }
-.hero__corner--tr { top: 22px; right: 22px; transform: scaleX(-1); }
-.hero__corner--bl { bottom: 22px; left: 22px; transform: scaleY(-1); }
-.hero__corner--br { bottom: 22px; right: 22px; transform: scale(-1); }
 
 /* ==========================================================
    HERO CARDS & 4-PHASE TIMELINE ANIMATION (3D FLIPPER SYSTEM)
@@ -826,11 +807,11 @@ h1, h2, h3 {
   height: 190px;
   flex: none;
   perspective: 1200px;
-  contain: layout paint;
-  transform: translateZ(0);
+  isolation: isolate;
+  overflow: visible;
 }
 
-/* Base Deck Card */
+/* Base Deck Card - Default resting state on arc ensures zero-snap during animation delay */
 .deck-card {
   --stream-x: 0px;
   --stream-y: 0px;
@@ -852,7 +833,7 @@ h1, h2, h3 {
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   will-change: transform, opacity;
-  transform: translateZ(0);
+  transform: translate3d(var(--stream-x), var(--stream-y), 0) rotate(var(--stream-r)) scale(0.52);
   user-select: none;
 }
 
@@ -863,8 +844,6 @@ h1, h2, h3 {
   transform-style: preserve-3d;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-  transform: translateZ(0);
-  will-change: transform;
 }
 
 /* 3D Flipper Container */
@@ -875,8 +854,6 @@ h1, h2, h3 {
   transform-style: preserve-3d;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-  transform: translateZ(0);
-  will-change: transform;
 }
 
 /* Card Faces Common Styles */
@@ -889,7 +866,6 @@ h1, h2, h3 {
   justify-content: center;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-  transform: translateZ(0);
   box-shadow: 0 14px 26px rgba(0,0,0,0.55), 0 0 0 1px rgba(207,159,63,0.5) inset;
   transition: box-shadow 0.35s ease;
 }
@@ -947,21 +923,17 @@ h1, h2, h3 {
    ========================================================== */
 body.play-intro .deck-card {
   opacity: 0;
-  animation: arcStreamEnter 1.4s cubic-bezier(0.16, 1, 0.3, 1) var(--stream-delay) forwards;
+  animation: arcStreamEnter 1.35s cubic-bezier(0.16, 1, 0.3, 1) var(--stream-delay) both;
 }
 
 @keyframes arcStreamEnter {
   0% {
     opacity: 0;
-    transform: translate3d(-75vw, 60px, -100px) rotate(-36deg) scale(0.35);
+    transform: translate3d(-62vw, 40px, -60px) rotate(-28deg) scale(0.36);
   }
-  65% {
+  75% {
     opacity: 1;
     transform: translate3d(var(--stream-x), var(--stream-y), 0) rotate(var(--stream-r)) scale(0.53);
-  }
-  85% {
-    opacity: 1;
-    transform: translate3d(var(--stream-x), calc(var(--stream-y) - 4px), 10px) rotate(calc(var(--stream-r) + 1.5deg)) scale(0.54);
   }
   100% {
     opacity: 1;
@@ -972,9 +944,9 @@ body.play-intro .deck-card {
 /* ==========================================================
    PHASE 2 & 3: SPLIT & SELECTION, FADE OUT 8, TRANSFORM 4
    ========================================================== */
-/* 8 exit cards: remain at their arc positions, smoothly sink & fade out */
+/* 8 exit cards: remain precisely at their arc positions, smoothly sink into depth & fade out */
 body.cards-extracting .deck-card--exit {
-  animation: remainingArcFadeOut 0.85s cubic-bezier(0.4, 0, 0.2, 1) var(--exit-delay) forwards;
+  animation: remainingArcFadeOut 0.8s cubic-bezier(0.33, 1, 0.68, 1) var(--exit-delay) both;
 }
 
 @keyframes remainingArcFadeOut {
@@ -982,16 +954,20 @@ body.cards-extracting .deck-card--exit {
     opacity: 1;
     transform: translate3d(var(--stream-x), var(--stream-y), 0) rotate(var(--stream-r)) scale(0.52);
   }
+  40% {
+    opacity: 0.6;
+    transform: translate3d(var(--stream-x), calc(var(--stream-y) + 8px), -15px) rotate(var(--stream-r)) scale(0.48);
+  }
   100% {
     opacity: 0;
-    transform: translate3d(var(--stream-x), calc(var(--stream-y) + 16px), -40px) rotate(var(--stream-r)) scale(0.44);
+    transform: translate3d(var(--stream-x), calc(var(--stream-y) + 22px), -40px) rotate(var(--stream-r)) scale(0.40);
   }
 }
 
-/* 4 picked cards: swooping magical flight from arc to Home positions with scale-up */
+/* 4 picked cards: swooping continuous 3D arc flight to Home positions with scale-up */
 body.cards-extracting .deck-card--picked {
   z-index: 10;
-  animation: pickedCardFlight 1.35s cubic-bezier(0.2, 0.85, 0.25, 1) var(--exit-delay) forwards;
+  animation: pickedCardFlight 1.35s cubic-bezier(0.16, 1, 0.3, 1) var(--exit-delay) both;
 }
 
 @keyframes pickedCardFlight {
@@ -999,13 +975,17 @@ body.cards-extracting .deck-card--picked {
     opacity: 1;
     transform: translate3d(var(--stream-x), var(--stream-y), 0) rotate(var(--stream-r)) scale(0.52);
   }
-  35% {
+  25% {
     opacity: 1;
-    transform: translate3d(calc(var(--stream-x) * 0.6 + var(--fx) * 0.4), calc(var(--stream-y) * 0.5 + var(--fy) * 0.5 - 35px), 80px) rotate(calc(var(--stream-r) * 0.5 + var(--fr) * 0.5)) scale(0.82);
+    transform: translate3d(calc(var(--stream-x) * 0.7 + var(--fx) * 0.3), calc(var(--stream-y) * 0.7 + var(--fy) * 0.3 - 22px), 50px) rotate(calc(var(--stream-r) * 0.5 + var(--fr) * 0.5)) scale(0.76);
   }
-  75% {
+  65% {
     opacity: 1;
-    transform: translate3d(var(--fx), calc(var(--fy) - 8px), 20px) rotate(calc(var(--fr) + 1deg)) scale(1.04);
+    transform: translate3d(calc(var(--stream-x) * 0.12 + var(--fx) * 0.88), calc(var(--fy) - 8px), 25px) rotate(calc(var(--fr) * 0.96)) scale(1.02);
+  }
+  88% {
+    opacity: 1;
+    transform: translate3d(var(--fx), calc(var(--fy) - 1.5px), 8px) rotate(var(--fr)) scale(1.005);
   }
   100% {
     opacity: 1;
@@ -1016,14 +996,15 @@ body.cards-extracting .deck-card--picked {
 /* 3D card flip in mid-air for the 2 center face cards (JPC & FTU) */
 body.cards-extracting .card-p2 .card__flipper,
 body.cards-extracting .card-p3 .card__flipper {
-  animation: flipCardInFlight 1.35s cubic-bezier(0.2, 0.85, 0.25, 1) var(--exit-delay) forwards;
+  will-change: transform;
+  animation: flipCardInFlight 1.35s cubic-bezier(0.2, 0.9, 0.3, 1) var(--exit-delay) both;
 }
 
 @keyframes flipCardInFlight {
-  0%, 18% {
+  0%, 15% {
     transform: rotateY(0deg);
   }
-  75%, 100% {
+  72%, 100% {
     transform: rotateY(180deg);
   }
 }
@@ -1031,14 +1012,13 @@ body.cards-extracting .card-p3 .card__flipper {
 /* Kanji calligraphy illumination for the 2 outer back cards (一期 & 一会) */
 body.cards-extracting .card-p1 .card__kanji,
 body.cards-extracting .card-p4 .card__kanji {
-  animation: kanjiGlowReveal 0.65s ease forwards;
-  animation-delay: calc(var(--exit-delay) + 0.65s);
+  animation: kanjiGlowReveal 0.75s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--exit-delay) + 0.45s) both;
 }
 
 @keyframes kanjiGlowReveal {
-  0%   { opacity: 0; transform: scale(0.75); }
-  70%  { opacity: 1; transform: scale(1.08); }
-  100% { opacity: 1; transform: scale(1); }
+  0%   { opacity: 0; transform: scale(0.75); filter: brightness(0.85); }
+  65%  { opacity: 1; transform: scale(1.06); filter: brightness(1.25); }
+  100% { opacity: 1; transform: scale(1); filter: brightness(1); }
 }
 
 /* ==========================================================
@@ -1055,7 +1035,7 @@ body:not(.play-intro):not(.cards-extracting) .deck-card--exit {
 body:not(.play-intro):not(.cards-extracting) .deck-card--picked {
   opacity: 1;
   pointer-events: auto;
-  transform: translate3d(var(--fx), var(--fy), 0) rotate(var(--fr));
+  transform: translate3d(var(--fx), var(--fy), 0) rotate(var(--fr)) scale(1);
   transition: transform 0.36s cubic-bezier(0.2, 0.9, 0.3, 1.15), z-index 0s;
   z-index: 5;
 }
@@ -1073,6 +1053,7 @@ body:not(.play-intro):not(.cards-extracting) .deck-card--picked::after {
 /* Gentle asynchronous idle vertical bobbing on inner float layer */
 .cards-complete .deck-card--picked .card__float,
 body:not(.play-intro):not(.cards-extracting) .deck-card--picked .card__float {
+  will-change: transform;
   animation: cardFloatingBob var(--float-duration, 3.6s) ease-in-out infinite;
 }
 
@@ -2126,19 +2107,25 @@ section {
     border-left: 2px solid rgba(207, 159, 63, 0.45);
     background: rgba(18, 5, 7, 0.9);
     border-radius: 0;
-    padding: 0.4rem 0 0.4rem 1rem;
+    padding: 0 0 0 1rem;
     max-height: 0;
     overflow: hidden;
     opacity: 0;
     visibility: hidden;
-    transition: max-height 0.32s ease, opacity 0.25s ease;
+    transition: max-height 0.35s ease, opacity 0.25s ease, padding 0.25s ease;
   }
 
   .nav__item--dropdown.is-open .nav__dropdown {
-    max-height: 1000px;
+    max-height: 1200px;
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
+    padding: 0.4rem 0 0.4rem 1rem;
+  }
+
+  .nav__item--dropdown.is-open .nav__arrow {
+    transform: rotate(180deg);
+    color: var(--gold-bright);
   }
 
   .nav__dropdown-branch {
@@ -2157,12 +2144,12 @@ section {
     border-left: 2px solid rgba(207, 159, 63, 0.35);
     background: rgba(8, 2, 3, 0.95);
     border-radius: 0;
-    padding: 0.3rem 0 0.3rem 0.8rem;
+    padding: 0 0 0 0.8rem;
     max-height: 0;
     overflow: hidden;
     opacity: 0;
     visibility: hidden;
-    transition: max-height 0.32s ease, opacity 0.25s ease;
+    transition: max-height 0.35s ease, opacity 0.25s ease, padding 0.25s ease;
   }
 
   .nav__dropdown-branch.is-open .nav__subdropdown {
@@ -2170,6 +2157,12 @@ section {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
+    padding: 0.3rem 0 0.3rem 0.8rem;
+  }
+
+  .nav__dropdown-branch.is-open .nav__branch-arrow {
+    transform: rotate(180deg);
+    color: var(--gold-bright);
   }
 
   .hero {
@@ -2285,14 +2278,6 @@ section {
     font-size: 0.85rem;
     margin-top: 1.2rem;
   }
-  .hero__corner {
-    width: 65px;
-    height: 65px;
-  }
-  .hero__corner--tl { top: 12px; left: 12px; }
-  .hero__corner--tr { top: 12px; right: 12px; }
-  .hero__corner--bl { bottom: 12px; left: 12px; }
-  .hero__corner--br { bottom: 12px; right: 12px; }
 
   .pillars,
   .join__steps,
@@ -2627,17 +2612,19 @@ section {
   height: 14px;
 }
 
-/* Hidden YouTube Player (Dual 200x200 kept inside viewport to prevent throttling) */
+/* Hidden YouTube Player (Kept inside viewport but safely layered far behind opaque background) */
 .yt-music-hidden {
   position: fixed;
   bottom: 0;
   right: 0;
   width: 200px;
   height: 200px;
-  opacity: 0.015;
-  pointer-events: none;
-  z-index: 1;
+  opacity: 0.0001 !important;
+  pointer-events: none !important;
+  z-index: -999 !important;
   overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
 }
 
 /* Responsive for Mobile */

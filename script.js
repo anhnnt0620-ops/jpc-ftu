@@ -40,30 +40,30 @@ function initNavToggle() {
     }
   });
 
-  // Mobile accordion behavior for Về JPC dropdown
+  // Mobile & Touch accordion behavior for Về JPC dropdown
   if (aboutParent && aboutDropdown) {
     aboutParent.addEventListener('click', (e) => {
-      if (window.innerWidth <= 720) {
-        e.preventDefault();
-        const isOpen = aboutDropdown.classList.toggle('is-open');
-        aboutParent.setAttribute('aria-expanded', String(isOpen));
-      }
+      // Toggle dropdown open state
+      e.preventDefault();
+      e.stopPropagation();
+      const isOpen = aboutDropdown.classList.toggle('is-open');
+      aboutParent.setAttribute('aria-expanded', String(isOpen));
     });
   }
 
-  // Mobile accordion behavior for Cơ cấu tổ chức sub-dropdown
+  // Mobile & Touch accordion behavior for Cơ cấu tổ chức sub-dropdown
   if (branchTrigger && branchOrg) {
     branchTrigger.addEventListener('click', (e) => {
-      if (window.innerWidth <= 720) {
-        e.stopPropagation();
-        const isOpen = branchOrg.classList.toggle('is-open');
-        branchTrigger.setAttribute('aria-expanded', String(isOpen));
-      }
+      e.preventDefault();
+      e.stopPropagation();
+      const isOpen = branchOrg.classList.toggle('is-open');
+      branchTrigger.setAttribute('aria-expanded', String(isOpen));
     });
 
     branchTrigger.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
+        e.stopPropagation();
         const isOpen = branchOrg.classList.toggle('is-open');
         branchTrigger.setAttribute('aria-expanded', String(isOpen));
       }
@@ -168,6 +168,11 @@ function initViewNavigation() {
   };
 
   internalLinks.forEach((link) => {
+    // Dropdown parent toggles (Về JPC) only toggle options on click, not page navigation!
+    if (link.classList.contains('nav__link--parent') || link.id === 'navAboutParent') {
+      return;
+    }
+
     link.addEventListener('click', (event) => {
       const targetId = link.getAttribute('href').slice(1);
       if (!targetId) return;
@@ -382,14 +387,14 @@ function initCursorGlow() {
    5. HERO INTRO 4-PHASE TIMELINE ANIMATION & TYPEWRITER
    ==========================================================
    Timeline:
-   Phase 1 (0s - 2.8s): 12 cards sweep from left along an arc
+   Phase 1 (0s - 2.15s): 12 cards sweep from left along an arc
            trajectory, settling symmetrically in screen center.
-   Phase 2 (2.85s - 4.45s): 4 picked cards separate to Home positions;
-           8 remaining cards remain in place on the arc and fade out.
-   Phase 3 (2.85s - 4.45s): The 4 cards scale up (0.52 -> 1.0) and
-           transform colors (lacquer red -> parchment) & reveal contents.
-   Phase 4 (4.45s+): 4 cards fully settled. The welcome title begins
-           typing character-by-character, followed by CTA entrance.
+   Phase 2 (2.15s - 3.70s): 4 picked cards separate along a 3D arc
+           to Home positions; 8 remaining cards smoothly sink & fade out.
+   Phase 3 (2.15s - 3.70s): Mid-flight 3D flip (cards 2 & 3) and
+           Kanji illumination (cards 1 & 4) as cards glide to 100% scale.
+   Phase 4 (3.70s+): 4 cards smoothly settle into idle bobbing.
+           Welcome title types character-by-character, CTA enters.
    ========================================================== */
 function initHeroIntroTimeline() {
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -409,6 +414,9 @@ function initHeroIntroTimeline() {
   function notifyIntroComplete() {
     if (introCompleteNotified) return;
     introCompleteNotified = true;
+    if (!playerA && !playerB && (isYtApiReady || (window.YT && window.YT.Player))) {
+      initYtMusicPlayer();
+    }
     window.dispatchEvent(new CustomEvent('heroIntroComplete'));
   }
 
@@ -430,17 +438,17 @@ function initHeroIntroTimeline() {
     titleCursorEl.classList.add('is-hidden');
   }
 
-  // Phase 2 & 3: At 2.85s, split cards: 8 fade out in place, 4 fly to Home & transform
+  // Phase 2 & 3: At 2.15s, split cards: 8 sink & fade out, 4 swoop along 3D arc to Home
   extractionTimer = window.setTimeout(() => {
     if (hasSkipped) return;
     document.body.classList.add('cards-extracting');
-  }, 2850);
+  }, 2150);
 
-  // Phase 4: At 4.35s, 4 cards have fully settled at Home positions. Seamlessly transition to floating & typing!
+  // Phase 4: At 3.70s, 4 cards have fully settled at Home positions. Transition seamlessly to floating & typing!
   completionTimer = window.setTimeout(() => {
     if (hasSkipped) return;
     settleAndStartTyping();
-  }, 4350);
+  }, 3700);
 
   function settleAndStartTyping() {
     document.body.classList.remove('play-intro', 'cards-extracting');
@@ -565,12 +573,12 @@ let nextPreloadedIndex = 1;
 let isMusicPlaying = false;
 let pendingAutoPlay = false;
 let hasUserInteracted = false;
+let isYtApiReady = false;
 
-// Global YouTube IFrame API Ready hook
+// Global YouTube IFrame API Ready hook (deferred during card flight animation to avoid frame drops)
 window.onYouTubeIframeAPIReady = function() {
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initYtMusicPlayer);
-  } else {
+  isYtApiReady = true;
+  if (hasUserInteracted || !document.body.classList.contains('play-intro')) {
     initYtMusicPlayer();
   }
 };
@@ -656,6 +664,9 @@ function initMusicPlayerUI() {
   cdBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     hasUserInteracted = true;
+    if (!playerA && !playerB && (isYtApiReady || (window.YT && window.YT.Player))) {
+      initYtMusicPlayer();
+    }
     toggleMusicPlayback();
   });
 
@@ -663,6 +674,9 @@ function initMusicPlayerUI() {
   shuffleBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     hasUserInteracted = true;
+    if (!playerA && !playerB && (isYtApiReady || (window.YT && window.YT.Player))) {
+      initYtMusicPlayer();
+    }
     playRandomTrack();
   });
 
@@ -674,10 +688,12 @@ function initMusicPlayerUI() {
   // Setup background audio unlock for any natural interaction (touch, scroll, click)
   setupAudioUnlock();
 
-  // If YT API loaded before DOMContentLoaded
-  if (window.YT && window.YT.Player && !playerA && !playerB) {
-    initYtMusicPlayer();
-  }
+  // Fallback: Lazy init player after intro duration (4.8s) if not already initialized
+  setTimeout(() => {
+    if (!playerA && !playerB && (isYtApiReady || (window.YT && window.YT.Player))) {
+      initYtMusicPlayer();
+    }
+  }, 4800);
 }
 
 const unlockEvents = ['click', 'pointerdown', 'touchstart', 'keydown', 'wheel', 'scroll'];
@@ -840,6 +856,9 @@ function handlePlayerError(playerId) {
 
 function startAutoPlay() {
   pendingAutoPlay = true;
+  if (!playerA && !playerB && (isYtApiReady || (window.YT && window.YT.Player))) {
+    initYtMusicPlayer();
+  }
   startMusicPlayback();
 }
 
