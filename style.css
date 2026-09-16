@@ -1,0 +1,2452 @@
+/* ==========================================================
+   JPC FTU — CLB Tiếng Nhật Trường Đại học Ngoại Thương
+   Design System & Main Stylesheet
+   ========================================================== */
+
+/* ==========================================================
+   FONTS
+   ========================================================== */
+@font-face {
+  font-family: 'JPC Card';
+  src: url('Font/epgyobld.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JPC Gyosho';
+  src: url('Font/epgyosho.ttf') format('truetype');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'HK Gokukaikk';
+  src: url('Font/hkgokukaikk.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JPC Sho';
+  src: url('Font/hkgokukaikk.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Alviona';
+  src: url('Font/Alviona.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SQT Alviona';
+  src: url('Font/Alviona.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ==========================================================
+   DESIGN TOKENS
+   ========================================================== */
+:root {
+  --black:        #0b0403;
+  --maroon-deep:  #22070a;
+  --maroon:       #3d0c0f;
+  --red:          #5c1216;
+  --red-bright:   #8a1c1c;
+  --gold-deep:    #8a6415;
+  --gold:         #cf9f3f;
+  --gold-bright:  #eecd7e;
+  --white:        #f4ecd8;
+  --white-pure:   #ffffff;
+
+  --font-title: 'Alviona', 'SQT Alviona', 'Cinzel', serif;
+  --font-card:  'Cinzel', serif;
+  --font-body:  'Be Vietnam Pro', sans-serif;
+
+  --nav-h: 84px;
+  --edge: 1.6rem;
+  --max: 1180px;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: var(--nav-h);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  color: var(--white);
+  background-color: var(--black);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* High-performance GPU-cached fixed background (prevents full-page repaints on animation and scroll) */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 70% 45% at 18% 8%,  rgba(138,28,28,0.35), transparent 60%),
+    radial-gradient(ellipse 60% 40% at 85% 15%, rgba(92,18,22,0.30), transparent 60%),
+    radial-gradient(ellipse 80% 55% at 50% 100%,rgba(61,12,15,0.45), transparent 65%),
+    linear-gradient(180deg, var(--black) 0%, var(--maroon-deep) 45%, var(--black) 100%);
+  transform: translateZ(0);
+}
+
+/* Ambient Atmospheric Lighting (Chuyển động sáng tối ngẫu nhiên, huyền ảo như ánh nến / đèn lồng) */
+.bg-ambience {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+  contain: strict;
+}
+
+.bg-orb {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translateZ(0);
+  will-change: transform, opacity;
+  mix-blend-mode: screen;
+}
+
+/* 1. Vầng sáng vàng kim Champagne (Lượn hình vô cực ở nửa trên & trung tâm) */
+.bg-orb--gold {
+  width: 75vw;
+  height: 65vw;
+  max-width: 850px;
+  max-height: 750px;
+  top: -12%;
+  left: -5%;
+  background: radial-gradient(circle closest-side, rgba(238, 205, 126, 0.35) 0%, rgba(207, 159, 63, 0.20) 38%, rgba(138, 28, 28, 0.06) 70%, transparent 100%);
+  animation: orbDriftGold 23s cubic-bezier(0.42, 0, 0.58, 1) infinite, orbBreatheGold 6.7s ease-in-out infinite alternate;
+}
+
+/* 2. Ánh lửa sơn mài đỏ thắm Urushi (Lượn sóng lệch pha từ phải sang góc dưới) */
+.bg-orb--crimson {
+  width: 80vw;
+  height: 68vw;
+  max-width: 900px;
+  max-height: 780px;
+  top: 18%;
+  right: -18%;
+  background: radial-gradient(circle closest-side, rgba(186, 28, 28, 0.42) 0%, rgba(128, 18, 22, 0.24) 42%, rgba(61, 12, 15, 0.08) 72%, transparent 100%);
+  animation: orbDriftCrimson 29s cubic-bezier(0.42, 0, 0.58, 1) infinite, orbBreatheCrimson 8.3s ease-in-out infinite alternate;
+}
+
+/* 3. Đốm than hồng hổ phách (Di chuyển chậm rãi, dập dờn ở nửa dưới) */
+.bg-orb--amber {
+  width: 85vw;
+  height: 72vw;
+  max-width: 950px;
+  max-height: 800px;
+  bottom: -20%;
+  left: 10%;
+  background: radial-gradient(circle closest-side, rgba(218, 165, 52, 0.32) 0%, rgba(168, 60, 20, 0.18) 46%, transparent 80%);
+  animation: orbDriftAmber 37s cubic-bezier(0.42, 0, 0.58, 1) infinite, orbBreatheAmber 9.7s ease-in-out infinite alternate;
+}
+
+/* 4. Tim sáng đèn lồng rực nhẹ (Lơ lửng ngẫu hứng ở vùng giữa) */
+.bg-orb--lantern {
+  width: 55vw;
+  height: 55vw;
+  max-width: 600px;
+  max-height: 600px;
+  top: 30%;
+  left: 30%;
+  background: radial-gradient(circle closest-side, rgba(244, 236, 216, 0.28) 0%, rgba(238, 205, 126, 0.14) 42%, transparent 80%);
+  animation: orbDriftLantern 19s cubic-bezier(0.42, 0, 0.58, 1) infinite, orbFlickerLantern 4.3s ease-in-out infinite alternate;
+}
+
+@keyframes orbDriftGold {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  17%  { transform: translate3d(18vw, -6vh, 0) scale(1.18); }
+  35%  { transform: translate3d(34vw, 16vh, 0) scale(0.92); }
+  52%  { transform: translate3d(16vw, 28vh, 0) scale(1.14); }
+  69%  { transform: translate3d(-14vw, 18vh, 0) scale(0.86); }
+  86%  { transform: translate3d(-8vw, 4vh, 0) scale(1.08); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+@keyframes orbBreatheGold {
+  0%   { opacity: 0.45; }
+  50%  { opacity: 0.90; }
+  100% { opacity: 0.55; }
+}
+
+@keyframes orbDriftCrimson {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  21%  { transform: translate3d(-24vw, 18vh, 0) scale(1.20); }
+  43%  { transform: translate3d(-40vw, -8vh, 0) scale(0.85); }
+  62%  { transform: translate3d(-18vw, -22vh, 0) scale(1.15); }
+  81%  { transform: translate3d(10vw, -10vh, 0) scale(0.90); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+@keyframes orbBreatheCrimson {
+  0%   { opacity: 0.50; }
+  50%  { opacity: 0.95; }
+  100% { opacity: 0.45; }
+}
+
+@keyframes orbDriftAmber {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  24%  { transform: translate3d(22vw, -18vh, 0) scale(0.88); }
+  47%  { transform: translate3d(-16vw, -26vh, 0) scale(1.25); }
+  71%  { transform: translate3d(-32vw, -8vh, 0) scale(0.90); }
+  89%  { transform: translate3d(-12vw, 12vh, 0) scale(1.08); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+@keyframes orbBreatheAmber {
+  0%   { opacity: 0.42; }
+  50%  { opacity: 0.88; }
+  100% { opacity: 0.52; }
+}
+
+@keyframes orbDriftLantern {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  26%  { transform: translate3d(-18vw, -14vh, 0) scale(1.14); }
+  48%  { transform: translate3d(20vw, -20vh, 0) scale(0.84); }
+  74%  { transform: translate3d(14vw, 18vh, 0) scale(1.18); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+@keyframes orbFlickerLantern {
+  0%   { opacity: 0.38; }
+  35%  { opacity: 0.78; }
+  70%  { opacity: 0.48; }
+  100% { opacity: 0.85; }
+}
+
+body > section, body > footer {
+  position: relative;
+  z-index: 1;
+}
+
+.view {
+  display: none;
+}
+
+.view:not(.is-active) {
+  display: none !important;
+}
+
+.view.is-active {
+  display: block;
+}
+
+.view.is-active.hero {
+  display: flex;
+}
+
+.view.is-entering {
+  animation: viewEnter 0.45s ease both;
+}
+
+@keyframes viewEnter {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Ambient Cursor Spotlight (vệt sáng dịu theo chuột, không che chữ & nền) */
+.cursor-glow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 420px;
+  height: 420px;
+  margin: -210px 0 0 -210px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+  background: radial-gradient(
+    circle closest-side,
+    rgba(238, 205, 126, 0.13) 0%,
+    rgba(207, 159, 63, 0.07) 35%,
+    rgba(138, 28, 28, 0.02) 68%,
+    transparent 100%
+  );
+  transform: translate3d(-9999px, -9999px, 0);
+  transition: opacity 0.5s ease;
+  mix-blend-mode: screen;
+  will-change: transform, opacity;
+}
+
+.cursor-glow.is-active {
+  opacity: 1;
+}
+
+/* ==========================================================
+   BACKGROUND FX: GOLD NEEDLES & MINI FALLING CARDS (2 SIDES)
+   ========================================================== */
+.gold-needles,
+.falling-cards {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  contain: strict;
+}
+
+.gold-needle {
+  position: absolute;
+  top: 100%;
+  width: 1px;
+  height: var(--needle-length, 60px);
+  background: linear-gradient(180deg, transparent, rgba(255,234,167,var(--needle-opacity, 0.25)) 28%, rgba(207,159,63,var(--needle-opacity, 0.25)), transparent);
+  box-shadow: 0 0 2px rgba(207,159,63,0.3);
+  transform: translateZ(0) rotate(var(--needle-angle, 0deg));
+  transform-origin: center bottom;
+  will-change: transform, opacity;
+  animation: needleFlow var(--needle-duration, 12s) linear infinite;
+  animation-delay: var(--needle-delay, 0s);
+}
+
+@keyframes needleFlow {
+  0%   { opacity: 0; transform: translate3d(0, 0, 0) rotate(var(--needle-angle, 0deg)); }
+  12%  { opacity: 1; }
+  82%  { opacity: 0.8; }
+  100% { opacity: 0; transform: translate3d(0, -110vh, 0) rotate(var(--needle-angle, 0deg)); }
+}
+
+/* Mini Falling Cards (Floating on left & right sides) */
+.mini-card {
+  position: absolute;
+  top: -60px;
+  width: var(--mc-w, 20px);
+  height: var(--mc-h, 28px);
+  border-radius: 3px;
+  border: 0.8px solid rgba(238,205,126,0.65);
+  background:
+    repeating-linear-gradient(135deg, rgba(207,159,63,0.2) 0 1px, transparent 1px 4px),
+    linear-gradient(160deg, #8a1c1c, #35070a 75%);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  pointer-events: none;
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  animation: miniCardTumble var(--mc-dur, 10s) cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
+  animation-delay: var(--mc-delay, 0s);
+}
+
+.mini-card--gold {
+  border-color: rgba(255, 234, 167, 0.85);
+  box-shadow: 0 0 8px rgba(207, 159, 63, 0.4), 0 4px 10px rgba(0,0,0,0.5);
+}
+
+.mini-card--deep {
+  background:
+    repeating-linear-gradient(135deg, rgba(207,159,63,0.12) 0 1px, transparent 1px 4px),
+    linear-gradient(160deg, #5b1016, #1c0305 82%);
+}
+
+@keyframes miniCardTumble {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(0deg) rotateZ(var(--mc-rz-start, 0deg));
+  }
+  12% {
+    opacity: var(--mc-opacity, 0.6);
+  }
+  35% {
+    transform: translate3d(var(--mc-drift, 12px), 38vh, 0) rotateX(calc(var(--mc-rx, 360deg) * 0.38)) rotateY(calc(var(--mc-ry, 270deg) * 0.38)) rotateZ(calc(var(--mc-rz-start, 0deg) + 50deg));
+  }
+  70% {
+    transform: translate3d(calc(var(--mc-drift, 12px) * -0.6), 76vh, 0) rotateX(calc(var(--mc-rx, 360deg) * 0.72)) rotateY(calc(var(--mc-ry, 270deg) * 0.72)) rotateZ(calc(var(--mc-rz-start, 0deg) + 110deg));
+  }
+  88% {
+    opacity: var(--mc-opacity, 0.6);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--mc-drift, 12px), 116vh, 0) rotateX(var(--mc-rx, 360deg)) rotateY(var(--mc-ry, 270deg)) rotateZ(var(--mc-rz-end, 180deg));
+  }
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-title);
+  font-weight: 700;
+  margin: 0;
+  color: var(--white-pure);
+}
+
+::selection {
+  background: var(--gold);
+  color: var(--black);
+}
+
+:focus-visible {
+  outline: 2px solid var(--gold-bright);
+  outline-offset: 3px;
+}
+
+/* ==========================================================
+   NAVIGATION
+   ========================================================== */
+.nav {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 100;
+  height: var(--nav-h);
+  background: linear-gradient(180deg, rgba(8,3,2,0.92), rgba(8,3,2,0.78));
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid rgba(207,159,63,0.35);
+}
+
+.nav__inner {
+  max-width: var(--max);
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 var(--edge);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.nav__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  min-width: 0;
+}
+
+.nav__badge {
+  width: 66px;
+  height: 42px;
+  flex: none;
+  object-fit: contain;
+}
+
+.nav__brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+  min-width: 0;
+}
+
+.nav__brand-text strong {
+  font-family: var(--font-title);
+  color: var(--gold-bright);
+  font-size: 1.05rem;
+  letter-spacing: 0.05em;
+  text-shadow: 0 0 10px rgba(238,205,126,0.5);
+}
+
+.nav__brand-text em {
+  font-style: normal;
+  font-size: 0.72rem;
+  color: rgba(244,236,216,0.72);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nav__menu {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.nav__menu a {
+  position: relative;
+  font-size: 0.95rem;
+  color: var(--white);
+  padding: 0.4rem 0.1rem;
+  transition: color 0.2s ease;
+}
+
+.nav__menu a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 100%;
+  bottom: -2px;
+  height: 2px;
+  background: var(--gold-bright);
+  transition: right 0.25s ease;
+}
+
+.nav__menu a:hover {
+  color: var(--gold-bright);
+}
+
+.nav__menu a:hover::after {
+  right: 0;
+}
+
+/* ==========================================================
+   NAVIGATION DROPDOWN (VỀ JPC & CƠ CẤU TỔ CHỨC)
+   ========================================================== */
+.nav__item--dropdown {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.nav__link--parent {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: pointer;
+}
+
+.nav__arrow {
+  font-size: 0.75rem;
+  transition: transform 0.25s ease;
+  color: var(--gold);
+}
+
+.nav__item--dropdown:hover .nav__arrow,
+.nav__item--dropdown:focus-within .nav__arrow {
+  transform: rotate(180deg);
+  color: var(--gold-bright);
+}
+
+/* Primary Dropdown Container: Compact single vertical menu, không bung ngang, không tràn màn hình */
+.nav__dropdown {
+  position: absolute;
+  top: calc(100% - 6px);
+  left: 0;
+  width: 255px;
+  max-width: calc(100vw - 32px);
+  background: linear-gradient(170deg, rgba(22, 6, 9, 0.98), rgba(11, 4, 3, 0.98));
+  border: 1px solid rgba(207, 159, 63, 0.45);
+  border-radius: 10px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.8), 0 0 24px rgba(207, 159, 63, 0.12);
+  backdrop-filter: blur(14px);
+  padding: 0.5rem;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(10px);
+  transition: opacity 0.24s cubic-bezier(0.16, 1, 0.3, 1), transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.24s;
+  z-index: 120;
+}
+
+/* Invisible bridge to prevent hover drop */
+.nav__dropdown::before {
+  content: "";
+  position: absolute;
+  top: -16px;
+  left: 0;
+  right: 0;
+  height: 16px;
+}
+
+.nav__item--dropdown:hover .nav__dropdown,
+.nav__item--dropdown:focus-within .nav__dropdown,
+.nav__item--dropdown.is-open .nav__dropdown {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+/* Option 1: Giới thiệu chung item */
+.nav__dropdown-item {
+  display: block !important;
+  padding: 0.65rem 0.8rem !important;
+  border-radius: 7px;
+  color: var(--white) !important;
+  text-decoration: none;
+  background: transparent;
+  transition: background 0.2s ease, border-color 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.nav__dropdown-item::after {
+  display: none !important;
+}
+
+.nav__dropdown-item:hover {
+  background: rgba(207, 159, 63, 0.12) !important;
+  border-color: rgba(207, 159, 63, 0.35);
+  color: var(--gold-bright) !important;
+}
+
+.nav__dropdown-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.35;
+}
+
+.nav__dropdown-title {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--white);
+  transition: color 0.2s ease;
+}
+
+.nav__dropdown-item:hover .nav__dropdown-title,
+.nav__branch-trigger:hover .nav__dropdown-title,
+.nav__dropdown-branch:hover .nav__dropdown-title {
+  color: var(--gold-bright);
+}
+
+.nav__dropdown-sub {
+  font-size: 0.74rem;
+  color: rgba(244, 236, 216, 0.65);
+  margin-top: 2px;
+}
+
+/* Option 2: Branch trigger (Cơ cấu tổ chức) */
+.nav__dropdown-branch {
+  position: relative;
+  margin-top: 0.3rem;
+  border-top: 1px solid rgba(207, 159, 63, 0.15);
+  padding-top: 0.3rem;
+}
+
+.nav__branch-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 0.8rem;
+  border-radius: 7px;
+  color: var(--white);
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid transparent;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.nav__branch-trigger:hover,
+.nav__dropdown-branch:hover .nav__branch-trigger {
+  background: rgba(207, 159, 63, 0.12);
+  border-color: rgba(207, 159, 63, 0.35);
+}
+
+.nav__branch-arrow {
+  font-size: 0.78rem;
+  color: var(--gold);
+  transition: transform 0.25s ease, color 0.2s ease;
+  margin-left: 0.5rem;
+}
+
+.nav__dropdown-branch:hover .nav__branch-arrow,
+.nav__dropdown-branch.is-open .nav__branch-arrow {
+  transform: rotate(180deg);
+  color: var(--gold-bright);
+}
+
+/* Sub-dropdown: 5 Ban (Xổ dọc ngay bên dưới Cơ cấu tổ chức, không bay ngang làm tràn màn hình) */
+.nav__subdropdown {
+  position: static;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: max-height 0.32s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.24s ease, transform 0.24s ease;
+  margin: 0.25rem 0 0.25rem 0.4rem;
+  padding-left: 0.65rem;
+  border-left: 1.5px solid rgba(207, 159, 63, 0.35);
+  pointer-events: none;
+}
+
+.nav__dropdown-branch:hover .nav__subdropdown,
+.nav__dropdown-branch:focus-within .nav__subdropdown,
+.nav__dropdown-branch.is-open .nav__subdropdown {
+  max-height: 280px;
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.nav__sub-item {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.48rem 0.65rem !important;
+  border-radius: 6px;
+  color: rgba(244, 236, 216, 0.88) !important;
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease, padding-left 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.nav__sub-item::after {
+  display: none !important;
+}
+
+.nav__sub-item:hover {
+  background: rgba(207, 159, 63, 0.14) !important;
+  border-color: rgba(207, 159, 63, 0.3);
+  color: var(--gold-bright) !important;
+  padding-left: 0.85rem !important;
+}
+
+.nav__sub-name {
+  font-size: 0.86rem;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.nav__sub-item:hover .nav__sub-name {
+  color: var(--gold-bright);
+}
+
+.nav__sub-jp {
+  font-family: 'JPC Gyosho', 'JPC Card', 'Noto Serif JP', 'Yu Mincho', serif;
+  font-size: 0.82rem;
+  color: var(--gold);
+  opacity: 0.85;
+  letter-spacing: 0.06em;
+  transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+.nav__sub-item:hover .nav__sub-jp {
+  color: var(--gold-bright);
+  opacity: 1;
+  text-shadow: 0 0 8px rgba(238, 205, 126, 0.5);
+}
+
+.nav__toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 38px;
+  height: 38px;
+  background: none;
+  border: 1px solid rgba(207,159,63,0.5);
+  border-radius: 4px;
+  cursor: pointer;
+  flex: none;
+  padding: 0;
+}
+
+.nav__toggle span {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: var(--gold-bright);
+}
+
+.nav__toggle span + span {
+  margin-top: 5px;
+}
+
+/* ==========================================================
+   HERO SECTION
+   ========================================================== */
+.hero {
+  position: relative;
+  min-height: 100svh;
+  padding-top: var(--nav-h);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.6rem;
+  text-align: center;
+  overflow: hidden;
+}
+
+.hero__corner {
+  position: absolute;
+  width: 140px;
+  height: 140px;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.hero__corner::before, .hero__corner::after {
+  content: "";
+  position: absolute;
+  background: var(--gold);
+}
+
+.hero__corner::before {
+  width: 100%;
+  height: 1px;
+  top: 26px;
+}
+
+.hero__corner::after {
+  width: 1px;
+  height: 100%;
+  left: 26px;
+}
+
+.hero__corner--tl { top: 22px; left: 22px; }
+.hero__corner--tr { top: 22px; right: 22px; transform: scaleX(-1); }
+.hero__corner--bl { bottom: 22px; left: 22px; transform: scaleY(-1); }
+.hero__corner--br { bottom: 22px; right: 22px; transform: scale(-1); }
+
+/* ==========================================================
+   HERO CARDS & 4-PHASE TIMELINE ANIMATION (3D FLIPPER SYSTEM)
+   ========================================================== */
+.hero__cards {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+  height: 190px;
+  flex: none;
+  perspective: 1200px;
+  contain: layout style;
+  transform: translateZ(0);
+}
+
+/* Base Deck Card */
+.deck-card {
+  --stream-x: 0px;
+  --stream-y: 0px;
+  --stream-r: 0deg;
+  --stream-delay: 0s;
+  --exit-delay: 0s;
+  --fx: 0px;
+  --fy: 0px;
+  --fr: 0deg;
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 108px;
+  height: 150px;
+  margin: -75px 0 0 -54px;
+  border-radius: 9px;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  will-change: transform, opacity;
+  user-select: none;
+}
+
+/* 3D Floating Layer (isolates idle vertical bobbing from hover lift) */
+.card__float {
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* 3D Flipper Container */
+.card__flipper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* Card Faces Common Styles */
+.card__face {
+  position: absolute;
+  inset: 0;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  box-shadow: 0 14px 26px rgba(0,0,0,0.55), 0 0 0 1px rgba(207,159,63,0.5) inset;
+  transition: box-shadow 0.35s ease;
+}
+
+/* Card Face Back (Lacquer Red & Gold Geometric) */
+.card__face--back {
+  background:
+    repeating-linear-gradient(135deg, rgba(207,159,63,0.14) 0 2px, transparent 2px 8px),
+    linear-gradient(160deg, var(--red-bright), var(--maroon) 70%);
+  border: 1px solid rgba(207,159,63,0.55);
+}
+
+.card__kanji {
+  font-family: 'HK Gokukaikk', 'JPC Sho', var(--font-title);
+  font-size: 1.45rem;
+  letter-spacing: 0.06em;
+  color: var(--gold-bright);
+  text-shadow: 0 0 10px rgba(238,205,126,0.65), 0 2px 4px rgba(0,0,0,0.8);
+  opacity: 0;
+  transform: scale(0.8);
+  display: inline-block;
+  will-change: opacity, transform;
+}
+
+/* Card Face Front (Ivory Parchment & Deep Gold) */
+.card__face--front {
+  background: linear-gradient(160deg, #f4ecd8, #e5d6af);
+  border: 1.5px solid var(--gold-deep);
+  color: var(--maroon);
+  transform: rotateY(180deg);
+}
+
+.card__mark {
+  font-family: var(--font-card);
+  font-weight: 700;
+  font-size: 1.25rem;
+  letter-spacing: 0.05em;
+  color: var(--maroon);
+  text-shadow: 0 1px 1px rgba(207,159,63,0.4);
+}
+
+.card__pip {
+  position: absolute;
+  font-family: var(--font-card);
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--maroon);
+}
+
+.card__pip--tl { top: 8px; left: 10px; }
+.card__pip--br { bottom: 8px; right: 10px; transform: rotate(180deg); }
+
+/* ==========================================================
+   PHASE 1: 12 CARDS INTRO ARC FLY-IN
+   ========================================================== */
+body.play-intro .deck-card {
+  opacity: 0;
+  animation: arcStreamEnter 1.4s cubic-bezier(0.16, 1, 0.3, 1) var(--stream-delay) forwards;
+}
+
+@keyframes arcStreamEnter {
+  0% {
+    opacity: 0;
+    transform: translate3d(-75vw, 60px, -100px) rotate(-36deg) scale(0.35);
+  }
+  65% {
+    opacity: 1;
+    transform: translate3d(var(--stream-x), var(--stream-y), 0) rotate(var(--stream-r)) scale(0.53);
+  }
+  85% {
+    opacity: 1;
+    transform: translate3d(var(--stream-x), calc(var(--stream-y) - 4px), 10px) rotate(calc(var(--stream-r) + 1.5deg)) scale(0.54);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(var(--stream-x), var(--stream-y), 0) rotate(var(--stream-r)) scale(0.52);
+  }
+}
+
+/* ==========================================================
+   PHASE 2 & 3: SPLIT & SELECTION, FADE OUT 8, TRANSFORM 4
+   ========================================================== */
+/* 8 exit cards: remain at their arc positions, smoothly sink & fade out */
+body.cards-extracting .deck-card--exit {
+  animation: remainingArcFadeOut 0.85s cubic-bezier(0.4, 0, 0.2, 1) var(--exit-delay) forwards;
+}
+
+@keyframes remainingArcFadeOut {
+  0% {
+    opacity: 1;
+    transform: translate3d(var(--stream-x), var(--stream-y), 0) rotate(var(--stream-r)) scale(0.52);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--stream-x), calc(var(--stream-y) + 16px), -40px) rotate(var(--stream-r)) scale(0.44);
+  }
+}
+
+/* 4 picked cards: swooping magical flight from arc to Home positions with scale-up */
+body.cards-extracting .deck-card--picked {
+  z-index: 10;
+  animation: pickedCardFlight 1.35s cubic-bezier(0.2, 0.85, 0.25, 1) var(--exit-delay) forwards;
+}
+
+@keyframes pickedCardFlight {
+  0% {
+    opacity: 1;
+    transform: translate3d(var(--stream-x), var(--stream-y), 0) rotate(var(--stream-r)) scale(0.52);
+  }
+  35% {
+    opacity: 1;
+    transform: translate3d(calc(var(--stream-x) * 0.6 + var(--fx) * 0.4), calc(var(--stream-y) * 0.5 + var(--fy) * 0.5 - 35px), 80px) rotate(calc(var(--stream-r) * 0.5 + var(--fr) * 0.5)) scale(0.82);
+  }
+  75% {
+    opacity: 1;
+    transform: translate3d(var(--fx), calc(var(--fy) - 8px), 20px) rotate(calc(var(--fr) + 1deg)) scale(1.04);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(var(--fx), var(--fy), 0) rotate(var(--fr)) scale(1);
+  }
+}
+
+/* 3D card flip in mid-air for the 2 center face cards (JPC & FTU) */
+body.cards-extracting .card-p2 .card__flipper,
+body.cards-extracting .card-p3 .card__flipper {
+  animation: flipCardInFlight 1.35s cubic-bezier(0.2, 0.85, 0.25, 1) var(--exit-delay) forwards;
+}
+
+@keyframes flipCardInFlight {
+  0%, 18% {
+    transform: rotateY(0deg);
+  }
+  75%, 100% {
+    transform: rotateY(180deg);
+  }
+}
+
+/* Kanji calligraphy illumination for the 2 outer back cards (一期 & 一会) */
+body.cards-extracting .card-p1 .card__kanji,
+body.cards-extracting .card-p4 .card__kanji {
+  animation: kanjiGlowReveal 0.65s ease forwards;
+  animation-delay: calc(var(--exit-delay) + 0.65s);
+}
+
+@keyframes kanjiGlowReveal {
+  0%   { opacity: 0; transform: scale(0.75); }
+  70%  { opacity: 1; transform: scale(1.08); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* ==========================================================
+   PHASE 4: OUTRO & FINAL SETTLED STATE
+   ========================================================== */
+/* Hide the 8 exit cards completely once settled */
+.cards-complete .deck-card--exit,
+body:not(.play-intro):not(.cards-extracting) .deck-card--exit {
+  display: none !important;
+}
+
+/* The 4 settled cards resting at home */
+.cards-complete .deck-card--picked,
+body:not(.play-intro):not(.cards-extracting) .deck-card--picked {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate3d(var(--fx), var(--fy), 0) rotate(var(--fr));
+  transition: transform 0.36s cubic-bezier(0.2, 0.9, 0.3, 1.15), z-index 0s;
+  z-index: 5;
+}
+
+/* Invisible hit area expansion to ensure ultra-stable hover even when lifted upward */
+.cards-complete .deck-card--picked::after,
+body:not(.play-intro):not(.cards-extracting) .deck-card--picked::after {
+  content: "";
+  position: absolute;
+  inset: -24px -14px -24px -14px;
+  pointer-events: auto;
+  border-radius: 14px;
+}
+
+/* Gentle asynchronous idle vertical bobbing on inner float layer */
+.cards-complete .deck-card--picked .card__float,
+body:not(.play-intro):not(.cards-extracting) .deck-card--picked .card__float {
+  animation: cardFloatingBob var(--float-duration, 3.6s) ease-in-out infinite;
+}
+
+/* Individual organic timing per card so they float asynchronously */
+.cards-complete .card-p1 .card__float,
+body:not(.play-intro):not(.cards-extracting) .card-p1 .card__float {
+  --float-duration: 3.2s;
+}
+
+.cards-complete .card-p2 .card__float,
+body:not(.play-intro):not(.cards-extracting) .card-p2 .card__float {
+  --float-duration: 3.8s;
+}
+
+.cards-complete .card-p3 .card__float,
+body:not(.play-intro):not(.cards-extracting) .card-p3 .card__float {
+  --float-duration: 3.5s;
+}
+
+.cards-complete .card-p4 .card__float,
+body:not(.play-intro):not(.cards-extracting) .card-p4 .card__float {
+  --float-duration: 4.0s;
+}
+
+@keyframes cardFloatingBob {
+  0%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -9px, 0);
+  }
+}
+
+.cards-complete .card-p2 .card__flipper,
+.cards-complete .card-p3 .card__flipper,
+body:not(.play-intro):not(.cards-extracting) .card-p2 .card__flipper,
+body:not(.play-intro):not(.cards-extracting) .card-p3 .card__flipper {
+  transform: rotateY(180deg);
+}
+
+.cards-complete .deck-card--picked .card__kanji,
+body:not(.play-intro):not(.cards-extracting) .deck-card--picked .card__kanji {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Interactive hover on settled cards: nổi bật nâng lên, vươn ra không gian 3D, phóng to và hào quang vàng */
+.cards-complete .deck-card--picked:hover,
+body:not(.play-intro):not(.cards-extracting) .deck-card--picked:hover {
+  transform: translate3d(var(--fx), calc(var(--fy) - 22px), 48px) rotate(var(--fr)) scale(1.08);
+  z-index: 50;
+}
+
+.cards-complete .deck-card--picked:hover .card__float,
+body:not(.play-intro):not(.cards-extracting) .deck-card--picked:hover .card__float {
+  animation-play-state: paused;
+}
+
+.cards-complete .deck-card--picked:hover .card__face,
+body:not(.play-intro):not(.cards-extracting) .deck-card--picked:hover .card__face {
+  box-shadow: 0 30px 52px rgba(0, 0, 0, 0.8),
+              0 0 0 1.5px rgba(238, 205, 126, 0.95) inset,
+              0 0 36px rgba(207, 159, 63, 0.45);
+  filter: brightness(1.08);
+  cursor: pointer;
+}
+
+.cards-complete .deck-card--picked:hover .card__kanji,
+body:not(.play-intro):not(.cards-extracting) .deck-card--picked:hover .card__kanji {
+  text-shadow: 0 0 16px rgba(238, 205, 126, 0.95), 0 0 28px rgba(207, 159, 63, 0.55), 0 2px 4px rgba(0, 0, 0, 0.9);
+}
+
+.cards-complete .deck-card--picked:hover .card__mark,
+body:not(.play-intro):not(.cards-extracting) .deck-card--picked:hover .card__mark {
+  text-shadow: 0 0 12px rgba(186, 28, 28, 0.4), 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+/* ==========================================================
+   HERO CONTENT & TYPING EFFECT
+   ========================================================== */
+.hero__content {
+  position: relative;
+  z-index: 2;
+  max-width: 680px;
+  padding: 0 1.5rem;
+}
+
+.hero__eyebrow {
+  margin: 0 0 0.9rem;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  color: rgba(244,236,216,0.75);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.hero__title {
+  font-size: clamp(1.9rem, 4.8vw, 3.1rem);
+  line-height: 1.35;
+  min-height: 2.8em;
+}
+
+.hero__title-text {
+  display: inline;
+}
+
+/* Dòng trên: Sáng hơn, vàng kim ấm áp thanh lịch */
+.hero__title-line1 {
+  display: inline-block;
+  background: linear-gradient(180deg, #fceecb 0%, #e5bc6e 55%, #bd8c32 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 2px 16px rgba(207,159,63,0.35), 0 0 20px rgba(238,205,126,0.2);
+  font-weight: 600;
+}
+
+/* Dòng dưới: Sáng rạng rỡ lấp lánh (brilliant luminous gold) */
+.hero__title-line2 {
+  display: inline-block;
+  background: linear-gradient(180deg, #ffffff 0%, #fff0c2 35%, #eecd7e 70%, #cf9f3f 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 24px rgba(238,205,126,0.45), 0 2px 16px rgba(207,159,63,0.3);
+  font-weight: 800;
+}
+
+/* Typewriter blinking gold cursor */
+.hero__title-cursor {
+  display: inline-block;
+  width: 3px;
+  height: 0.95em;
+  margin-left: 4px;
+  vertical-align: -0.05em;
+  background-color: var(--gold-bright);
+  box-shadow: 0 0 10px var(--gold-bright), 0 0 20px var(--gold);
+  animation: cursorBlink 0.75s step-start infinite;
+}
+
+.hero__title-cursor.is-hidden,
+body.play-intro .hero__title-cursor,
+body.cards-extracting .hero__title-cursor {
+  display: none !important;
+}
+
+@keyframes cursorBlink {
+  50% { opacity: 0; }
+}
+
+.hero__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2.2rem;
+  min-width: 200px;
+  height: 60px;
+  border-radius: 8px;
+  border: 1.5px solid var(--gold);
+  background: radial-gradient(circle at 35% 30%, rgba(207,159,63,0.18), rgba(11,4,3,0.6));
+  color: var(--gold-bright);
+  font-family: var(--font-title);
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+  text-align: center;
+  padding: 0 1.8rem;
+  white-space: nowrap;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, opacity 0.6s ease;
+}
+
+.hero__cta:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 0 6px rgba(207,159,63,0.12), 0 0 20px rgba(207,159,63,0.3);
+  background: radial-gradient(circle at 35% 30%, rgba(207,159,63,0.3), rgba(11,4,3,0.6));
+}
+
+/* Intro visibility: Eyebrow and CTA hide during intro and appear after cards settle */
+body.play-intro .hero__eyebrow {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+body.play-intro .hero__cta {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+body.hero-text-active .hero__eyebrow {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+body.hero-text-active .hero__cta {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ==========================================================
+   SECTIONS (ABOUT, EVENTS, JOIN, CONTACT)
+   ========================================================== */
+section {
+  position: relative;
+  padding: 6.5rem var(--edge) 5.5rem;
+}
+
+.section__head {
+  max-width: 680px;
+  margin: 0 auto 3.2rem;
+  text-align: center;
+}
+
+.section__head h2 {
+  font-size: clamp(1.7rem, 3.4vw, 2.3rem);
+  color: var(--gold-bright);
+  position: relative;
+  display: inline-block;
+  padding-bottom: 0.9rem;
+}
+
+.section__head h2::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 64px;
+  height: 2px;
+  background: var(--gold);
+  transform: translateX(-50%);
+}
+
+.section__lede {
+  margin: 1.1rem 0 0;
+  color: rgba(244,236,216,0.82);
+  font-size: 1.02rem;
+}
+
+/* Pillars (About) */
+.pillars {
+  max-width: var(--max);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.6rem;
+}
+
+.pillar {
+  position: relative;
+  padding: 2.4rem 1.8rem 2rem;
+  text-align: center;
+  border: 1px solid rgba(207,159,63,0.35);
+  border-radius: 10px;
+  background: linear-gradient(160deg, rgba(207,159,63,0.06), rgba(0,0,0,0.15));
+  transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+.pillar:hover {
+  transform: translateY(-4px);
+  border-color: rgba(207,159,63,0.65);
+}
+
+.pillar__rank {
+  font-family: 'HK Gokukaikk', 'Noto Serif JP', 'Yu Mincho', 'Hiragino Mincho ProN', 'MS Mincho', serif;
+  font-size: 1.8rem;
+  color: var(--gold-bright);
+  margin-bottom: 0.6rem;
+  line-height: 1;
+}
+
+.pillar h3 {
+  font-size: 1.15rem;
+  color: var(--white-pure);
+  margin-bottom: 0.7rem;
+}
+
+.pillar p {
+  margin: 0;
+  font-size: 0.94rem;
+  color: rgba(244,236,216,0.78);
+}
+
+/* Events */
+.event-feature {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 0;
+  border: 1px solid rgba(207,159,63,0.4);
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(0,0,0,0.25);
+}
+
+.event-feature img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.event-feature figcaption {
+  padding: 1.4rem 1.7rem 1.7rem;
+}
+
+.event-feature__title {
+  display: block;
+  font-family: var(--font-title);
+  color: var(--gold-bright);
+  font-size: 1.1rem;
+  margin-bottom: 0.4rem;
+}
+
+.event-feature__desc {
+  display: block;
+  color: rgba(244,236,216,0.78);
+  font-size: 0.95rem;
+}
+
+.events__follow {
+  max-width: 560px;
+  margin: 2.2rem auto 0;
+  text-align: center;
+  color: rgba(244,236,216,0.78);
+  font-size: 0.95rem;
+}
+
+/* Join */
+.join {
+  background: linear-gradient(180deg, rgba(92,18,22,0.25), transparent 60%);
+}
+
+.section__head--light .section__lede {
+  color: rgba(244,236,216,0.85);
+}
+
+.join__dept-more {
+  margin-top: 1rem;
+}
+
+.join__dept-link {
+  display: inline-block;
+  color: var(--gold-bright);
+  font-size: 0.98rem;
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 5px;
+  cursor: pointer;
+  transition: color 0.2s ease, text-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.join__dept-link:hover {
+  color: #ffffff;
+  text-shadow: 0 0 10px rgba(238, 205, 126, 0.7);
+  transform: translateY(-1px);
+}
+
+.join__steps {
+  list-style: none;
+  margin: 0 auto;
+  padding: 0;
+  max-width: var(--max);
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1.1rem;
+  counter-reset: step;
+}
+
+.join__step {
+  position: relative;
+  padding: 1.8rem 1.1rem;
+  text-align: center;
+  border: 1px solid rgba(207,159,63,0.3);
+  border-radius: 10px;
+  background: linear-gradient(160deg, rgba(207,159,63,0.05), rgba(0,0,0,0.25));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.join__step:hover {
+  transform: translateY(-4px);
+  border-color: rgba(238, 205, 126, 0.6);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+.join__step-no {
+  display: block;
+  font-family: var(--font-title);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--gold);
+  margin-bottom: 0.35rem;
+  letter-spacing: 0.03em;
+}
+
+.join__step-date {
+  display: inline-block;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--gold-bright);
+  background: rgba(207, 159, 63, 0.15);
+  border: 1px solid rgba(207, 159, 63, 0.35);
+  padding: 0.22rem 0.55rem;
+  border-radius: 999px;
+  margin-bottom: 0.75rem;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.join__step h3 {
+  font-size: 1.05rem;
+  margin-bottom: 0.55rem;
+  color: var(--white-pure);
+}
+
+.join__step p {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: rgba(244,236,216,0.78);
+}
+
+.join__step--result {
+  border-color: rgba(238, 205, 126, 0.55);
+  background: linear-gradient(160deg, rgba(207, 159, 63, 0.12), rgba(138, 28, 28, 0.2));
+  box-shadow: 0 0 16px rgba(207, 159, 63, 0.15);
+}
+
+.join__step--result .join__step-no {
+  color: var(--gold-bright);
+  text-shadow: 0 0 8px rgba(238, 205, 126, 0.5);
+}
+
+@media (max-width: 1024px) {
+  .join__steps {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 720px) {
+  .join__steps {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+.join__cta {
+  display: block;
+  width: fit-content;
+  margin: 3rem auto 0;
+  padding: 0.95rem 2.6rem;
+  border-radius: 999px;
+  font-family: var(--font-title);
+  letter-spacing: 0.03em;
+  font-size: 1rem;
+  color: var(--black);
+  background: linear-gradient(180deg, var(--gold-bright), var(--gold));
+  box-shadow: 0 10px 24px rgba(0,0,0,0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.join__cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px rgba(0,0,0,0.4);
+}
+
+/* Contact / Footer */
+.contact {
+  padding: 3.6rem var(--edge) 2.6rem;
+  background: linear-gradient(180deg, transparent, rgba(0,0,0,0.55) 40%, var(--black));
+  border-top: 1px solid rgba(207,159,63,0.3);
+}
+
+.contact__inner {
+  max-width: 720px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.contact__heading {
+  font-family: var(--font-title);
+  color: var(--gold-bright);
+  font-size: 1rem;
+  line-height: 1.6;
+  margin: 0 0 1.8rem;
+}
+
+.contact__list {
+  list-style: none;
+  margin: 0 0 2.2rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  font-size: 0.96rem;
+}
+
+.contact__icon {
+  margin-right: 0.5rem;
+}
+
+.contact__list a {
+  color: var(--white);
+  border-bottom: 1px solid rgba(244,236,216,0.35);
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.contact__list a:hover {
+  color: var(--gold-bright);
+  border-color: var(--gold-bright);
+}
+
+.contact__credit {
+  margin: 0;
+  padding-top: 1.6rem;
+  border-top: 1px solid rgba(207,159,63,0.2);
+  font-size: 0.82rem;
+  color: rgba(244,236,216,0.55);
+}
+
+/* ==========================================================
+   DEPARTMENT VIEWS (.dept) & ABOUT ORG TEASER
+   ========================================================== */
+.dept {
+  padding-top: calc(var(--nav-h) + 2.5rem);
+}
+
+.dept__inner {
+  max-width: 1060px;
+  margin: 0 auto;
+}
+
+.dept__breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.84rem;
+  color: rgba(244, 236, 216, 0.6);
+  margin-bottom: 2.2rem;
+}
+
+.dept__breadcrumb a {
+  color: rgba(244, 236, 216, 0.7);
+  transition: color 0.2s ease;
+}
+
+.dept__breadcrumb a:hover {
+  color: var(--gold-bright);
+}
+
+.dept__breadcrumb .is-current {
+  color: var(--gold-bright);
+  font-weight: 500;
+}
+
+/* Department Hero Header */
+.dept__hero {
+  position: relative;
+  text-align: center;
+  max-width: 820px;
+  margin: 0 auto 3.8rem;
+  padding: 0 1rem;
+}
+
+.dept__kanji-seal {
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'JPC Gyosho', 'JPC Card', 'Noto Serif JP', serif;
+  font-size: 8.5rem;
+  color: rgba(207, 159, 63, 0.05);
+  user-select: none;
+  pointer-events: none;
+  line-height: 1;
+  z-index: 0;
+}
+
+.dept__badge {
+  position: relative;
+  z-index: 1;
+  display: inline-block;
+  font-family: var(--font-card);
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
+  color: var(--gold);
+  border: 1px solid rgba(207, 159, 63, 0.35);
+  border-radius: 999px;
+  padding: 0.32rem 1.2rem;
+  margin: 0 0 0.8rem;
+  background: rgba(207, 159, 63, 0.06);
+}
+
+.dept__jp-title {
+  position: relative;
+  z-index: 1;
+  font-family: 'JPC Gyosho', 'JPC Card', 'Noto Serif JP', 'Yu Mincho', 'Hiragino Mincho ProN', 'MS Mincho', serif;
+  font-size: clamp(1.4rem, 2.8vw, 2.05rem);
+  letter-spacing: 0.18em;
+  color: var(--gold-bright);
+  text-shadow: 0 0 16px rgba(238, 205, 126, 0.5), 0 2px 4px rgba(0, 0, 0, 0.85);
+  margin: 0 0 0.35rem;
+  line-height: 1.2;
+}
+
+.dept__title {
+  position: relative;
+  z-index: 1;
+  font-size: clamp(2.1rem, 4.4vw, 3.2rem);
+  color: var(--white-pure);
+  background: linear-gradient(180deg, #ffffff 0%, #fff0c2 40%, #eecd7e 75%, #cf9f3f 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 24px rgba(238, 205, 126, 0.35);
+  margin: 0 0 1.2rem;
+}
+
+.dept__slogan {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  margin: 0 0 1.5rem;
+}
+
+.dept__slogan-jp {
+  font-family: 'HK Gokukaikk', serif;
+  font-size: 1.2rem;
+  color: var(--gold-bright);
+  letter-spacing: 0.08em;
+}
+
+.dept__slogan-vi {
+  font-style: italic;
+  font-size: 0.95rem;
+  color: rgba(244, 236, 216, 0.85);
+}
+
+.dept__desc {
+  position: relative;
+  z-index: 1;
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: rgba(244, 236, 216, 0.82);
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+/* 3 Core Activity Cards */
+.dept__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.8rem;
+  margin-bottom: 3.6rem;
+}
+
+.dept__card {
+  position: relative;
+  padding: 2.4rem 1.8rem 2.2rem;
+  border: 1px solid rgba(207, 159, 63, 0.32);
+  border-radius: 12px;
+  background: linear-gradient(160deg, rgba(207, 159, 63, 0.06) 0%, rgba(15, 5, 6, 0.6) 100%);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+  transition: transform 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
+}
+
+.dept__card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(238, 205, 126, 0.65);
+  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.6), 0 0 20px rgba(207, 159, 63, 0.2);
+}
+
+.dept__card-rank {
+  font-family: 'HK Gokukaikk', 'Noto Serif JP', 'Yu Mincho', 'Hiragino Mincho ProN', 'MS Mincho', serif;
+  font-size: 2.2rem;
+  color: var(--gold-bright);
+  display: block;
+  margin-bottom: 0.8rem;
+  line-height: 1;
+}
+
+.dept__card-title {
+  font-family: var(--font-title);
+  font-size: 1.15rem;
+  color: var(--white-pure);
+  margin-bottom: 0.8rem;
+  line-height: 1.4;
+}
+
+.dept__card-desc {
+  font-size: 0.94rem;
+  color: rgba(244, 236, 216, 0.78);
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* Skills & Value Row */
+.dept__skills {
+  padding: 2rem 2.2rem;
+  border-radius: 12px;
+  border: 1px solid rgba(207, 159, 63, 0.25);
+  background: linear-gradient(180deg, rgba(34, 7, 10, 0.45), rgba(11, 4, 3, 0.7));
+  margin-bottom: 3.2rem;
+  text-align: center;
+}
+
+.dept__skills-title {
+  font-family: var(--font-title);
+  font-size: 1.05rem;
+  color: var(--gold-bright);
+  margin-bottom: 1.2rem;
+  letter-spacing: 0.04em;
+}
+
+.dept__skill-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  justify-content: center;
+}
+
+.dept__tag {
+  padding: 0.42rem 1.1rem;
+  border-radius: 999px;
+  background: rgba(207, 159, 63, 0.12);
+  border: 1px solid rgba(207, 159, 63, 0.35);
+  color: var(--white);
+  font-size: 0.88rem;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.dept__tag:hover {
+  background: rgba(207, 159, 63, 0.24);
+  transform: translateY(-2px);
+}
+
+/* Action CTA */
+.dept__action {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.dept__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.95rem 2.8rem;
+  border-radius: 999px;
+  font-family: var(--font-title);
+  font-size: 1rem;
+  letter-spacing: 0.04em;
+  color: var(--black);
+  background: linear-gradient(180deg, var(--gold-bright), var(--gold));
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45), 0 0 18px rgba(207, 159, 63, 0.35);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.dept__cta:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.55), 0 0 26px rgba(238, 205, 126, 0.5);
+}
+
+/* Cross Department Navigation Bar */
+.dept__nav-bar {
+  padding-top: 2.2rem;
+  border-top: 1px solid rgba(207, 159, 63, 0.22);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.dept__nav-label {
+  font-size: 0.88rem;
+  color: rgba(244, 236, 216, 0.65);
+}
+
+.dept__nav-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.dept__nav-pill {
+  padding: 0.45rem 1.15rem;
+  border-radius: 8px;
+  background: rgba(207, 159, 63, 0.08);
+  border: 1px solid rgba(207, 159, 63, 0.3);
+  color: var(--gold-bright);
+  font-size: 0.88rem;
+  transition: all 0.2s ease;
+}
+
+.dept__nav-pill:hover {
+  background: rgba(207, 159, 63, 0.2);
+  border-color: var(--gold-bright);
+  transform: translateY(-2px);
+}
+
+/* About Org Teaser */
+.about-org-teaser {
+  margin-top: 4.8rem;
+  padding-top: 3.5rem;
+  border-top: 1px solid rgba(207, 159, 63, 0.25);
+}
+
+.about-org-teaser__head {
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto 2.6rem;
+}
+
+.about-org-teaser__head h3 {
+  font-size: 1.55rem;
+  color: var(--gold-bright);
+  margin-bottom: 0.6rem;
+}
+
+.about-org-teaser__head p {
+  color: rgba(244, 236, 216, 0.75);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.about-org-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1.2rem;
+}
+
+.about-org-card {
+  padding: 1.6rem 1.2rem;
+  border-radius: 10px;
+  border: 1px solid rgba(207, 159, 63, 0.3);
+  background: linear-gradient(160deg, rgba(207, 159, 63, 0.05), rgba(0, 0, 0, 0.2));
+  text-align: center;
+  transition: transform 0.25s ease, border-color 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.about-org-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--gold-bright);
+  background: linear-gradient(160deg, rgba(207, 159, 63, 0.12), rgba(0, 0, 0, 0.3));
+}
+
+.about-org-card__jp {
+  font-family: 'JPC Gyosho', 'JPC Card', 'Noto Serif JP', 'Yu Mincho', serif;
+  font-size: 1.12rem;
+  color: var(--gold-bright);
+  letter-spacing: 0.08em;
+  margin-bottom: 0.45rem;
+  display: block;
+  transition: color 0.2s ease, text-shadow 0.2s ease;
+}
+
+.about-org-card:hover .about-org-card__jp {
+  color: var(--white-pure);
+  text-shadow: 0 0 10px rgba(238, 205, 126, 0.7);
+}
+
+.about-org-card h4 {
+  font-family: var(--font-title);
+  font-size: 1rem;
+  color: var(--white-pure);
+  margin: 0 0 0.4rem;
+}
+
+.about-org-card p {
+  font-size: 0.8rem;
+  color: rgba(244, 236, 216, 0.7);
+  margin: 0 0 1rem;
+  line-height: 1.4;
+  flex-grow: 1;
+}
+
+.about-org-card__arrow {
+  font-size: 0.8rem;
+  color: var(--gold-bright);
+  font-weight: 500;
+}
+
+/* ==========================================================
+   RESPONSIVE DESIGN
+   ========================================================== */
+@media (max-width: 860px) {
+  .pillars, .join__steps, .dept__grid {
+    grid-template-columns: 1fr;
+  }
+  .nav__brand-text em {
+    display: none;
+  }
+  .nav__badge {
+    width: 60px;
+    height: 38px;
+  }
+}
+
+@media (max-width: 720px) {
+  .nav__toggle {
+    display: flex;
+  }
+  .nav__menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    background: rgba(8,3,2,0.97);
+    border-bottom: 1px solid rgba(207,159,63,0.35);
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease;
+  }
+  .nav__menu.is-open {
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+  .nav__menu a {
+    width: 100%;
+    padding: 1rem var(--edge);
+    border-top: 1px solid rgba(207,159,63,0.12);
+  }
+
+  /* Mobile Dropdown Layout */
+  .nav__item--dropdown {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    height: auto;
+  }
+
+  .nav__link--parent {
+    width: 100%;
+    justify-content: space-between;
+    padding: 1rem var(--edge);
+    border-top: 1px solid rgba(207,159,63,0.12);
+  }
+
+  .nav__dropdown {
+    position: static;
+    transform: none !important;
+    width: 100%;
+    min-width: 0;
+    box-shadow: none;
+    border: none;
+    border-left: 2px solid rgba(207, 159, 63, 0.45);
+    background: rgba(18, 5, 7, 0.85);
+    border-radius: 0;
+    padding: 0.4rem 0 0.4rem 1rem;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    transition: max-height 0.32s ease, opacity 0.25s ease;
+  }
+
+  .nav__item--dropdown.is-open .nav__dropdown {
+    max-height: 1000px;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .nav__dropdown-branch {
+    border-top: 1px solid rgba(207, 159, 63, 0.1);
+    margin-top: 0.4rem;
+    padding-top: 0.4rem;
+  }
+
+  .nav__subdropdown {
+    position: static;
+    transform: none !important;
+    width: 100%;
+    min-width: 0;
+    box-shadow: none;
+    border: none;
+    border-left: 2px solid rgba(207, 159, 63, 0.35);
+    background: rgba(8, 2, 3, 0.9);
+    border-radius: 0;
+    padding: 0.3rem 0 0.3rem 0.8rem;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    transition: max-height 0.32s ease, opacity 0.25s ease;
+  }
+
+  .nav__dropdown-branch.is-open .nav__subdropdown {
+    max-height: 800px;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .hero__cta {
+    width: 170px;
+    height: 56px;
+    font-size: 0.85rem;
+  }
+  .hero__cards {
+    height: 158px;
+    transform: scale(0.82);
+    transform-origin: 50% 20%;
+  }
+  section {
+    padding: 4.5rem var(--edge) 3.8rem;
+  }
+}
+
+/* ==========================================================
+   MINI CD MUSIC PLAYER (TOP RIGHT, BELOW NAV)
+   ========================================================== */
+.music-player {
+  position: fixed;
+  top: calc(var(--nav-h) + 12px);
+  right: var(--edge);
+  z-index: 95;
+  pointer-events: auto;
+  user-select: none;
+  font-family: var(--font-body);
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.music-player__inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 44px;
+  padding: 4px 10px 4px 6px;
+  background: rgba(18, 5, 8, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(207, 159, 63, 0.45);
+  border-radius: 999px;
+  box-shadow: 
+    0 8px 24px rgba(0, 0, 0, 0.65),
+    0 0 15px rgba(207, 159, 63, 0.15),
+    inset 0 1px 1px rgba(238, 205, 126, 0.25);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.music-player:hover .music-player__inner {
+  border-color: rgba(238, 205, 126, 0.7);
+  box-shadow: 
+    0 10px 28px rgba(0, 0, 0, 0.75),
+    0 0 20px rgba(207, 159, 63, 0.25),
+    inset 0 1px 1px rgba(238, 205, 126, 0.4);
+}
+
+/* CD Disc Button */
+.music-player__cd-btn {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 50%;
+  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.music-player__cd-btn:focus-visible {
+  outline: 2px solid var(--gold-bright);
+  outline-offset: 2px;
+}
+
+/* CD Disc Visual */
+.music-player__cd {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: 
+    repeating-radial-gradient(
+      circle at 50% 50%,
+      #11090a 0,
+      #11090a 1.5px,
+      #231518 2px,
+      #11090a 2.5px
+    );
+  border: 1px solid rgba(207, 159, 63, 0.5);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+  will-change: transform;
+  transform: rotate(0deg);
+  transition: box-shadow 0.3s ease;
+}
+
+/* Holographic sheen / reflection cone on vinyl */
+.music-player__cd::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 45deg,
+    transparent 0deg,
+    rgba(238, 205, 126, 0.25) 30deg,
+    transparent 65deg,
+    transparent 180deg,
+    rgba(238, 205, 126, 0.25) 210deg,
+    transparent 245deg
+  );
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+/* CD Center label */
+.music-player__cd-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #8a1c1c 0%, #3d0c0f 80%);
+  border: 1px solid var(--gold);
+  box-shadow: 0 0 4px rgba(207, 159, 63, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Center hole */
+.music-player__cd-hole {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #0b0403;
+  border: 0.5px solid rgba(238, 205, 126, 0.8);
+}
+
+/* Spin Animation */
+@keyframes spinCd {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.music-player.is-playing .music-player__cd {
+  animation: spinCd 3.2s linear infinite;
+  animation-play-state: running;
+  box-shadow: 0 0 12px rgba(207, 159, 63, 0.55);
+}
+
+.music-player:not(.is-playing) .music-player__cd {
+  animation: spinCd 3.2s linear infinite;
+  animation-play-state: paused;
+}
+
+/* Play/Pause Hover Badge on CD */
+.music-player__play-badge {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(11, 4, 3, 0.65);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: scale(0.85);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: none;
+}
+
+.music-player__cd-btn:hover .music-player__play-badge,
+.music-player__cd-btn:focus-visible .music-player__play-badge {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.music-player__badge-icon {
+  width: 15px;
+  height: 15px;
+  fill: var(--gold-bright);
+  filter: drop-shadow(0 0 3px rgba(238, 205, 126, 0.8));
+}
+
+.music-player__badge-icon--pause {
+  display: none;
+}
+
+.music-player.is-playing .music-player__badge-icon--play {
+  display: none;
+}
+
+.music-player.is-playing .music-player__badge-icon--pause {
+  display: block;
+}
+
+/* Track Info */
+.music-player__track-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  max-width: 140px;
+  line-height: 1.25;
+}
+
+.music-player__meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.music-player__tag {
+  font-family: var(--font-card);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--gold-bright);
+  opacity: 0.9;
+  text-shadow: 0 0 6px rgba(207, 159, 63, 0.4);
+}
+
+/* Equalizer Bars */
+.music-player__equalizer {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 9px;
+}
+
+.music-player__equalizer span {
+  display: block;
+  width: 2px;
+  height: 100%;
+  background: var(--gold-bright);
+  border-radius: 1px;
+  transform-origin: bottom;
+  transform: scaleY(0.25);
+  transition: transform 0.2s ease;
+}
+
+.music-player.is-playing .music-player__equalizer span:nth-child(1) {
+  animation: eqBounce 0.8s ease-in-out infinite alternate;
+}
+.music-player.is-playing .music-player__equalizer span:nth-child(2) {
+  animation: eqBounce 0.65s ease-in-out 0.2s infinite alternate;
+}
+.music-player.is-playing .music-player__equalizer span:nth-child(3) {
+  animation: eqBounce 0.9s ease-in-out 0.4s infinite alternate;
+}
+
+@keyframes eqBounce {
+  0% { transform: scaleY(0.2); }
+  50% { transform: scaleY(0.95); }
+  100% { transform: scaleY(0.4); }
+}
+
+/* Song Title */
+.music-player__title-wrap {
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.music-player__title {
+  display: inline-block;
+  font-size: 0.76rem;
+  font-weight: 500;
+  color: var(--white);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 140px;
+  transition: opacity 0.25s ease, transform 0.25s ease, color 0.2s ease;
+}
+
+.music-player:hover .music-player__title {
+  color: var(--gold-bright);
+}
+
+.music-player__title.is-changing {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+
+/* Shuffle Button */
+.music-player__btn--shuffle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 50%;
+  background: rgba(207, 159, 63, 0.12);
+  border: 1px solid rgba(207, 159, 63, 0.35);
+  color: var(--gold-bright);
+  cursor: pointer;
+  outline: none;
+  flex-shrink: 0;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+}
+
+.music-player__btn--shuffle:hover {
+  background: rgba(207, 159, 63, 0.28);
+  border-color: var(--gold-bright);
+  box-shadow: 0 0 10px rgba(207, 159, 63, 0.4);
+  transform: rotate(25deg) scale(1.1);
+}
+
+.music-player__btn--shuffle:active {
+  transform: scale(0.92);
+}
+
+.music-player__btn--shuffle:focus-visible {
+  outline: 2px solid var(--gold-bright);
+  outline-offset: 2px;
+}
+
+.music-player__shuffle-icon {
+  width: 14px;
+  height: 14px;
+}
+
+/* Hidden YouTube Player (Dual 200x200 kept inside viewport to prevent throttling) */
+.yt-music-hidden {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  width: 200px;
+  height: 200px;
+  opacity: 0.015;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+/* Responsive for Mobile */
+@media (max-width: 720px) {
+  .music-player {
+    top: calc(var(--nav-h) + 8px);
+    right: 12px;
+  }
+  .music-player__inner {
+    height: 40px;
+    padding: 3px 8px 3px 5px;
+    gap: 8px;
+  }
+  .music-player__cd-btn {
+    width: 30px;
+    height: 30px;
+  }
+  .music-player__track-info {
+    max-width: 105px;
+  }
+  .music-player__title {
+    max-width: 105px;
+    font-size: 0.72rem;
+  }
+  .music-player__btn--shuffle {
+    width: 26px;
+    height: 26px;
+  }
+  .music-player__shuffle-icon {
+    width: 13px;
+    height: 13px;
+  }
+}
+
+@media (max-width: 400px) {
+  .music-player__track-info {
+    max-width: 85px;
+  }
+  .music-player__title {
+    max-width: 85px;
+  }
+}
+
