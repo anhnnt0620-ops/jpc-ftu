@@ -135,11 +135,10 @@ body::before {
   border-radius: 50%;
   pointer-events: none;
   transform: translateZ(0);
-  will-change: transform, opacity;
-  mix-blend-mode: screen;
+  will-change: transform;
 }
 
-/* 1. Vầng sáng vàng kim Champagne (Lượn hình vô cực ở nửa trên & trung tâm) */
+/* 1. Vầng sáng vàng kim Champagne (Nửa trên & trung tâm) */
 .bg-orb--gold {
   width: 75vw;
   height: 65vw;
@@ -147,11 +146,11 @@ body::before {
   max-height: 750px;
   top: -12%;
   left: -5%;
-  background: radial-gradient(circle closest-side, rgba(238, 205, 126, 0.35) 0%, rgba(207, 159, 63, 0.20) 38%, rgba(138, 28, 28, 0.06) 70%, transparent 100%);
+  background: radial-gradient(circle closest-side, rgba(238, 205, 126, 0.22) 0%, rgba(207, 159, 63, 0.12) 40%, rgba(138, 28, 28, 0.04) 70%, transparent 100%);
   animation: orbDriftGold 23s cubic-bezier(0.42, 0, 0.58, 1) infinite, orbBreatheGold 6.7s ease-in-out infinite alternate;
 }
 
-/* 2. Ánh lửa sơn mài đỏ thắm Urushi (Lượn sóng lệch pha từ phải sang góc dưới) */
+/* 2. Ánh lửa sơn mài đỏ thắm Urushi (Nửa phải sang góc dưới) */
 .bg-orb--crimson {
   width: 80vw;
   height: 68vw;
@@ -159,11 +158,11 @@ body::before {
   max-height: 780px;
   top: 18%;
   right: -18%;
-  background: radial-gradient(circle closest-side, rgba(186, 28, 28, 0.42) 0%, rgba(128, 18, 22, 0.24) 42%, rgba(61, 12, 15, 0.08) 72%, transparent 100%);
+  background: radial-gradient(circle closest-side, rgba(186, 28, 28, 0.26) 0%, rgba(128, 18, 22, 0.15) 45%, rgba(61, 12, 15, 0.05) 75%, transparent 100%);
   animation: orbDriftCrimson 29s cubic-bezier(0.42, 0, 0.58, 1) infinite, orbBreatheCrimson 8.3s ease-in-out infinite alternate;
 }
 
-/* 3. Đốm than hồng hổ phách (Di chuyển chậm rãi, dập dờn ở nửa dưới) */
+/* 3. Đốm than hồng hổ phách (Di chuyển chậm rãi ở nửa dưới) */
 .bg-orb--amber {
   width: 85vw;
   height: 72vw;
@@ -171,11 +170,11 @@ body::before {
   max-height: 800px;
   bottom: -20%;
   left: 10%;
-  background: radial-gradient(circle closest-side, rgba(218, 165, 52, 0.32) 0%, rgba(168, 60, 20, 0.18) 46%, transparent 80%);
+  background: radial-gradient(circle closest-side, rgba(218, 165, 52, 0.20) 0%, rgba(168, 60, 20, 0.10) 48%, transparent 80%);
   animation: orbDriftAmber 37s cubic-bezier(0.42, 0, 0.58, 1) infinite, orbBreatheAmber 9.7s ease-in-out infinite alternate;
 }
 
-/* 4. Tim sáng đèn lồng rực nhẹ (Lơ lửng ngẫu hứng ở vùng giữa) */
+/* 4. Tim sáng đèn lồng rực nhẹ (Lơ lửng ở vùng giữa) */
 .bg-orb--lantern {
   width: 55vw;
   height: 55vw;
@@ -183,7 +182,7 @@ body::before {
   max-height: 600px;
   top: 30%;
   left: 30%;
-  background: radial-gradient(circle closest-side, rgba(244, 236, 216, 0.28) 0%, rgba(238, 205, 126, 0.14) 42%, transparent 80%);
+  background: radial-gradient(circle closest-side, rgba(244, 236, 216, 0.18) 0%, rgba(238, 205, 126, 0.09) 45%, transparent 80%);
   animation: orbDriftLantern 19s cubic-bezier(0.42, 0, 0.58, 1) infinite, orbFlickerLantern 4.3s ease-in-out infinite alternate;
 }
 
@@ -197,9 +196,9 @@ body::before {
   100% { transform: translate3d(0, 0, 0) scale(1); }
 }
 @keyframes orbBreatheGold {
-  0%   { opacity: 0.45; }
-  50%  { opacity: 0.90; }
-  100% { opacity: 0.55; }
+  0%   { opacity: 0.5; }
+  50%  { opacity: 0.9; }
+  100% { opacity: 0.6; }
 }
 
 @keyframes orbDriftCrimson {
@@ -211,9 +210,9 @@ body::before {
   100% { transform: translate3d(0, 0, 0) scale(1); }
 }
 @keyframes orbBreatheCrimson {
-  0%   { opacity: 0.50; }
+  0%   { opacity: 0.5; }
   50%  { opacity: 0.95; }
-  100% { opacity: 0.45; }
+  100% { opacity: 0.5; }
 }
 
 @keyframes orbDriftAmber {
@@ -225,9 +224,9 @@ body::before {
   100% { transform: translate3d(0, 0, 0) scale(1); }
 }
 @keyframes orbBreatheAmber {
-  0%   { opacity: 0.42; }
-  50%  { opacity: 0.88; }
-  100% { opacity: 0.52; }
+  0%   { opacity: 0.45; }
+  50%  { opacity: 0.85; }
+  100% { opacity: 0.55; }
 }
 
 @keyframes orbDriftLantern {
@@ -238,9 +237,9 @@ body::before {
   100% { transform: translate3d(0, 0, 0) scale(1); }
 }
 @keyframes orbFlickerLantern {
-  0%   { opacity: 0.38; }
-  35%  { opacity: 0.78; }
-  70%  { opacity: 0.48; }
+  0%   { opacity: 0.4; }
+  35%  { opacity: 0.8; }
+  70%  { opacity: 0.5; }
   100% { opacity: 0.85; }
 }
 
@@ -288,19 +287,24 @@ body > section, body > footer {
   opacity: 0;
   background: radial-gradient(
     circle closest-side,
-    rgba(238, 205, 126, 0.13) 0%,
-    rgba(207, 159, 63, 0.07) 35%,
+    rgba(238, 205, 126, 0.12) 0%,
+    rgba(207, 159, 63, 0.06) 35%,
     rgba(138, 28, 28, 0.02) 68%,
     transparent 100%
   );
   transform: translate3d(-9999px, -9999px, 0);
-  transition: opacity 0.5s ease;
-  mix-blend-mode: screen;
-  will-change: transform, opacity;
+  transition: opacity 0.4s ease;
+  will-change: transform;
 }
 
 .cursor-glow.is-active {
   opacity: 1;
+}
+
+@media (hover: none) or (pointer: coarse) {
+  .cursor-glow {
+    display: none !important;
+  }
 }
 
 /* ==========================================================
@@ -822,7 +826,7 @@ h1, h2, h3 {
   height: 190px;
   flex: none;
   perspective: 1200px;
-  contain: layout style;
+  contain: layout paint;
   transform: translateZ(0);
 }
 
@@ -848,6 +852,7 @@ h1, h2, h3 {
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   will-change: transform, opacity;
+  transform: translateZ(0);
   user-select: none;
 }
 
@@ -856,6 +861,9 @@ h1, h2, h3 {
   width: 100%;
   height: 100%;
   transform-style: preserve-3d;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
   will-change: transform;
 }
 
@@ -865,6 +873,9 @@ h1, h2, h3 {
   width: 100%;
   height: 100%;
   transform-style: preserve-3d;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
   will-change: transform;
 }
 
@@ -878,6 +889,7 @@ h1, h2, h3 {
   justify-content: center;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
   box-shadow: 0 14px 26px rgba(0,0,0,0.55), 0 0 0 1px rgba(207,159,63,0.5) inset;
   transition: box-shadow 0.35s ease;
 }
@@ -1948,11 +1960,19 @@ section {
 }
 
 /* ==========================================================
-   RESPONSIVE DESIGN
+   RESPONSIVE DESIGN & MOBILE OPTIMIZATIONS
    ========================================================== */
+
+/* Tablet & Smaller Desktops */
 @media (max-width: 860px) {
-  .pillars, .join__steps, .dept__grid {
-    grid-template-columns: 1fr;
+  .pillars {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .join__steps {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .dept__grid {
+    grid-template-columns: repeat(2, 1fr);
   }
   .nav__brand-text em {
     display: none;
@@ -1963,7 +1983,93 @@ section {
   }
 }
 
+/* Tablet (481px - 768px): Card scaling & Ambient optimization */
+@media (min-width: 481px) and (max-width: 768px) {
+  .hero__cards {
+    height: 165px;
+    max-width: 500px;
+  }
+  .deck-card {
+    width: 90px;
+    height: 125px;
+    margin: -62px 0 0 -45px;
+    border-radius: 8px;
+  }
+  .card__face {
+    border-radius: 8px;
+  }
+  .card-p1 {
+    --fx: -145px !important;
+    --fy: 10px !important;
+    --fr: -13deg !important;
+    --stream-x: -95px !important;
+    --stream-y: 10px !important;
+  }
+  .card-p2 {
+    --fx: -50px !important;
+    --fy: -8px !important;
+    --fr: -5deg !important;
+    --stream-x: -18px !important;
+    --stream-y: 0px !important;
+  }
+  .card-p3 {
+    --fx: 50px !important;
+    --fy: -8px !important;
+    --fr: 5deg !important;
+    --stream-x: 58px !important;
+    --stream-y: 3px !important;
+  }
+  .card-p4 {
+    --fx: 145px !important;
+    --fy: 10px !important;
+    --fr: 13deg !important;
+    --stream-x: 142px !important;
+    --stream-y: 20px !important;
+  }
+  .hero__cards .deck-card:nth-child(1)  { --stream-x: -210px !important; --stream-y: 52px !important; }
+  .hero__cards .deck-card:nth-child(2)  { --stream-x: -172px !important; --stream-y: 36px !important; }
+  .hero__cards .deck-card:nth-child(3)  { --stream-x: -134px !important; --stream-y: 20px !important; }
+  .hero__cards .deck-card:nth-child(5)  { --stream-x: -54px !important; --stream-y: 3px !important; }
+  .hero__cards .deck-card:nth-child(7)  { --stream-x: 20px !important; --stream-y: 0px !important; }
+  .hero__cards .deck-card:nth-child(9)  { --stream-x: 98px !important; --stream-y: 10px !important; }
+  .hero__cards .deck-card:nth-child(11) { --stream-x: 180px !important; --stream-y: 36px !important; }
+  .hero__cards .deck-card:nth-child(12) { --stream-x: 215px !important; --stream-y: 52px !important; }
+
+  .card__kanji { font-size: 1.22rem; }
+  .card__mark { font-size: 1.05rem; }
+  .card__pip { font-size: 0.72rem; }
+}
+
+/* Ambient GPU Fillrate Optimization for all Mobile & Tablet */
+@media (max-width: 768px) {
+  .bg-orb--amber,
+  .bg-orb--lantern {
+    display: none !important;
+  }
+  .bg-orb--gold {
+    width: 88vw;
+    height: 88vw;
+    max-width: 480px;
+    max-height: 480px;
+  }
+  .bg-orb--crimson {
+    width: 92vw;
+    height: 92vw;
+    max-width: 520px;
+    max-height: 520px;
+  }
+}
+
+/* Mobile Screens (<= 720px) */
 @media (max-width: 720px) {
+  body.menu-open .nav {
+    z-index: 1000;
+  }
+  body.menu-open .music-player {
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
   .nav__toggle {
     display: flex;
   }
@@ -1975,11 +2081,13 @@ section {
     flex-direction: column;
     align-items: flex-start;
     gap: 0;
-    background: rgba(8,3,2,0.97);
+    background: rgba(8,3,2,0.98);
     border-bottom: 1px solid rgba(207,159,63,0.35);
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.35s ease;
+    -webkit-overflow-scrolling: touch;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.85);
   }
   .nav__menu.is-open {
     max-height: 85vh;
@@ -1987,7 +2095,8 @@ section {
   }
   .nav__menu a {
     width: 100%;
-    padding: 1rem var(--edge);
+    min-height: 44px;
+    padding: 0.85rem var(--edge);
     border-top: 1px solid rgba(207,159,63,0.12);
   }
 
@@ -2001,8 +2110,9 @@ section {
 
   .nav__link--parent {
     width: 100%;
+    min-height: 44px;
     justify-content: space-between;
-    padding: 1rem var(--edge);
+    padding: 0.85rem var(--edge);
     border-top: 1px solid rgba(207,159,63,0.12);
   }
 
@@ -2014,7 +2124,7 @@ section {
     box-shadow: none;
     border: none;
     border-left: 2px solid rgba(207, 159, 63, 0.45);
-    background: rgba(18, 5, 7, 0.85);
+    background: rgba(18, 5, 7, 0.9);
     border-radius: 0;
     padding: 0.4rem 0 0.4rem 1rem;
     max-height: 0;
@@ -2045,7 +2155,7 @@ section {
     box-shadow: none;
     border: none;
     border-left: 2px solid rgba(207, 159, 63, 0.35);
-    background: rgba(8, 2, 3, 0.9);
+    background: rgba(8, 2, 3, 0.95);
     border-radius: 0;
     padding: 0.3rem 0 0.3rem 0.8rem;
     max-height: 0;
@@ -2062,18 +2172,139 @@ section {
     pointer-events: auto;
   }
 
-  .hero__cta {
-    width: 170px;
-    height: 56px;
-    font-size: 0.85rem;
+  .hero {
+    min-height: 100svh;
+    padding: calc(var(--nav-h) + 1.2rem) 1rem 2.8rem;
+    gap: 1.2rem;
   }
-  .hero__cards {
-    height: 158px;
-    transform: scale(0.82);
-    transform-origin: 50% 20%;
+  .hero__title {
+    font-size: clamp(1.6rem, 5.2vw, 2.2rem);
+    min-height: 2.4em;
+  }
+  .hero__cta {
+    width: 180px;
+    height: 52px;
+    font-size: 0.88rem;
+    margin-top: 1.6rem;
   }
   section {
-    padding: 4.5rem var(--edge) 3.8rem;
+    padding: 4.2rem var(--edge) 3.5rem;
+  }
+}
+
+/* Small Mobile Screens (<= 480px, including iPhone SE, iPhone 12/13/14, Samsung Galaxy) */
+@media (max-width: 480px) {
+  .hero__cards {
+    height: 135px;
+    max-width: 320px;
+  }
+  .deck-card {
+    width: 74px;
+    height: 104px;
+    margin: -52px 0 0 -37px;
+    border-radius: 7px;
+  }
+  .card__face {
+    border-radius: 7px;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.6), 0 0 0 1px rgba(207,159,63,0.45) inset;
+  }
+
+  /* 4 Settled Cards: Precision balanced layout, zero overflow on 360px-390px screens */
+  .card-p1 {
+    --fx: -108px !important;
+    --fy: 7px !important;
+    --fr: -11deg !important;
+    --stream-x: -66px !important;
+    --stream-y: 8px !important;
+  }
+  .card-p2 {
+    --fx: -36px !important;
+    --fy: -5px !important;
+    --fr: -4deg !important;
+    --stream-x: -13px !important;
+    --stream-y: 0px !important;
+  }
+  .card-p3 {
+    --fx: 36px !important;
+    --fy: -5px !important;
+    --fr: 4deg !important;
+    --stream-x: 41px !important;
+    --stream-y: 2px !important;
+  }
+  .card-p4 {
+    --fx: 108px !important;
+    --fy: 7px !important;
+    --fr: 11deg !important;
+    --stream-x: 96px !important;
+    --stream-y: 16px !important;
+  }
+
+  /* Scale arc stream on mobile */
+  .hero__cards .deck-card:nth-child(1)  { --stream-x: -148px !important; --stream-y: 38px !important; }
+  .hero__cards .deck-card:nth-child(2)  { --stream-x: -122px !important; --stream-y: 26px !important; }
+  .hero__cards .deck-card:nth-child(3)  { --stream-x: -95px !important; --stream-y: 16px !important; }
+  .hero__cards .deck-card:nth-child(5)  { --stream-x: -39px !important; --stream-y: 2px !important; }
+  .hero__cards .deck-card:nth-child(7)  { --stream-x: 14px !important; --stream-y: 0px !important; }
+  .hero__cards .deck-card:nth-child(9)  { --stream-x: 68px !important; --stream-y: 8px !important; }
+  .hero__cards .deck-card:nth-child(11) { --stream-x: 124px !important; --stream-y: 26px !important; }
+  .hero__cards .deck-card:nth-child(12) { --stream-x: 150px !important; --stream-y: 38px !important; }
+
+  .card__kanji {
+    font-size: 1.05rem;
+  }
+  .card__mark {
+    font-size: 0.92rem;
+  }
+  .card__pip {
+    font-size: 0.65rem;
+  }
+  .card__pip--tl { top: 5px; left: 7px; }
+  .card__pip--br { bottom: 5px; right: 7px; }
+
+  /* Soft bob on mobile */
+  @keyframes cardFloatingBob {
+    0%, 100% {
+      transform: translate3d(0, 0, 0);
+    }
+    50% {
+      transform: translate3d(0, -5px, 0);
+    }
+  }
+
+  .hero__title {
+    font-size: clamp(1.4rem, 6.2vw, 1.85rem);
+    line-height: 1.35;
+  }
+  .hero__eyebrow {
+    font-size: 0.76rem;
+    margin-bottom: 0.6rem;
+  }
+  .hero__cta {
+    width: 170px;
+    height: 48px;
+    font-size: 0.85rem;
+    margin-top: 1.2rem;
+  }
+  .hero__corner {
+    width: 65px;
+    height: 65px;
+  }
+  .hero__corner--tl { top: 12px; left: 12px; }
+  .hero__corner--tr { top: 12px; right: 12px; }
+  .hero__corner--bl { bottom: 12px; left: 12px; }
+  .hero__corner--br { bottom: 12px; right: 12px; }
+
+  .pillars,
+  .join__steps,
+  .dept__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pillar {
+    padding: 1.8rem 1.2rem;
+  }
+  .dept__card {
+    padding: 1.8rem 1.2rem;
   }
 }
 

@@ -32,6 +32,7 @@ function initNavToggle() {
 
   navToggle.addEventListener('click', () => {
     const isOpen = navMenu.classList.toggle('is-open');
+    document.body.classList.toggle('menu-open', isOpen);
     navToggle.setAttribute('aria-expanded', String(isOpen));
     if (!isOpen) {
       if (aboutDropdown) aboutDropdown.classList.remove('is-open');
@@ -106,6 +107,7 @@ function initNavToggle() {
       if (branchOrg) branchOrg.classList.remove('is-open');
       if (navMenu) {
         navMenu.classList.remove('is-open');
+        document.body.classList.remove('menu-open');
         navToggle.setAttribute('aria-expanded', 'false');
       }
     }
@@ -181,6 +183,7 @@ function initViewNavigation() {
 
       if (navMenu && navToggle) {
         navMenu.classList.remove('is-open');
+        document.body.classList.remove('menu-open');
         navToggle.setAttribute('aria-expanded', 'false');
       }
 
@@ -210,16 +213,17 @@ function initGoldNeedles() {
 
   if (!needleField || prefersReducedMotion) return;
 
-  // Pre-allocate a fixed pool once on startup to eliminate runtime DOM allocations and GC pauses
-  const count = 16;
+  const isMobile = window.innerWidth <= 768;
+  const count = isMobile ? 8 : 12;
   const fragment = document.createDocumentFragment();
   for (let i = 0; i < count; i++) {
     const needle = document.createElement('span');
     needle.className = 'gold-needle';
+    needle.style.pointerEvents = 'none';
     const duration = 10 + (i % 5) * 1.5;
     const delay = -(i * 1.1 + (i % 3) * 0.7);
     needle.style.setProperty('--needle-length', `${45 + (i * 7) % 65}px`);
-    needle.style.setProperty('--needle-opacity', (0.18 + (i % 4) * 0.05).toFixed(2));
+    needle.style.setProperty('--needle-opacity', (0.16 + (i % 4) * 0.04).toFixed(2));
     needle.style.setProperty('--needle-angle', `${-6 + (i * 3) % 13}deg`);
     needle.style.setProperty('--needle-duration', `${duration.toFixed(1)}s`);
     needle.style.setProperty('--needle-delay', `${delay.toFixed(1)}s`);
@@ -230,7 +234,7 @@ function initGoldNeedles() {
 }
 
 /* ==========================================================
-   4. MINI FALLING CARDS (PRE-ALLOCATED DENSE POOL - 2 SIDES)
+   4. MINI FALLING CARDS (LIGHTWEIGHT RESPONSIVE POOL - 2 SIDES)
    ========================================================== */
 function initFallingCards() {
   const container = document.getElementById('fallingCards');
@@ -238,46 +242,40 @@ function initFallingCards() {
 
   if (!container || prefersReducedMotion) return;
 
-  // Dense, elegant waterfall of 24 cards (12 on left side, 12 on right side)
-  const count = 24;
+  const isMobile = window.innerWidth <= 768;
+  // Lightweight count on mobile (8 cards) vs desktop (16 cards) to eliminate frame drops
+  const count = isMobile ? 8 : 16;
   const halfCount = count / 2;
   const fragment = document.createDocumentFragment();
 
   for (let i = 0; i < count; i++) {
     const card = document.createElement('div');
     card.className = 'mini-card';
+    card.style.pointerEvents = 'none';
     const isLeft = i < halfCount;
     const sideIndex = isLeft ? i : i - halfCount;
 
-    // Distribute gracefully across left (0.8% - 15.5%) and right (84.5% - 99.2%)
-    // Deterministic pseudo-random distribution to avoid uniform straight lines
-    const spreadFactor = ((sideIndex * 7 + (isLeft ? 2 : 5)) % halfCount) / (halfCount - 1);
+    const spreadFactor = ((sideIndex * 7 + (isLeft ? 2 : 5)) % halfCount) / Math.max(1, halfCount - 1);
     const leftPercent = isLeft
-      ? 0.8 + spreadFactor * 14.7
-      : 84.5 + spreadFactor * 14.7;
+      ? (isMobile ? 0.5 + spreadFactor * 9.5 : 0.8 + spreadFactor * 14.7)
+      : (isMobile ? 89.5 + spreadFactor * 9.5 : 84.5 + spreadFactor * 14.7);
 
-    // Varied fall speeds: between 7.5s (lively) and 15s (graceful drift)
     const duration = 7.5 + ((sideIndex * 3 + (isLeft ? 0 : 2)) % 7) * 1.15;
-
-    // Staggered negative delays across entire cycle so cards are already falling at every height on load
     const delay = -(((sideIndex + (isLeft ? 0 : 0.45)) / halfCount) * duration + (i % 4) * 0.7);
 
-    // Multi-depth size tiers: background (13-16px), midground (18-21px), foreground (23-27px)
     const sizeTier = i % 3;
-    const width = sizeTier === 0 ? 14 + (i % 3) : sizeTier === 1 ? 18 + (i % 4) : 23 + (i % 4);
+    const width = isMobile
+      ? (sizeTier === 0 ? 11 : sizeTier === 1 ? 14 : 17)
+      : (sizeTier === 0 ? 14 + (i % 3) : sizeTier === 1 ? 18 + (i % 4) : 23 + (i % 4));
     const height = Math.round(width * 1.4);
 
-    // Subtle atmospheric opacities based on depth
-    const opacity = sizeTier === 0 ? 0.32 : sizeTier === 1 ? 0.48 : 0.65;
+    const opacity = sizeTier === 0 ? 0.30 : sizeTier === 1 ? 0.45 : 0.60;
 
-    // Natural 3D tumbling angles
     const rzStart = -45 + ((i * 37) % 90);
     const rzEnd = rzStart + (i % 2 === 0 ? 1 : -1) * (180 + ((i * 29) % 150));
     const rx = 180 + ((i * 41) % 240);
     const ry = 160 + ((i * 31) % 220);
-
-    // Lateral flutter drift (cards gently swaying in the breeze)
-    const drift = (i % 2 === 0 ? 1 : -1) * (10 + (i % 5) * 4);
+    const drift = (i % 2 === 0 ? 1 : -1) * (isMobile ? 6 + (i % 4) * 2 : 10 + (i % 5) * 4);
 
     card.style.left = `${leftPercent.toFixed(1)}%`;
     card.style.setProperty('--mc-w', `${width}px`);
@@ -291,7 +289,6 @@ function initFallingCards() {
     card.style.setProperty('--mc-ry', `${ry}deg`);
     card.style.setProperty('--mc-drift', `${drift}px`);
 
-    // Subtle Karuta card variants (traditional vermilion, gold border, and deep lacquer)
     if (i % 4 === 0) {
       card.classList.add('mini-card--gold');
     } else if (i % 3 === 0) {
@@ -305,7 +302,7 @@ function initFallingCards() {
 }
 
 /* ==========================================================
-   4.5. CURSOR LIGHT STREAK FX (SMOOTH LERPED SPOTLIGHT)
+   4.5. CURSOR LIGHT STREAK FX (SMART IDLE LERPED SPOTLIGHT)
    ========================================================== */
 function initCursorGlow() {
   const glow = document.getElementById('cursorGlow');
@@ -320,18 +317,38 @@ function initCursorGlow() {
   let targetX = -9999;
   let targetY = -9999;
   let isVisible = false;
-  let rafId = null;
+  let isRunning = false;
 
   const render = () => {
-    if (isVisible) {
-      // Smooth linear interpolation for trailing streak effect
-      const dx = targetX - currentX;
-      const dy = targetY - currentY;
-      currentX += dx * 0.16;
-      currentY += dy * 0.16;
-      glow.style.transform = `translate3d(${currentX.toFixed(1)}px, ${currentY.toFixed(1)}px, 0)`;
+    if (!isVisible) {
+      isRunning = false;
+      return;
     }
-    rafId = requestAnimationFrame(render);
+
+    const dx = targetX - currentX;
+    const dy = targetY - currentY;
+
+    // Smart idle detection: when cursor is still, pause RAF to free GPU/CPU!
+    if (Math.abs(dx) < 0.2 && Math.abs(dy) < 0.2) {
+      currentX = targetX;
+      currentY = targetY;
+      glow.style.transform = `translate3d(${currentX.toFixed(1)}px, ${currentY.toFixed(1)}px, 0)`;
+      isRunning = false;
+      return;
+    }
+
+    currentX += dx * 0.16;
+    currentY += dy * 0.16;
+    glow.style.transform = `translate3d(${currentX.toFixed(1)}px, ${currentY.toFixed(1)}px, 0)`;
+
+    requestAnimationFrame(render);
+  };
+
+  const startLoop = () => {
+    if (!isRunning) {
+      isRunning = true;
+      requestAnimationFrame(render);
+    }
   };
 
   window.addEventListener('mousemove', (e) => {
@@ -343,8 +360,8 @@ function initCursorGlow() {
       currentX = targetX;
       currentY = targetY;
       glow.classList.add('is-active');
-      if (!rafId) rafId = requestAnimationFrame(render);
     }
+    startLoop();
   }, { passive: true });
 
   document.addEventListener('mouseleave', () => {
@@ -356,6 +373,7 @@ function initCursorGlow() {
     if (targetX > 0 && targetY > 0) {
       isVisible = true;
       glow.classList.add('is-active');
+      startLoop();
     }
   });
 }
