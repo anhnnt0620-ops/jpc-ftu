@@ -414,9 +414,6 @@ function initHeroIntroTimeline() {
   function notifyIntroComplete() {
     if (introCompleteNotified) return;
     introCompleteNotified = true;
-    if (!playerA && !playerB && (isYtApiReady || (window.YT && window.YT.Player))) {
-      initYtMusicPlayer();
-    }
     window.dispatchEvent(new CustomEvent('heroIntroComplete'));
   }
 
@@ -563,76 +560,114 @@ function initHeroIntroTimeline() {
 }
 
 /* ==========================================================
-   6. MINI CD MUSIC PLAYER CONTROLLER (DUAL-PLAYER INSTANT ENGINE)
+   6. MINI CD MUSIC PLAYER CONTROLLER (HTML5 DUAL AUDIO ENGINE)
    ========================================================== */
-let playerA = null;
-let playerB = null;
-let activePlayerId = 'A'; // 'A' or 'B'
+let audioA = null;
+let audioB = null;
+let activeAudio = null;
+let standbyAudio = null;
 let currentTrackIndex = 0;
 let nextPreloadedIndex = 1;
 let isMusicPlaying = false;
 let pendingAutoPlay = false;
 let hasUserInteracted = false;
-let isYtApiReady = false;
+const playedTrackIndices = new Set();
 
-// Global YouTube IFrame API Ready hook (deferred during card flight animation to avoid frame drops)
-window.onYouTubeIframeAPIReady = function() {
-  isYtApiReady = true;
-  if (hasUserInteracted || !document.body.classList.contains('play-intro')) {
-    initYtMusicPlayer();
-  }
-};
-
-function getNextRandomIndex(excludeIndex, length) {
-  if (length <= 1) return 0;
-  let next;
-  do {
-    next = Math.floor(Math.random() * length);
-  } while (next === excludeIndex);
-  return next;
-}
-
-function getActivePlayer() {
-  return (activePlayerId === 'A') ? playerA : playerB;
-}
-
-function isPlayerCurrentlyPlaying() {
-  const active = getActivePlayer();
-  if (!active) return isMusicPlaying;
-  try {
-    if (typeof active.getPlayerState === 'function') {
-      const state = active.getPlayerState();
-      return state === 1 || state === 3; // 1 = PLAYING, 3 = BUFFERING
-    }
-  } catch (_) {}
-  return isMusicPlaying;
-}
-
-let unmuteRetryTimers = [];
-
-function clearAllUnmuteRetries() {
-  unmuteRetryTimers.forEach((id) => clearTimeout(id));
-  unmuteRetryTimers = [];
-}
-
-function scheduleUnmuteAttempts() {
-  clearAllUnmuteRetries();
-  const delays = [40, 120, 250, 450, 750, 1100, 1600, 2300, 3200];
-  delays.forEach((delay) => {
-    const timerId = window.setTimeout(() => {
-      const active = getActivePlayer();
-      if (!active || !isMusicPlaying) return;
-      try {
-        if (typeof active.unMute === 'function') active.unMute();
-        if (typeof active.setVolume === 'function') active.setVolume(60);
-        if (typeof active.isMuted === 'function' && !active.isMuted()) {
-          clearAllUnmuteRetries();
-          removeGlobalUnlockListeners();
+function getPlaylist() {
+  return (typeof JPC_PLAYLIST !== 'undefined' && Array.isArray(JPC_PLAYLIST) && JPC_PLAYLIST.length > 0)
+    ? JPC_PLAYLIST
+    : [
+        {
+          title: 'Inazuma Main Theme',
+          fullTitle: 'Inazuma Main Theme | Genshin Impact OST',
+          src: 'Playlist/Inazuma.m4a'
         }
-      } catch (_) {}
-    }, delay);
-    unmuteRetryTimers.push(timerId);
-  });
+      ];
+}
+
+function getNextRandomIndex(excludeIndex, length, repeatChance = 0.2) {
+  if (length <= 1) return 0;
+
+  // Tách các bài hát khả dụng thành 2 nhóm: chưa phát và đã phát (loại trừ bài hiện tại)
+  let unplayed = [];
+  let played = [];
+
+  for (let i = 0; i < length; i++) {
+    if (i === excludeIndex) continue;
+    if (playedTrackIndices.has(i)) {
+      played.push(i);
+    } else {
+      unplayed.push(i);
+    }
+  }
+
+  // Nếu tất cả bài đã phát hết -> reset lại danh sách (giữ lại bài hiện tại để không lặp liên tiếp)
+  if (unplayed.length === 0) {
+    playedTrackIndices.clear();
+    if (excludeIndex >= 0 && excludeIndex < length) {
+      playedTrackIndices.add(excludeIndex);
+    }
+    for (let i = 0; i < length; i++) {
+      if (i !== excludeIndex) unplayed.push(i);
+    }
+    played = [];
+  }
+
+  // Khi chủ động đổi bài (repeatChance <= 0) hoặc chưa có bài nào đã phát: 100% chọn bài chưa phát (tỉ lệ lặp lại = 0%)
+  if (repeatChance <= 0 || played.length === 0) {
+    const rIdx = Math.floor(Math.random() * unplayed.length);
+    return unplayed[rIdx];
+  }
+
+  // Khi để play hết nhạc tự động: tỉ lệ trúng bài đã nghe là 20% (repeatChance = 0.2), 80% ưu tiên bài chưa nghe
+  const pickPlayed = Math.random() < repeatChance;
+  if (pickPlayed) {
+    const rIdx = Math.floor(Math.random() * played.length);
+    return played[rIdx];
+  } else {
+    const rIdx = Math.floor(Math.random() * unplayed.length);
+    return unplayed[rIdx];
+  }
+}
+
+function updateTitleMarquee() {
+  const wrap = document.getElementById('musicPlayerTitleWrap');
+  const track = document.getElementById('musicPlayerTitleTrack');
+  const title = document.getElementById('musicPlayerTitle');
+  const clone = document.getElementById('musicPlayerTitleClone');
+  if (!wrap || !title) return;
+
+  // 1. Reset state for accurate unconstrained measurement
+  if (wrap) wrap.classList.remove('has-marquee');
+  if (track) {
+    track.classList.remove('is-scrolling');
+    track.style.removeProperty('--marquee-duration');
+    track.style.transform = '';
+  }
+  if (clone) clone.textContent = '';
+
+  // Force reflow
+  void title.offsetWidth;
+
+  const wrapWidth = wrap.clientWidth;
+  const titleWidth = title.offsetWidth || title.scrollWidth;
+
+  // 2. If title is long (exceeds container width), start continuous seamless loop marquee
+  if (wrapWidth > 0 && titleWidth > wrapWidth + 2) {
+    if (clone) clone.textContent = title.textContent;
+    if (wrap) wrap.classList.add('has-marquee');
+
+    // Pace: ~26px per second for comfortable, readable scrolling
+    const itemDistance = titleWidth + 38;
+    const duration = Math.max(6, Math.round(itemDistance / 26));
+
+    if (track) {
+      track.style.setProperty('--marquee-duration', `${duration}s`);
+      requestAnimationFrame(() => {
+        track.classList.add('is-scrolling');
+      });
+    }
+  }
 }
 
 function initMusicPlayerUI() {
@@ -643,41 +678,82 @@ function initMusicPlayerUI() {
 
   if (!playerEl || !cdBtn || !titleEl || !shuffleBtn) return;
 
-  const playlist = (typeof JPC_PLAYLIST !== 'undefined' && Array.isArray(JPC_PLAYLIST) && JPC_PLAYLIST.length > 0)
-    ? JPC_PLAYLIST
-    : [
-        {
-          id: 'qTCu-0my_58',
-          title: 'Inazuma Main Theme',
-          fullTitle: 'Inazuma Main Theme | Genshin Impact Original Soundtrack: Inazuma Chapter'
-        }
-      ];
+  const playlist = getPlaylist();
 
-  // Initialize with the iconic Inazuma Main Theme
-  currentTrackIndex = 0;
-  nextPreloadedIndex = getNextRandomIndex(currentTrackIndex, playlist.length);
-  const currentTrack = playlist[currentTrackIndex];
-  titleEl.textContent = currentTrack.title;
-  titleEl.setAttribute('title', currentTrack.fullTitle || currentTrack.title);
+  // Initialize with Inazuma.m4a as the default opening track
+  const inazumaIdx = playlist.findIndex((t) => t.src && t.src.toLowerCase().includes('inazuma.m4a'));
+  currentTrackIndex = inazumaIdx !== -1 ? inazumaIdx : 0;
+  playedTrackIndices.add(currentTrackIndex);
+  nextPreloadedIndex = getNextRandomIndex(currentTrackIndex, playlist.length, 0.2);
+
+  const initialTrack = playlist[currentTrackIndex];
+  titleEl.textContent = initialTrack.title;
+  titleEl.setAttribute('title', initialTrack.fullTitle || initialTrack.title);
+
+  // Measure title width and apply back-and-forth marquee if title is long
+  setTimeout(updateTitleMarquee, 100);
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(updateTitleMarquee);
+  }
+
+  // Recalculate marquee on window resize / mobile orientation change
+  let marqueeResizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(marqueeResizeTimer);
+    marqueeResizeTimer = setTimeout(updateTitleMarquee, 120);
+  }, { passive: true });
+
+  // Initialize Dual HTML5 Audio instances for instant latency-free playback and background preloading
+  audioA = new Audio();
+  audioB = new Audio();
+  activeAudio = audioA;
+  standbyAudio = audioB;
+
+  activeAudio.volume = 0.6;
+  standbyAudio.volume = 0.6;
+  activeAudio.preload = 'auto';
+  standbyAudio.preload = 'auto';
+
+  // Load default opening track (Inazuma.m4a)
+  activeAudio.src = encodeURI(initialTrack.src);
+
+  // Preload standby track for instantaneous shuffle
+  const preloadedTrack = playlist[nextPreloadedIndex];
+  if (preloadedTrack) {
+    standbyAudio.src = encodeURI(preloadedTrack.src);
+  }
+
+  // Handle track ended -> tự động hết nhạc: tỉ lệ trúng bài đã nghe là 20%
+  const handleTrackEnded = (audioObj) => {
+    if (audioObj === activeAudio) {
+      playRandomTrack(false);
+    }
+  };
+  audioA.addEventListener('ended', () => handleTrackEnded(audioA));
+  audioB.addEventListener('ended', () => handleTrackEnded(audioB));
+
+  // Audio error fallback
+  const handleTrackError = (audioObj) => {
+    if (audioObj === activeAudio && isMusicPlaying) {
+      console.warn('Audio playback error, switching to next track');
+      playRandomTrack(false);
+    }
+  };
+  audioA.addEventListener('error', () => handleTrackError(audioA));
+  audioB.addEventListener('error', () => handleTrackError(audioB));
 
   // Click CD disc -> toggle play/pause directly
   cdBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     hasUserInteracted = true;
-    if (!playerA && !playerB && (isYtApiReady || (window.YT && window.YT.Player))) {
-      initYtMusicPlayer();
-    }
     toggleMusicPlayback();
   });
 
-  // Click shuffle button -> instant switch
+  // Click shuffle button -> chủ động đổi bài: tỉ lệ lặp lại bài đã phát bằng 0%
   shuffleBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     hasUserInteracted = true;
-    if (!playerA && !playerB && (isYtApiReady || (window.YT && window.YT.Player))) {
-      initYtMusicPlayer();
-    }
-    playRandomTrack();
+    playRandomTrack(true);
   });
 
   // Auto-play when hero intro completes
@@ -685,15 +761,8 @@ function initMusicPlayerUI() {
     startAutoPlay();
   });
 
-  // Setup background audio unlock for any natural interaction (touch, scroll, click)
+  // Setup background audio unlock for any natural interaction (touch, scroll, click, keydown)
   setupAudioUnlock();
-
-  // Fallback: Lazy init player after intro duration (4.8s) if not already initialized
-  setTimeout(() => {
-    if (!playerA && !playerB && (isYtApiReady || (window.YT && window.YT.Player))) {
-      initYtMusicPlayer();
-    }
-  }, 4800);
 }
 
 const unlockEvents = ['click', 'pointerdown', 'touchstart', 'keydown', 'wheel', 'scroll'];
@@ -703,16 +772,10 @@ function handleGlobalUserGesture(e) {
   if (e && e.target && e.target.closest('#musicPlayer')) return;
 
   hasUserInteracted = true;
-  const active = getActivePlayer();
-  if (!active) return;
+  if (!activeAudio) return;
 
-  if (isMusicPlaying || pendingAutoPlay) {
-    try {
-      if (typeof active.unMute === 'function') active.unMute();
-      if (typeof active.setVolume === 'function') active.setVolume(60);
-      if (typeof active.playVideo === 'function') active.playVideo();
-      scheduleUnmuteAttempts();
-    } catch (_) {}
+  if (pendingAutoPlay && !isMusicPlaying) {
+    startMusicPlayback();
   }
 }
 
@@ -728,206 +791,58 @@ function removeGlobalUnlockListeners() {
   });
 }
 
-function initYtMusicPlayer() {
-  if (playerA || playerB) return;
-  const containerA = document.getElementById('ytMusicPlayerA');
-  const containerB = document.getElementById('ytMusicPlayerB');
-  if (!containerA || !containerB) return;
-
-  const playlist = (typeof JPC_PLAYLIST !== 'undefined' && Array.isArray(JPC_PLAYLIST) && JPC_PLAYLIST.length > 0)
-    ? JPC_PLAYLIST
-    : [{ id: 'qTCu-0my_58' }];
-
-  const initialVideoId = playlist[currentTrackIndex] ? playlist[currentTrackIndex].id : 'qTCu-0my_58';
-  const preloadedVideoId = playlist[nextPreloadedIndex] ? playlist[nextPreloadedIndex].id : '1qfZ2UufhGY';
-
-  let readyCount = 0;
-  const onAnyReady = () => {
-    readyCount++;
-    if (readyCount >= 1 && pendingAutoPlay && !isMusicPlaying) {
-      startMusicPlayback();
-    }
-  };
-
-  const commonPlayerVars = {
-    autoplay: 0,
-    controls: 0,
-    rel: 0,
-    modestbranding: 1,
-    playsinline: 1,
-    disablekb: 1,
-    fs: 0,
-    enablejsapi: 1
-  };
-  if (window.location.origin && window.location.origin !== 'null' && !window.location.origin.startsWith('file:')) {
-    commonPlayerVars.origin = window.location.origin;
-  }
-
-  try {
-    playerA = new YT.Player('ytMusicPlayerA', {
-      height: '200',
-      width: '200',
-      videoId: initialVideoId,
-      playerVars: commonPlayerVars,
-      events: {
-        onReady: (event) => {
-          try {
-            const iframe = event.target.getIframe();
-            if (iframe) {
-              iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
-            }
-            event.target.unMute();
-            event.target.setVolume(60);
-          } catch (_) {}
-          onAnyReady();
-        },
-        onStateChange: (event) => handlePlayerStateChange('A', event),
-        onError: () => handlePlayerError('A')
-      }
-    });
-
-    playerB = new YT.Player('ytMusicPlayerB', {
-      height: '200',
-      width: '200',
-      videoId: preloadedVideoId,
-      playerVars: commonPlayerVars,
-      events: {
-        onReady: (event) => {
-          try {
-            const iframe = event.target.getIframe();
-            if (iframe) {
-              iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
-            }
-            event.target.unMute();
-            event.target.setVolume(60);
-            event.target.cueVideoById(preloadedVideoId);
-          } catch (_) {}
-          onAnyReady();
-        },
-        onStateChange: (event) => handlePlayerStateChange('B', event),
-        onError: () => handlePlayerError('B')
-      }
-    });
-  } catch (err) {
-    console.error('Failed to init YouTube Dual Players:', err);
-  }
-}
-
-function handlePlayerStateChange(playerId, event) {
-  if (playerId !== activePlayerId) return;
-  const playerEl = document.getElementById('musicPlayer');
-  if (!playerEl) return;
-
-  if (event.data === YT.PlayerState.PLAYING) {
-    isMusicPlaying = true;
-    playerEl.classList.add('is-playing');
-
-    const active = getActivePlayer();
-    if (active) {
-      try {
-        if (typeof active.unMute === 'function') active.unMute();
-        if (typeof active.setVolume === 'function') active.setVolume(60);
-      } catch (_) {}
-
-      try {
-        if (typeof active.isMuted === 'function' && active.isMuted()) {
-          scheduleUnmuteAttempts();
-        } else {
-          clearAllUnmuteRetries();
-          removeGlobalUnlockListeners();
-        }
-      } catch (_) {}
-    }
-  } else if (event.data === YT.PlayerState.PAUSED) {
-    isMusicPlaying = false;
-    playerEl.classList.remove('is-playing');
-    clearAllUnmuteRetries();
-  } else if (event.data === YT.PlayerState.ENDED) {
-    playRandomTrack();
-  }
-}
-
-function handlePlayerError(playerId) {
-  if (playerId === activePlayerId) {
-    console.warn('Playback error on player ' + playerId + ', skipping immediately');
-    playRandomTrack();
-  }
-}
-
 function startAutoPlay() {
   pendingAutoPlay = true;
-  if (!playerA && !playerB && (isYtApiReady || (window.YT && window.YT.Player))) {
-    initYtMusicPlayer();
-  }
   startMusicPlayback();
 }
 
 function startMusicPlayback() {
-  const active = getActivePlayer();
-  if (!active || typeof active.playVideo !== 'function') {
-    pendingAutoPlay = true;
-    return;
-  }
-  pendingAutoPlay = false;
+  if (!activeAudio) return;
 
   const playerEl = document.getElementById('musicPlayer');
   isMusicPlaying = true;
   if (playerEl) playerEl.classList.add('is-playing');
 
-  try {
-    if (typeof active.unMute === 'function') active.unMute();
-    if (typeof active.setVolume === 'function') active.setVolume(60);
-    active.playVideo();
-  } catch (e) {
-    console.warn('Playback playVideo() restricted:', e);
+  const playPromise = activeAudio.play();
+  if (playPromise !== undefined) {
+    playPromise
+      .then(() => {
+        pendingAutoPlay = false;
+        removeGlobalUnlockListeners();
+      })
+      .catch((err) => {
+        // Browser autoplay restriction waiting for first user gesture
+        console.info('Autoplay waiting for user gesture:', err.message);
+        pendingAutoPlay = true;
+        isMusicPlaying = false;
+        if (playerEl) playerEl.classList.remove('is-playing');
+      });
   }
-
-  // Progressive un-mute retries across buffering and playback start
-  scheduleUnmuteAttempts();
 }
 
 function pauseMusicPlayback() {
   pendingAutoPlay = false; // Explicit user pause: never auto-play again
-  clearAllUnmuteRetries();
   removeGlobalUnlockListeners();
 
   isMusicPlaying = false;
   const playerEl = document.getElementById('musicPlayer');
   if (playerEl) playerEl.classList.remove('is-playing');
 
-  const active = getActivePlayer();
-  if (active && typeof active.pauseVideo === 'function') {
-    try {
-      active.pauseVideo();
-    } catch (_) {}
+  if (activeAudio) {
+    activeAudio.pause();
   }
 }
 
 function toggleMusicPlayback() {
-  const active = getActivePlayer();
-  if (!active) {
-    if (window.YT && window.YT.Player && !playerA && !playerB) {
-      initYtMusicPlayer();
-    }
-    return;
-  }
-
-  const isMuted = typeof active.isMuted === 'function' ? active.isMuted() : false;
-  const isPlaying = isPlayerCurrentlyPlaying();
-
-  // If playing WITH SOUND (audible) -> user wants to pause!
-  if (isPlaying && !isMuted) {
+  if (isMusicPlaying) {
     pauseMusicPlayback();
   } else {
-    // If paused, stopped, OR playing silently muted -> UNMUTE & PLAY WITH SOUND!
     startMusicPlayback();
   }
 }
 
-function playRandomTrack() {
-  const playlist = (typeof JPC_PLAYLIST !== 'undefined' && Array.isArray(JPC_PLAYLIST) && JPC_PLAYLIST.length > 0)
-    ? JPC_PLAYLIST
-    : [];
+function playRandomTrack(isManual = false) {
+  const playlist = getPlaylist();
   if (playlist.length === 0) return;
 
   const playerEl = document.getElementById('musicPlayer');
@@ -935,56 +850,88 @@ function playRandomTrack() {
   const shuffleBtn = document.getElementById('musicPlayerShuffleBtn');
 
   // Instant rotation pulse animation on shuffle button
-  if (shuffleBtn) {
+  if (shuffleBtn && isManual) {
     shuffleBtn.style.transform = 'rotate(180deg) scale(1.15)';
     setTimeout(() => { shuffleBtn.style.transform = ''; }, 280);
   }
 
-  const oldActive = (activePlayerId === 'A') ? playerA : playerB;
-  const newActive = (activePlayerId === 'A') ? playerB : playerA;
-  const newActiveId = (activePlayerId === 'A') ? 'B' : 'A';
-
-  // 1. Instantly silence and pause current player
-  if (oldActive && typeof oldActive.pauseVideo === 'function') {
-    try { oldActive.pauseVideo(); } catch (_) {}
+  // 1. Instantly silence and pause current active audio
+  if (activeAudio) {
+    activeAudio.pause();
+    activeAudio.currentTime = 0;
   }
 
-  // 2. Set current track to the preloaded track
-  currentTrackIndex = nextPreloadedIndex;
+  // 2. Xác định bài tiếp theo:
+  // - Khi chủ động đổi bài (isManual = true): tỉ lệ lặp lại bài đã phát là 0%.
+  //   Nếu bài preloaded đã vô tình là bài từng phát, chọn lại 1 bài chưa từng phát.
+  let targetIndex = nextPreloadedIndex;
+  if (isManual) {
+    if (playedTrackIndices.has(targetIndex)) {
+      targetIndex = getNextRandomIndex(currentTrackIndex, playlist.length, 0.0);
+    }
+  }
+  currentTrackIndex = targetIndex;
+  playedTrackIndices.add(currentTrackIndex);
   const nowPlaying = playlist[currentTrackIndex];
 
-  // 3. Update title IMMEDIATELY with zero delay
+  // 3. Update title immediately with subtle animation and marquee check
+  const trackEl = document.getElementById('musicPlayerTitleTrack');
+  const cloneEl = document.getElementById('musicPlayerTitleClone');
+
   if (titleEl) {
+    if (trackEl) {
+      trackEl.classList.remove('is-scrolling');
+      trackEl.classList.add('is-changing');
+    }
     titleEl.textContent = nowPlaying.title;
     titleEl.setAttribute('title', nowPlaying.fullTitle || nowPlaying.title);
+    if (cloneEl) cloneEl.textContent = '';
+
+    setTimeout(() => {
+      if (trackEl) trackEl.classList.remove('is-changing');
+      updateTitleMarquee();
+    }, 220);
   }
 
-  // 4. Activate new player and play IMMEDIATELY
-  activePlayerId = newActiveId;
+  // 4. Swap active and standby players
+  const oldActive = activeAudio;
+  activeAudio = standbyAudio;
+  standbyAudio = oldActive;
+
+  // Ensure activeAudio source is up-to-date
+  const targetSrc = encodeURI(nowPlaying.src);
+  if (!activeAudio.src || !activeAudio.src.endsWith(targetSrc)) {
+    activeAudio.src = targetSrc;
+  }
+  activeAudio.currentTime = 0;
+  activeAudio.volume = 0.6;
+
+  // 5. Play new track
   isMusicPlaying = true;
   if (playerEl) playerEl.classList.add('is-playing');
 
-  if (newActive && typeof newActive.playVideo === 'function') {
-    try {
-      newActive.unMute();
-      newActive.setVolume(60);
-      newActive.playVideo();
-    } catch (_) {
-      try { newActive.loadVideoById(nowPlaying.id); } catch (_) {}
-    }
+  const playPromise = activeAudio.play();
+  if (playPromise !== undefined) {
+    playPromise
+      .then(() => {
+        pendingAutoPlay = false;
+        removeGlobalUnlockListeners();
+      })
+      .catch((err) => {
+        console.info('Playback deferred for user gesture:', err.message);
+        pendingAutoPlay = true;
+      });
   }
-  scheduleUnmuteAttempts();
 
-  // 5. In the background, prepare the NEXT random song and cue it into the standby player!
-  nextPreloadedIndex = getNextRandomIndex(currentTrackIndex, playlist.length);
+  // 6. In background, prepare NEXT random song in standby audio (mặc định 20% lặp cho tự động hết nhạc)
+  nextPreloadedIndex = getNextRandomIndex(currentTrackIndex, playlist.length, 0.2);
   const futureTrack = playlist[nextPreloadedIndex];
-
-  setTimeout(() => {
-    if (oldActive && typeof oldActive.cueVideoById === 'function') {
-      try {
-        oldActive.cueVideoById(futureTrack.id);
-      } catch (_) {}
-    }
-  }, 100);
+  if (futureTrack && standbyAudio) {
+    setTimeout(() => {
+      standbyAudio.src = encodeURI(futureTrack.src);
+      standbyAudio.preload = 'auto';
+      standbyAudio.load();
+    }, 150);
+  }
 }
 

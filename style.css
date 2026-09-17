@@ -1955,12 +1955,13 @@ section {
   .dept__grid {
     grid-template-columns: repeat(2, 1fr);
   }
-  .nav__brand-text em {
-    display: none;
-  }
   .nav__badge {
-    width: 60px;
-    height: 38px;
+    width: 52px;
+    height: 34px;
+  }
+  .nav__brand-text em {
+    display: block;
+    font-size: 0.68rem;
   }
 }
 
@@ -2043,6 +2044,70 @@ section {
 
 /* Mobile Screens (<= 720px) */
 @media (max-width: 720px) {
+  :root {
+    --nav-h: 54px;
+  }
+
+  /* Fixed Navigation Bar */
+  .nav {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    height: calc(var(--nav-h) + env(safe-area-inset-top, 0px)) !important;
+    padding-top: env(safe-area-inset-top, 0px) !important;
+    z-index: 1000 !important;
+    background: rgba(8, 3, 2, 0.96) !important;
+    backdrop-filter: blur(14px) !important;
+    -webkit-backdrop-filter: blur(14px) !important;
+    border-bottom: 1px solid rgba(207, 159, 63, 0.35) !important;
+  }
+
+  .nav__inner {
+    height: var(--nav-h);
+    padding: 0 0.85rem;
+  }
+
+  .nav__brand {
+    gap: 0.55rem;
+    min-width: 0;
+  }
+
+  .nav__badge {
+    width: 38px;
+    height: 26px;
+    flex: none;
+  }
+
+  .nav__brand-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    line-height: 1.15;
+    min-width: 0;
+  }
+
+  .nav__brand-text strong {
+    font-size: 0.92rem;
+    letter-spacing: 0.04em;
+    line-height: 1.1;
+    margin-bottom: 1px;
+  }
+
+  .nav__brand-text em {
+    display: block !important;
+    font-style: normal;
+    font-size: 0.62rem;
+    color: rgba(244, 236, 216, 0.85);
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: calc(100vw - 110px);
+  }
+
   body.menu-open .nav {
     z-index: 1000;
   }
@@ -2053,10 +2118,21 @@ section {
 
   .nav__toggle {
     display: flex;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    flex: none;
+  }
+  .nav__toggle span {
+    width: 16px;
+    height: 2px;
+  }
+  .nav__toggle span + span {
+    margin-top: 4px;
   }
   .nav__menu {
-    position: absolute;
-    top: 100%;
+    position: fixed;
+    top: calc(var(--nav-h) + env(safe-area-inset-top, 0px));
     left: 0;
     right: 0;
     flex-direction: column;
@@ -2071,7 +2147,7 @@ section {
     box-shadow: 0 16px 36px rgba(0, 0, 0, 0.85);
   }
   .nav__menu.is-open {
-    max-height: 85vh;
+    max-height: calc(100svh - var(--nav-h) - env(safe-area-inset-top, 0px));
     overflow-y: auto;
   }
   .nav__menu a {
@@ -2165,36 +2241,108 @@ section {
     color: var(--gold-bright);
   }
 
+  /* Main Content: Hero starts cleanly below fixed nav */
   .hero {
+    box-sizing: border-box;
     min-height: 100svh;
-    padding: calc(var(--nav-h) + 1.2rem) 1rem 2.8rem;
+    min-height: -webkit-fill-available;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start !important;
+    padding-top: calc(var(--nav-h) + 1.6rem + env(safe-area-inset-top, 0px)) !important;
+    padding-bottom: 3.2rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
     gap: 1.2rem;
+    overflow-x: hidden;
   }
   .hero__title {
-    font-size: clamp(1.6rem, 5.2vw, 2.2rem);
-    min-height: 2.4em;
+    font-size: clamp(1.48rem, 5.8vw, 2.05rem);
+    line-height: 1.35;
+    min-height: auto;
   }
   .hero__cta {
     width: 180px;
-    height: 52px;
+    height: 50px;
     font-size: 0.88rem;
-    margin-top: 1.6rem;
+    margin-top: 1.4rem;
   }
+
+  /* Main Content: Sections start cleanly below fixed nav */
   section {
-    padding: 4.2rem var(--edge) 3.5rem;
+    box-sizing: border-box;
+    padding-top: calc(var(--nav-h) + 2rem + env(safe-area-inset-top, 0px)) !important;
+    padding-bottom: 3.5rem;
+    padding-left: var(--edge);
+    padding-right: var(--edge);
+  }
+  .dept {
+    padding-top: calc(var(--nav-h) + 2rem + env(safe-area-inset-top, 0px)) !important;
+  }
+  .dept__breadcrumb {
+    margin-bottom: 1.6rem;
+    font-size: 0.82rem;
   }
 }
 
 /* Small Mobile Screens (<= 480px, including iPhone SE, iPhone 12/13/14, Samsung Galaxy) */
 @media (max-width: 480px) {
+  :root {
+    --nav-h: 50px;
+  }
+
+  .nav__inner {
+    padding: 0 0.65rem;
+  }
+
+  .nav__brand {
+    gap: 0.45rem;
+  }
+
+  .nav__badge {
+    width: 32px;
+    height: 22px;
+  }
+
+  .nav__brand-text strong {
+    font-size: 0.85rem;
+    letter-spacing: 0.03em;
+    line-height: 1.1;
+  }
+
+  .nav__brand-text em {
+    display: block !important;
+    font-size: clamp(0.48rem, 2.2vw, 0.56rem);
+    letter-spacing: -0.015em;
+    line-height: 1.15;
+    color: rgba(244, 236, 216, 0.85);
+    max-width: calc(100vw - 90px);
+  }
+
+  .nav__toggle {
+    width: 32px;
+    height: 32px;
+  }
+  .nav__toggle span {
+    width: 15px;
+  }
+
+  .hero {
+    padding-top: calc(var(--nav-h) + 1.3rem + env(safe-area-inset-top, 0px)) !important;
+    gap: 1rem;
+  }
+
   .hero__cards {
-    height: 135px;
-    max-width: 320px;
+    height: 125px;
+    max-width: 300px;
+    margin-top: 0.3rem;
+    margin-bottom: 0.2rem;
   }
   .deck-card {
-    width: 74px;
-    height: 104px;
-    margin: -52px 0 0 -37px;
+    width: 70px;
+    height: 98px;
+    margin: -49px 0 0 -35px;
     border-radius: 7px;
   }
   .card__face {
@@ -2204,30 +2352,30 @@ section {
 
   /* 4 Settled Cards: Precision balanced layout, zero overflow on 360px-390px screens */
   .card-p1 {
-    --fx: -108px !important;
-    --fy: 7px !important;
-    --fr: -11deg !important;
+    --fx: -102px !important;
+    --fy: 6px !important;
+    --fr: -10deg !important;
     --stream-x: -66px !important;
     --stream-y: 8px !important;
   }
   .card-p2 {
-    --fx: -36px !important;
-    --fy: -5px !important;
-    --fr: -4deg !important;
+    --fx: -34px !important;
+    --fy: -4px !important;
+    --fr: -3deg !important;
     --stream-x: -13px !important;
     --stream-y: 0px !important;
   }
   .card-p3 {
-    --fx: 36px !important;
-    --fy: -5px !important;
-    --fr: 4deg !important;
+    --fx: 34px !important;
+    --fy: -4px !important;
+    --fr: 3deg !important;
     --stream-x: 41px !important;
     --stream-y: 2px !important;
   }
   .card-p4 {
-    --fx: 108px !important;
-    --fy: 7px !important;
-    --fr: 11deg !important;
+    --fx: 102px !important;
+    --fy: 6px !important;
+    --fr: 10deg !important;
     --stream-x: 96px !important;
     --stream-y: 16px !important;
   }
@@ -2243,13 +2391,13 @@ section {
   .hero__cards .deck-card:nth-child(12) { --stream-x: 150px !important; --stream-y: 38px !important; }
 
   .card__kanji {
-    font-size: 1.05rem;
+    font-size: 0.98rem;
   }
   .card__mark {
-    font-size: 0.92rem;
+    font-size: 0.88rem;
   }
   .card__pip {
-    font-size: 0.65rem;
+    font-size: 0.62rem;
   }
   .card__pip--tl { top: 5px; left: 7px; }
   .card__pip--br { bottom: 5px; right: 7px; }
@@ -2265,18 +2413,26 @@ section {
   }
 
   .hero__title {
-    font-size: clamp(1.4rem, 6.2vw, 1.85rem);
+    font-size: clamp(1.35rem, 6.4vw, 1.75rem);
     line-height: 1.35;
   }
   .hero__eyebrow {
-    font-size: 0.76rem;
-    margin-bottom: 0.6rem;
+    font-size: 0.74rem;
+    margin-bottom: 0.4rem;
   }
   .hero__cta {
     width: 170px;
-    height: 48px;
-    font-size: 0.85rem;
-    margin-top: 1.2rem;
+    height: 46px;
+    font-size: 0.84rem;
+    margin-top: 1.1rem;
+  }
+
+  section {
+    padding-top: calc(var(--nav-h) + 1.6rem + env(safe-area-inset-top, 0px)) !important;
+    padding-bottom: 3rem;
+  }
+  .dept {
+    padding-top: calc(var(--nav-h) + 1.6rem + env(safe-area-inset-top, 0px)) !important;
   }
 
   .pillars,
@@ -2548,29 +2704,85 @@ section {
 /* Song Title */
 .music-player__title-wrap {
   width: 100%;
+  max-width: 140px;
   overflow: hidden;
   white-space: nowrap;
+  position: relative;
 }
 
-.music-player__title {
+/* Hiệu ứng mờ dần 2 biên trái/phải khi đang trượt nối đuôi nhau */
+.music-player__title-wrap.has-marquee {
+  mask-image: linear-gradient(to right, transparent 0%, #000 8px, #000 calc(100% - 10px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 8px, #000 calc(100% - 10px), transparent 100%);
+}
+
+.music-player__title-track {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  will-change: transform;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.music-player__title-track.is-changing {
+  opacity: 0;
+  transform: translateY(-3px);
+}
+
+.music-player__title,
+.music-player__title-clone {
   display: inline-block;
   font-size: 0.76rem;
   font-weight: 500;
   color: var(--white);
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 140px;
-  transition: opacity 0.25s ease, transform 0.25s ease, color 0.2s ease;
+  flex-shrink: 0;
+  transition: color 0.2s ease;
 }
 
-.music-player:hover .music-player__title {
+.music-player__title-clone {
+  display: none;
+}
+
+/* Trượt thành 1 vòng nối đuôi nhau liên tục (Infinite Seamless Loop Marquee) */
+.music-player__title-track.is-scrolling {
+  animation: titleMarqueeLoop var(--marquee-duration, 10s) linear infinite;
+}
+
+/* Di chuột vào player thì tạm dừng để tiện đọc hoặc bấm */
+.music-player:hover .music-player__title-track.is-scrolling {
+  animation-play-state: paused;
+}
+
+@keyframes titleMarqueeLoop {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.music-player__title-track.is-scrolling .music-player__title,
+.music-player__title-track.is-scrolling .music-player__title-clone {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Dấu chấm phân cách ánh vàng giữa 2 lượt tên bài hát nối đuôi nhau */
+.music-player__title-track.is-scrolling .music-player__title::after,
+.music-player__title-track.is-scrolling .music-player__title-clone::after {
+  content: "•";
+  display: inline-block;
   color: var(--gold-bright);
+  opacity: 0.55;
+  font-size: 0.62rem;
+  margin: 0 16px;
 }
 
-.music-player__title.is-changing {
-  opacity: 0;
-  transform: translateY(-4px);
+.music-player:hover .music-player__title,
+.music-player:hover .music-player__title-clone {
+  color: var(--gold-bright);
 }
 
 /* Shuffle Button */
@@ -2612,59 +2824,58 @@ section {
   height: 14px;
 }
 
-/* Hidden YouTube Player (Kept inside viewport but safely layered far behind opaque background) */
-.yt-music-hidden {
-  position: fixed;
-  bottom: 0;
-  right: 0;
-  width: 200px;
-  height: 200px;
-  opacity: 0.0001 !important;
-  pointer-events: none !important;
-  z-index: -999 !important;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  clip-path: inset(50%);
-}
-
 /* Responsive for Mobile */
 @media (max-width: 720px) {
   .music-player {
-    top: calc(var(--nav-h) + 8px);
-    right: 12px;
+    top: auto !important;
+    bottom: calc(14px + env(safe-area-inset-bottom, 0px)) !important;
+    right: 12px !important;
+    z-index: 990 !important;
   }
   .music-player__inner {
-    height: 40px;
-    padding: 3px 8px 3px 5px;
+    height: 42px;
+    padding: 3px 10px 3px 6px;
     gap: 8px;
+    background: rgba(18, 5, 8, 0.92);
   }
   .music-player__cd-btn {
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
   }
   .music-player__track-info {
-    max-width: 105px;
+    max-width: 120px;
   }
-  .music-player__title {
-    max-width: 105px;
-    font-size: 0.72rem;
+  .music-player__title-wrap {
+    max-width: 120px;
+  }
+  .music-player__title,
+  .music-player__title-clone {
+    font-size: 0.74rem;
   }
   .music-player__btn--shuffle {
-    width: 26px;
-    height: 26px;
+    width: 28px;
+    height: 28px;
   }
   .music-player__shuffle-icon {
-    width: 13px;
-    height: 13px;
+    width: 14px;
+    height: 14px;
   }
 }
 
 @media (max-width: 400px) {
-  .music-player__track-info {
-    max-width: 85px;
+  .music-player {
+    bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+    right: 10px !important;
   }
-  .music-player__title {
-    max-width: 85px;
+  .music-player__track-info {
+    max-width: 95px;
+  }
+  .music-player__title-wrap {
+    max-width: 95px;
+  }
+  .music-player__title,
+  .music-player__title-clone {
+    font-size: 0.7rem;
   }
 }
 

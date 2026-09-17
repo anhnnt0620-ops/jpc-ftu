@@ -9,7 +9,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;900&family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Noto+Serif+JP:wght@600;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <script src="https://www.youtube.com/iframe_api"></script>
   <script src="playlist.js" defer></script>
   <script src="script.js" defer></script>
 </head>
@@ -132,7 +131,10 @@
           </div>
         </div>
         <div class="music-player__title-wrap" id="musicPlayerTitleWrap">
-          <span class="music-player__title" id="musicPlayerTitle" title="Inazuma Main Theme">Inazuma Main Theme</span>
+          <div class="music-player__title-track" id="musicPlayerTitleTrack">
+            <span class="music-player__title" id="musicPlayerTitle" title="Inazuma Main Theme">Inazuma Main Theme</span>
+            <span class="music-player__title-clone" id="musicPlayerTitleClone" aria-hidden="true"></span>
+          </div>
         </div>
       </div>
 
@@ -753,12 +755,6 @@
       <p class="contact__credit">Website made by Nguyễn Ánh · Zuki</p>
     </div>
   </footer>
-
-  <!-- Hidden YouTube Player Container (Dual A/B for Instant Switching) -->
-  <div id="ytMusicPlayerContainer" class="yt-music-hidden" aria-hidden="true">
-    <div id="ytMusicPlayerA"></div>
-    <div id="ytMusicPlayerB"></div>
-  </div>
 
 </body>
 </html>
