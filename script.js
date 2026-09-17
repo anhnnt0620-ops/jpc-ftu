@@ -13,8 +13,14 @@ document.addEventListener('DOMContentLoaded', () => {
   initGoldNeedles();
   initFallingCards();
   initCursorGlow();
-  initHeroIntroTimeline();
   initMusicPlayerUI();
+  initHeroIntroTimeline();
+
+  // Khóa bôi đen văn bản trên toàn trang (trừ ô input/textarea)
+  document.addEventListener('selectstart', (e) => {
+    if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+    e.preventDefault();
+  });
 });
 
 /* ==========================================================
@@ -26,7 +32,7 @@ function initNavToggle() {
   const aboutDropdown = document.getElementById('navAboutDropdown');
   const aboutParent = document.getElementById('navAboutParent');
   const branchOrg = document.getElementById('navBranchOrg');
-  const branchTrigger = branchOrg ? branchOrg.querySelector('.nav__branch-trigger') : null;
+  const branchArrowBtn = branchOrg ? branchOrg.querySelector('.nav__branch-arrow-btn') : null;
 
   if (!navToggle || !navMenu) return;
 
@@ -51,21 +57,21 @@ function initNavToggle() {
     });
   }
 
-  // Mobile & Touch accordion behavior for Cơ cấu tổ chức sub-dropdown
-  if (branchTrigger && branchOrg) {
-    branchTrigger.addEventListener('click', (e) => {
+  // Mobile & Touch accordion behavior for Cơ cấu tổ chức arrow button (toggles 5 Ban sub-accordion)
+  if (branchArrowBtn && branchOrg) {
+    branchArrowBtn.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
       const isOpen = branchOrg.classList.toggle('is-open');
-      branchTrigger.setAttribute('aria-expanded', String(isOpen));
+      branchArrowBtn.setAttribute('aria-expanded', String(isOpen));
     });
 
-    branchTrigger.addEventListener('keydown', (e) => {
+    branchArrowBtn.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
         e.stopPropagation();
         const isOpen = branchOrg.classList.toggle('is-open');
-        branchTrigger.setAttribute('aria-expanded', String(isOpen));
+        branchArrowBtn.setAttribute('aria-expanded', String(isOpen));
       }
     });
   }
@@ -76,7 +82,7 @@ function initNavToggle() {
       aboutDropdown.classList.remove('is-open');
       if (branchOrg) branchOrg.classList.remove('is-open');
       if (aboutParent) aboutParent.setAttribute('aria-expanded', 'false');
-      if (branchTrigger) branchTrigger.setAttribute('aria-expanded', 'false');
+      if (branchArrowBtn) branchArrowBtn.setAttribute('aria-expanded', 'false');
       if (document.activeElement && aboutDropdown.contains(document.activeElement)) {
         document.activeElement.blur();
       }
@@ -86,7 +92,7 @@ function initNavToggle() {
   if (branchOrg) {
     branchOrg.addEventListener('mouseleave', () => {
       branchOrg.classList.remove('is-open');
-      if (branchTrigger) branchTrigger.setAttribute('aria-expanded', 'false');
+      if (branchArrowBtn) branchArrowBtn.setAttribute('aria-expanded', 'false');
       if (document.activeElement && branchOrg.contains(document.activeElement)) {
         document.activeElement.blur();
       }
@@ -159,7 +165,7 @@ function initViewNavigation() {
     if (requestedEl && requestedEl !== activeView) {
       setTimeout(() => {
         requestedEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 60);
+      }, 100);
     } else if (isContact && contact) {
       contact.scrollIntoView({ behavior: 'smooth', block: 'start' });
     } else {
@@ -515,15 +521,6 @@ function initHeroIntroTimeline() {
     window.clearTimeout(completionTimer);
     window.clearTimeout(typeTimer);
 
-    // Pre-prime audio right within this user gesture
-    try {
-      const active = getActivePlayer();
-      if (active) {
-        if (typeof active.unMute === 'function') active.unMute();
-        if (typeof active.setVolume === 'function') active.setVolume(60);
-      }
-    } catch (_) {}
-
     document.body.classList.remove('play-intro', 'cards-extracting');
     document.body.classList.add('cards-complete', 'hero-text-active');
     notifyIntroComplete();
@@ -533,6 +530,10 @@ function initHeroIntroTimeline() {
     }
     if (titleCursorEl) {
       titleCursorEl.classList.add('is-hidden');
+    }
+
+    if (typeof startMusicPlayback === 'function') {
+      startMusicPlayback();
     }
   }
 
@@ -544,6 +545,8 @@ function initHeroIntroTimeline() {
       hasUserInteracted = true;
       if (!document.body.classList.contains('cards-complete')) {
         finishInstant();
+      } else if (typeof startMusicPlayback === 'function' && !isMusicPlaying) {
+        startMusicPlayback();
       }
     });
   }
@@ -560,27 +563,106 @@ function initHeroIntroTimeline() {
 }
 
 /* ==========================================================
-   6. MINI CD MUSIC PLAYER CONTROLLER (HTML5 DUAL AUDIO ENGINE)
+   6. MINI CD MUSIC PLAYER CONTROLLER (PERSISTENT BACKGROUND AUDIO ENGINE)
    ========================================================== */
-let audioA = null;
-let audioB = null;
+let bgAudio = null;
+let preloaderAudio = null;
 let activeAudio = null;
-let standbyAudio = null;
 let currentTrackIndex = 0;
 let nextPreloadedIndex = 1;
 let isMusicPlaying = false;
-let pendingAutoPlay = false;
+let pendingAutoPlay = true;
 let hasUserInteracted = false;
 const playedTrackIndices = new Set();
+
+// BGM Volume Calibration & Loudness Normalization
+// Âm lượng nhạc phát được đặt ở mức 20% (0.20) so với mức âm lượng thực tế của máy tính.
+// Mỗi bài hát được chuẩn hóa gain (EBU R128 / RMS) dựa trên bản nhạc không lời Inazuma & Genshin OST
+// giúp các bài hát thương mại (J-Pop / Anime) có âm lượng hoàn toàn đồng dạng với các bản không lời.
+const BGM_BASE_VOLUME = 0.20;
+let volumeFadeTimer = null;
+
+function getTrackTargetVolume(track) {
+  const currentTrack = track || (getPlaylist()[currentTrackIndex]);
+  const trackGain = (currentTrack && typeof currentTrack.gain === 'number') ? currentTrack.gain : 1.0;
+  return Math.max(0.01, Math.min(1.0, BGM_BASE_VOLUME * trackGain));
+}
+
+function applyBgmVolume(smooth = false, track = null) {
+  if (!bgAudio) return;
+
+  const currentTrack = track || (getPlaylist()[currentTrackIndex]);
+  const targetVol = getTrackTargetVolume(currentTrack);
+
+  if (volumeFadeTimer) {
+    clearInterval(volumeFadeTimer);
+    volumeFadeTimer = null;
+  }
+
+  if (!smooth) {
+    bgAudio.volume = targetVol;
+    return;
+  }
+
+  // Smooth gentle fade-in ramp (500ms) để không bị tiếng to đột ngột khi đổi bài
+  const startVol = Math.min(0.03, targetVol * 0.3);
+  bgAudio.volume = startVol;
+  const duration = 500;
+  const steps = 12;
+  const stepTime = duration / steps;
+  const volInc = (targetVol - startVol) / steps;
+  let currentStep = 0;
+
+  volumeFadeTimer = setInterval(() => {
+    currentStep++;
+    if (!bgAudio) {
+      clearInterval(volumeFadeTimer);
+      return;
+    }
+    const nextVol = Math.min(targetVol, bgAudio.volume + volInc);
+    bgAudio.volume = Math.max(0, Math.min(1, nextVol));
+    if (currentStep >= steps || bgAudio.volume >= targetVol) {
+      bgAudio.volume = targetVol;
+      clearInterval(volumeFadeTimer);
+      volumeFadeTimer = null;
+    }
+  }, stepTime);
+}
+
+function updateMediaSession(track) {
+  if (!('mediaSession' in navigator) || !track) return;
+  try {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: track.title,
+      artist: 'JPC FTU',
+      album: 'CLB Tiếng Nhật — Trường Đại học Ngoại Thương',
+      artwork: [
+        { src: 'Image/Logo.png', sizes: '512x512', type: 'image/png' }
+      ]
+    });
+    navigator.mediaSession.playbackState = isMusicPlaying ? 'playing' : 'paused';
+  } catch (_) {}
+}
+
+function initMediaSessionHandlers() {
+  if (!('mediaSession' in navigator)) return;
+  try {
+    navigator.mediaSession.setActionHandler('play', () => startMusicPlayback());
+    navigator.mediaSession.setActionHandler('pause', () => pauseMusicPlayback());
+    navigator.mediaSession.setActionHandler('nexttrack', () => playRandomTrack(true));
+    navigator.mediaSession.setActionHandler('previoustrack', () => playRandomTrack(true));
+  } catch (_) {}
+}
 
 function getPlaylist() {
   return (typeof JPC_PLAYLIST !== 'undefined' && Array.isArray(JPC_PLAYLIST) && JPC_PLAYLIST.length > 0)
     ? JPC_PLAYLIST
     : [
         {
-          title: 'Inazuma Main Theme',
-          fullTitle: 'Inazuma Main Theme | Genshin Impact OST',
-          src: 'Playlist/Inazuma.m4a'
+          title: 'Inazuma',
+          fullTitle: 'Inazuma',
+          src: 'Playlist/Inazuma.m4a',
+          gain: 1.0
         }
       ];
 }
@@ -703,49 +785,75 @@ function initMusicPlayerUI() {
     marqueeResizeTimer = setTimeout(updateTitleMarquee, 120);
   }, { passive: true });
 
-  // Initialize Dual HTML5 Audio instances for instant latency-free playback and background preloading
-  audioA = new Audio();
-  audioB = new Audio();
-  activeAudio = audioA;
-  standbyAudio = audioB;
+  // Initialize single persistent DOM audio element (uninterrupted background playback)
+  bgAudio = document.getElementById('jpcBgAudio');
+  if (!bgAudio) {
+    bgAudio = new Audio();
+    bgAudio.id = 'jpcBgAudio';
+    document.body.appendChild(bgAudio);
+  }
+  activeAudio = bgAudio;
 
-  activeAudio.volume = 0.6;
-  standbyAudio.volume = 0.6;
-  activeAudio.preload = 'auto';
-  standbyAudio.preload = 'auto';
+  // Set calibrated background music volume (20% of computer master volume with track gain normalization)
+  bgAudio.volume = getTrackTargetVolume(initialTrack);
+  bgAudio.preload = 'auto';
 
   // Load default opening track (Inazuma.m4a)
-  activeAudio.src = encodeURI(initialTrack.src);
+  bgAudio.src = encodeURI(initialTrack.src);
+  bgAudio.load();
 
-  // Preload standby track for instantaneous shuffle
+  // Preloader instance for caching upcoming track
+  preloaderAudio = new Audio();
+  preloaderAudio.preload = 'auto';
   const preloadedTrack = playlist[nextPreloadedIndex];
   if (preloadedTrack) {
-    standbyAudio.src = encodeURI(preloadedTrack.src);
+    preloaderAudio.src = encodeURI(preloadedTrack.src);
+    preloaderAudio.load();
   }
 
-  // Handle track ended -> tự động hết nhạc: tỉ lệ trúng bài đã nghe là 20%
-  const handleTrackEnded = (audioObj) => {
-    if (audioObj === activeAudio) {
-      playRandomTrack(false);
-    }
-  };
-  audioA.addEventListener('ended', () => handleTrackEnded(audioA));
-  audioB.addEventListener('ended', () => handleTrackEnded(audioB));
+  // Continuous background playback: handle track ended on the same audio element
+  bgAudio.addEventListener('ended', () => {
+    playRandomTrack(false);
+  });
 
-  // Audio error fallback
-  const handleTrackError = (audioObj) => {
-    if (audioObj === activeAudio && isMusicPlaying) {
-      console.warn('Audio playback error, switching to next track');
+  // Audio error fallback - auto recover if active track errors
+  bgAudio.addEventListener('error', () => {
+    console.warn('Audio playback error on track', currentTrackIndex, bgAudio.error);
+    setTimeout(() => {
       playRandomTrack(false);
+    }, 100);
+  });
+
+  // Background tab & visibility persistence
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+      updateTitleMarquee();
+      if (isMusicPlaying && bgAudio && bgAudio.paused) {
+        bgAudio.play().catch(() => {});
+      }
     }
-  };
-  audioA.addEventListener('error', () => handleTrackError(audioA));
-  audioB.addEventListener('error', () => handleTrackError(audioB));
+  });
+
+  // Register OS Media Session controls
+  initMediaSessionHandlers();
+  updateMediaSession(initialTrack);
+
+  // Click hint badge -> bật nhạc trực tiếp
+  const hintEl = document.getElementById('musicPlayerHint');
+  if (hintEl) {
+    hintEl.addEventListener('click', (e) => {
+      e.stopPropagation();
+      hasUserInteracted = true;
+      unlockAudioContext();
+      startMusicPlayback();
+    });
+  }
 
   // Click CD disc -> toggle play/pause directly
   cdBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     hasUserInteracted = true;
+    unlockAudioContext();
     toggleMusicPlayback();
   });
 
@@ -753,6 +861,7 @@ function initMusicPlayerUI() {
   shuffleBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     hasUserInteracted = true;
+    unlockAudioContext();
     playRandomTrack(true);
   });
 
@@ -765,13 +874,26 @@ function initMusicPlayerUI() {
   setupAudioUnlock();
 }
 
-const unlockEvents = ['click', 'pointerdown', 'touchstart', 'keydown', 'wheel', 'scroll'];
+const unlockEvents = ['click', 'pointerdown', 'pointerup', 'touchstart', 'touchend', 'keydown'];
+
+function unlockAudioContext() {
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (AudioContext) {
+      if (!window._jpcAudioCtx) window._jpcAudioCtx = new AudioContext();
+      if (window._jpcAudioCtx.state === 'suspended') {
+        window._jpcAudioCtx.resume();
+      }
+    }
+  } catch (_) {}
+}
 
 function handleGlobalUserGesture(e) {
   // If user clicked or interacted directly with music player controls, let button handler manage it
   if (e && e.target && e.target.closest('#musicPlayer')) return;
 
   hasUserInteracted = true;
+  unlockAudioContext();
   if (!activeAudio) return;
 
   if (pendingAutoPlay && !isMusicPlaying) {
@@ -781,13 +903,13 @@ function handleGlobalUserGesture(e) {
 
 function setupAudioUnlock() {
   unlockEvents.forEach((evt) => {
-    window.addEventListener(evt, handleGlobalUserGesture, { passive: true });
+    window.addEventListener(evt, handleGlobalUserGesture, { passive: true, capture: true });
   });
 }
 
 function removeGlobalUnlockListeners() {
   unlockEvents.forEach((evt) => {
-    window.removeEventListener(evt, handleGlobalUserGesture);
+    window.removeEventListener(evt, handleGlobalUserGesture, { capture: true });
   });
 }
 
@@ -797,25 +919,57 @@ function startAutoPlay() {
 }
 
 function startMusicPlayback() {
-  if (!activeAudio) return;
+  if (!bgAudio) return;
+  unlockAudioContext();
 
   const playerEl = document.getElementById('musicPlayer');
   isMusicPlaying = true;
-  if (playerEl) playerEl.classList.add('is-playing');
+  if (playerEl) {
+    playerEl.classList.add('is-playing');
+    playerEl.classList.remove('needs-gesture');
+  }
 
-  const playPromise = activeAudio.play();
+  // Ensure current track is properly loaded if audio was in error state or empty
+  const playlist = getPlaylist();
+  const currentTrack = playlist[currentTrackIndex];
+  if (currentTrack && (bgAudio.error || !bgAudio.src || bgAudio.networkState === HTMLMediaElement.NETWORK_NO_SOURCE)) {
+    bgAudio.src = encodeURI(currentTrack.src);
+    bgAudio.load();
+  }
+
+  // Apply calibrated BGM volume with gentle ramp if starting from silence
+  if (bgAudio.volume < getTrackTargetVolume(currentTrack) * 0.5) {
+    applyBgmVolume(true, currentTrack);
+  }
+
+  const playPromise = bgAudio.play();
   if (playPromise !== undefined) {
     playPromise
       .then(() => {
         pendingAutoPlay = false;
+        if (playerEl) {
+          playerEl.classList.remove('needs-gesture');
+          playerEl.classList.add('is-playing');
+        }
+        updateMediaSession(currentTrack);
         removeGlobalUnlockListeners();
       })
       .catch((err) => {
-        // Browser autoplay restriction waiting for first user gesture
-        console.info('Autoplay waiting for user gesture:', err.message);
-        pendingAutoPlay = true;
-        isMusicPlaying = false;
-        if (playerEl) playerEl.classList.remove('is-playing');
+        console.warn('Playback error:', err.name, err.message);
+        if (err.name === 'NotAllowedError') {
+          // Browser autoplay restriction waiting for first user gesture
+          pendingAutoPlay = true;
+          isMusicPlaying = false;
+          if (playerEl) {
+            playerEl.classList.remove('is-playing');
+            playerEl.classList.add('needs-gesture');
+          }
+          if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
+        } else {
+          // Media decode/network error: auto advance to next playable track
+          console.warn('Media error detected, advancing to next track');
+          playRandomTrack(false);
+        }
       });
   }
 }
@@ -826,10 +980,16 @@ function pauseMusicPlayback() {
 
   isMusicPlaying = false;
   const playerEl = document.getElementById('musicPlayer');
-  if (playerEl) playerEl.classList.remove('is-playing');
+  if (playerEl) {
+    playerEl.classList.remove('is-playing');
+    playerEl.classList.remove('needs-gesture');
+  }
 
-  if (activeAudio) {
-    activeAudio.pause();
+  if (bgAudio) {
+    bgAudio.pause();
+  }
+  if ('mediaSession' in navigator) {
+    navigator.mediaSession.playbackState = 'paused';
   }
 }
 
@@ -843,7 +1003,7 @@ function toggleMusicPlayback() {
 
 function playRandomTrack(isManual = false) {
   const playlist = getPlaylist();
-  if (playlist.length === 0) return;
+  if (playlist.length === 0 || !bgAudio) return;
 
   const playerEl = document.getElementById('musicPlayer');
   const titleEl = document.getElementById('musicPlayerTitle');
@@ -855,11 +1015,9 @@ function playRandomTrack(isManual = false) {
     setTimeout(() => { shuffleBtn.style.transform = ''; }, 280);
   }
 
-  // 1. Instantly silence and pause current active audio
-  if (activeAudio) {
-    activeAudio.pause();
-    activeAudio.currentTime = 0;
-  }
+  // 1. Instantly silence current track before loading next
+  bgAudio.pause();
+  bgAudio.currentTime = 0;
 
   // 2. Xác định bài tiếp theo:
   // - Khi chủ động đổi bài (isManual = true): tỉ lệ lặp lại bài đã phát là 0%.
@@ -874,64 +1032,73 @@ function playRandomTrack(isManual = false) {
   playedTrackIndices.add(currentTrackIndex);
   const nowPlaying = playlist[currentTrackIndex];
 
-  // 3. Update title immediately with subtle animation and marquee check
+  // 3. Update title UI (defer heavy layout measurement if tab is in background)
   const trackEl = document.getElementById('musicPlayerTitleTrack');
   const cloneEl = document.getElementById('musicPlayerTitleClone');
 
   if (titleEl) {
-    if (trackEl) {
-      trackEl.classList.remove('is-scrolling');
-      trackEl.classList.add('is-changing');
-    }
     titleEl.textContent = nowPlaying.title;
     titleEl.setAttribute('title', nowPlaying.fullTitle || nowPlaying.title);
     if (cloneEl) cloneEl.textContent = '';
 
-    setTimeout(() => {
-      if (trackEl) trackEl.classList.remove('is-changing');
-      updateTitleMarquee();
-    }, 220);
+    if (!document.hidden) {
+      if (trackEl) {
+        trackEl.classList.remove('is-scrolling');
+        trackEl.classList.add('is-changing');
+      }
+      setTimeout(() => {
+        if (trackEl) trackEl.classList.remove('is-changing');
+        updateTitleMarquee();
+      }, 220);
+    }
   }
 
-  // 4. Swap active and standby players
-  const oldActive = activeAudio;
-  activeAudio = standbyAudio;
-  standbyAudio = oldActive;
-
-  // Ensure activeAudio source is up-to-date
+  // 4. Play new track on the SAME persistent master audio element (continuous background stream)
   const targetSrc = encodeURI(nowPlaying.src);
-  if (!activeAudio.src || !activeAudio.src.endsWith(targetSrc)) {
-    activeAudio.src = targetSrc;
-  }
-  activeAudio.currentTime = 0;
-  activeAudio.volume = 0.6;
+  bgAudio.src = targetSrc;
+  bgAudio.currentTime = 0;
+  applyBgmVolume(true, nowPlaying);
 
-  // 5. Play new track
+  unlockAudioContext();
   isMusicPlaying = true;
   if (playerEl) playerEl.classList.add('is-playing');
 
-  const playPromise = activeAudio.play();
+  const playPromise = bgAudio.play();
   if (playPromise !== undefined) {
     playPromise
       .then(() => {
         pendingAutoPlay = false;
+        if (playerEl) {
+          playerEl.classList.remove('needs-gesture');
+          playerEl.classList.add('is-playing');
+        }
+        updateMediaSession(nowPlaying);
         removeGlobalUnlockListeners();
       })
       .catch((err) => {
-        console.info('Playback deferred for user gesture:', err.message);
-        pendingAutoPlay = true;
+        console.warn('Playback deferred or failed:', err.name, err.message);
+        if (err.name === 'NotAllowedError') {
+          pendingAutoPlay = true;
+          isMusicPlaying = false;
+          if (playerEl) {
+            playerEl.classList.remove('is-playing');
+            playerEl.classList.add('needs-gesture');
+          }
+          if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
+        } else {
+          console.warn('Track playback error, advancing to next track');
+          playRandomTrack(false);
+        }
       });
   }
 
-  // 6. In background, prepare NEXT random song in standby audio (mặc định 20% lặp cho tự động hết nhạc)
+  // 5. In background, cache NEXT random song ahead of time in preloader instance
   nextPreloadedIndex = getNextRandomIndex(currentTrackIndex, playlist.length, 0.2);
   const futureTrack = playlist[nextPreloadedIndex];
-  if (futureTrack && standbyAudio) {
-    setTimeout(() => {
-      standbyAudio.src = encodeURI(futureTrack.src);
-      standbyAudio.preload = 'auto';
-      standbyAudio.load();
-    }, 150);
+  if (futureTrack && preloaderAudio) {
+    preloaderAudio.src = encodeURI(futureTrack.src);
+    preloaderAudio.preload = 'auto';
+    preloaderAudio.load();
   }
 }
 

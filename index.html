@@ -58,14 +58,18 @@
               </div>
             </a>
 
-            <!-- Option 2: Cơ cấu tổ chức (5 Ban con xổ dọc ngay bên dưới) -->
+            <!-- Option 2: Cơ cấu tổ chức (Click để di chuyển tới phần Cơ cấu tổ chức, bấm mũi tên để mở 5 Ban) -->
             <div class="nav__dropdown-branch" id="navBranchOrg">
-              <div class="nav__branch-trigger" tabindex="0" role="button" aria-haspopup="true" aria-expanded="false">
-                <div class="nav__dropdown-info">
-                  <strong class="nav__dropdown-title">Cơ cấu tổ chức</strong>
-                  <small class="nav__dropdown-sub">5 Ban chuyên trách vận hành</small>
-                </div>
-                <span class="nav__branch-arrow" aria-hidden="true">▾</span>
+              <div class="nav__dropdown-item nav__dropdown-item--branch nav__branch-trigger">
+                <a href="#about-org" class="nav__branch-link" role="menuitem">
+                  <div class="nav__dropdown-info">
+                    <strong class="nav__dropdown-title">Cơ cấu tổ chức</strong>
+                    <small class="nav__dropdown-sub">5 Ban chuyên trách vận hành</small>
+                  </div>
+                </a>
+                <button type="button" class="nav__branch-arrow-btn" id="navBranchArrowBtn" aria-label="Mở rộng danh sách 5 Ban" aria-expanded="false">
+                  <span class="nav__branch-arrow" aria-hidden="true">▾</span>
+                </button>
               </div>
 
               <!-- Sub-dropdown: 5 Ban (xổ dọc bên trong cùng panel, không tràn màn hình) -->
@@ -104,6 +108,7 @@
 
   <!-- ============ MINI CD MUSIC PLAYER ============ -->
   <aside class="music-player" id="musicPlayer" aria-label="JPC Mini Music Player">
+    <audio id="jpcBgAudio" preload="auto" playsinline style="display:none;"></audio>
     <div class="music-player__inner">
       <!-- Spinning CD Disc (Click to Toggle Play/Pause) -->
       <button class="music-player__cd-btn" id="musicPlayerCdBtn" type="button" aria-label="Phát hoặc tạm dừng nhạc" title="Nhấn để phát / tạm dừng">
@@ -132,7 +137,7 @@
         </div>
         <div class="music-player__title-wrap" id="musicPlayerTitleWrap">
           <div class="music-player__title-track" id="musicPlayerTitleTrack">
-            <span class="music-player__title" id="musicPlayerTitle" title="Inazuma Main Theme">Inazuma Main Theme</span>
+            <span class="music-player__title" id="musicPlayerTitle" title="Inazuma">Inazuma</span>
             <span class="music-player__title-clone" id="musicPlayerTitleClone" aria-hidden="true"></span>
           </div>
         </div>
@@ -148,6 +153,12 @@
           <line x1="4" y1="4" x2="9" y2="9"></line>
         </svg>
       </button>
+    </div>
+
+    <!-- Autoplay Activation Hint (shown only if browser blocks unmuted autoplay until user gesture) -->
+    <div class="music-player__hint" id="musicPlayerHint" aria-live="polite">
+      <span class="music-player__hint-icon" aria-hidden="true">🎵</span>
+      <span class="music-player__hint-text">Chạm để bật nhạc</span>
     </div>
   </aside>
 

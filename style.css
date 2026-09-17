@@ -82,6 +82,62 @@
   box-sizing: border-box;
 }
 
+/* Khóa bôi đen văn bản & loại bỏ trỏ chuột dạng text (I-beam) trên toàn trang */
+html, body {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  cursor: default;
+}
+
+/* Mọi phần tử chữ hiển thị trỏ chuột mũi tên chuẩn (không phải trỏ chuột gõ văn bản) */
+h1, h2, h3, h4, h5, h6,
+p, span, em, strong, small,
+label, li, ol, ul, dd, dt,
+figcaption, blockquote, q, time,
+header, footer, nav, section, article, aside, div {
+  cursor: default;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Các phần tử bấm / tương tác giữ nguyên trỏ chuột pointer (kể cả chữ bên trong link/nút) */
+a, button, [role="button"], [role="tab"], select, summary, .btn, .card {
+  cursor: pointer;
+}
+
+a *, button *, [role="button"] *, [role="tab"] *, .btn * {
+  cursor: pointer;
+}
+
+/* Triệt tiêu hoàn toàn hiệu ứng bôi đen highlight của trình duyệt */
+::selection {
+  background: transparent;
+  color: inherit;
+}
+
+::-moz-selection {
+  background: transparent;
+  color: inherit;
+}
+
+/* Chặn kéo bóng mờ (ghost drag) chữ và ảnh */
+img, a {
+  -webkit-user-drag: none;
+  user-drag: none;
+}
+
+/* Cho phép nhập liệu bình thường nếu có input/textarea */
+input, textarea {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  user-select: text;
+  cursor: text;
+}
+
 html {
   scroll-behavior: smooth;
   scroll-padding-top: var(--nav-h);
@@ -558,7 +614,7 @@ h1, h2, h3 {
   position: absolute;
   top: calc(100% - 6px);
   left: 0;
-  width: 255px;
+  width: 270px;
   max-width: calc(100vw - 32px);
   background: linear-gradient(170deg, rgba(22, 6, 9, 0.98), rgba(11, 4, 3, 0.98));
   border: 1px solid rgba(207, 159, 63, 0.45);
@@ -593,25 +649,37 @@ h1, h2, h3 {
   transform: translateY(0);
 }
 
-/* Option 1: Giới thiệu chung item */
+/* Option 1 & 2: Dropdown item base container */
 .nav__dropdown-item {
   display: block !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
   padding: 0.65rem 0.8rem !important;
+  margin: 0 !important;
   border-radius: 7px;
   color: var(--white) !important;
-  text-decoration: none;
+  text-decoration: none !important;
   background: transparent;
   transition: background 0.2s ease, border-color 0.2s ease;
-  border: 1px solid transparent;
+  border: 1px solid transparent !important;
 }
 
-.nav__dropdown-item::after {
+/* Disable gold menu underline for all dropdown links */
+.nav__dropdown-item::after,
+.nav__dropdown a::after,
+.nav__branch-link::after,
+.nav__sub-item::after {
   display: none !important;
+  content: none !important;
 }
 
-.nav__dropdown-item:hover {
+/* Unified hover states for Option 1 & Option 2 */
+a.nav__dropdown-item:hover,
+.nav__dropdown-item--branch:hover,
+.nav__dropdown-branch:hover .nav__dropdown-item--branch,
+.nav__dropdown-branch.is-open .nav__dropdown-item--branch {
   background: rgba(207, 159, 63, 0.12) !important;
-  border-color: rgba(207, 159, 63, 0.35);
+  border-color: rgba(207, 159, 63, 0.35) !important;
   color: var(--gold-bright) !important;
 }
 
@@ -619,6 +687,8 @@ h1, h2, h3 {
   display: flex;
   flex-direction: column;
   line-height: 1.35;
+  box-sizing: border-box;
+  min-width: 0;
 }
 
 .nav__dropdown-title {
@@ -628,10 +698,11 @@ h1, h2, h3 {
   transition: color 0.2s ease;
 }
 
-.nav__dropdown-item:hover .nav__dropdown-title,
-.nav__branch-trigger:hover .nav__dropdown-title,
-.nav__dropdown-branch:hover .nav__dropdown-title {
-  color: var(--gold-bright);
+a.nav__dropdown-item:hover .nav__dropdown-title,
+.nav__dropdown-item--branch:hover .nav__dropdown-title,
+.nav__dropdown-branch:hover .nav__dropdown-title,
+.nav__dropdown-branch.is-open .nav__dropdown-title {
+  color: var(--gold-bright) !important;
 }
 
 .nav__dropdown-sub {
@@ -643,35 +714,74 @@ h1, h2, h3 {
 /* Option 2: Branch trigger (Cơ cấu tổ chức) */
 .nav__dropdown-branch {
   position: relative;
-  margin-top: 0.3rem;
+  margin-top: 0.35rem;
   border-top: 1px solid rgba(207, 159, 63, 0.15);
-  padding-top: 0.3rem;
+  padding-top: 0.35rem;
+  box-sizing: border-box;
 }
 
-.nav__branch-trigger {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.65rem 0.8rem;
-  border-radius: 7px;
-  color: var(--white);
-  cursor: pointer;
+/* Option 2: Row container inside dropdown-branch */
+.nav__dropdown-item--branch {
+  display: flex !important;
+  align-items: stretch !important;
+  justify-content: space-between !important;
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+/* Option 2: Link to #about-org (Identical padding & horizontal positioning as Option 1) */
+.nav__branch-link {
+  display: flex !important;
+  align-items: center !important;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  width: auto !important;
+  min-height: auto !important;
+  box-sizing: border-box !important;
+  padding: 0.65rem 0.8rem !important;
+  margin: 0 !important;
+  border: none !important;
+  border-top: none !important;
+  border-radius: 7px 0 0 7px !important;
+  background: transparent !important;
+  color: var(--white) !important;
+  text-decoration: none !important;
+}
+
+.nav__branch-link:hover .nav__dropdown-title {
+  color: var(--gold-bright) !important;
+}
+
+/* Option 2: Arrow button to toggle 5 Ban */
+.nav__branch-arrow-btn {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 0 0 38px !important;
+  width: 38px !important;
+  min-width: 38px !important;
+  min-height: 42px !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
   background: transparent;
-  border: 1px solid transparent;
-  transition: background 0.2s ease, border-color 0.2s ease;
+  cursor: pointer;
+  color: var(--gold);
+  border-radius: 0 6px 6px 0;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
-.nav__branch-trigger:hover,
-.nav__dropdown-branch:hover .nav__branch-trigger {
-  background: rgba(207, 159, 63, 0.12);
-  border-color: rgba(207, 159, 63, 0.35);
+.nav__branch-arrow-btn:hover {
+  background: rgba(207, 159, 63, 0.22) !important;
+  color: var(--gold-bright) !important;
 }
 
 .nav__branch-arrow {
   font-size: 0.78rem;
-  color: var(--gold);
-  transition: transform 0.25s ease, color 0.2s ease;
-  margin-left: 0.5rem;
+  color: inherit;
+  transition: transform 0.25s ease;
+  line-height: 1;
 }
 
 .nav__dropdown-branch:hover .nav__branch-arrow,
@@ -1860,6 +1970,7 @@ section {
   margin-top: 4.8rem;
   padding-top: 3.5rem;
   border-top: 1px solid rgba(207, 159, 63, 0.25);
+  scroll-margin-top: calc(var(--nav-h) + 1.2rem);
 }
 
 .about-org-teaser__head {
@@ -2196,12 +2307,41 @@ section {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
-    padding: 0.4rem 0 0.4rem 1rem;
+    padding: 0.4rem 0.8rem 0.4rem 0.8rem;
   }
 
   .nav__item--dropdown.is-open .nav__arrow {
     transform: rotate(180deg);
     color: var(--gold-bright);
+  }
+
+  /* Reset mobile .nav__menu a overrides on dropdown items */
+  .nav__dropdown a.nav__dropdown-item,
+  .nav__dropdown .nav__branch-link {
+    width: auto !important;
+    min-height: auto !important;
+    padding: 0.65rem 0.8rem !important;
+    border-top: none !important;
+  }
+
+  .nav__dropdown a.nav__dropdown-item {
+    width: 100% !important;
+  }
+
+  .nav__dropdown-item--branch {
+    width: 100% !important;
+    padding: 0 !important;
+  }
+
+  .nav__dropdown .nav__branch-link {
+    flex: 1 1 auto !important;
+  }
+
+  .nav__dropdown .nav__branch-arrow-btn {
+    flex: 0 0 44px !important;
+    width: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
   }
 
   .nav__dropdown-branch {
@@ -2233,7 +2373,12 @@ section {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
-    padding: 0.3rem 0 0.3rem 0.8rem;
+    padding: 0.3rem 0.6rem 0.3rem 0.8rem;
+  }
+
+  .nav__subdropdown .nav__sub-item {
+    border-top: none !important;
+    min-height: auto !important;
   }
 
   .nav__dropdown-branch.is-open .nav__branch-arrow {
@@ -2283,6 +2428,9 @@ section {
   .dept__breadcrumb {
     margin-bottom: 1.6rem;
     font-size: 0.82rem;
+  }
+  .about-org-teaser {
+    scroll-margin-top: calc(var(--nav-h) + 0.8rem);
   }
 }
 
@@ -2824,6 +2972,69 @@ section {
   height: 14px;
 }
 
+/* Autoplay Activation Hint & Pulse when browser blocks unmuted autoplay */
+.music-player__hint {
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background: rgba(18, 5, 8, 0.96);
+  border: 1px solid rgba(238, 205, 126, 0.7);
+  border-radius: 999px;
+  box-shadow: 
+    0 8px 24px rgba(0, 0, 0, 0.8),
+    0 0 16px rgba(207, 159, 63, 0.35);
+  white-space: nowrap;
+  pointer-events: auto;
+  cursor: pointer;
+  z-index: 100;
+  animation: hintPulse 2s ease-in-out infinite;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.music-player__hint-icon {
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+.music-player__hint-text {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--gold-bright);
+  letter-spacing: 0.02em;
+}
+
+.music-player.needs-gesture:not(.is-playing) .music-player__hint {
+  display: flex;
+}
+
+.music-player.needs-gesture:not(.is-playing) .music-player__cd-btn {
+  animation: cdPromptPulse 1.8s ease-in-out infinite;
+}
+
+@keyframes hintPulse {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8), 0 0 14px rgba(207, 159, 63, 0.35);
+  }
+  50% {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.9), 0 0 22px rgba(238, 205, 126, 0.6);
+  }
+}
+
+@keyframes cdPromptPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(238, 205, 126, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 7px rgba(238, 205, 126, 0);
+  }
+}
+
 /* Responsive for Mobile */
 @media (max-width: 720px) {
   .music-player {
@@ -2831,6 +3042,11 @@ section {
     bottom: calc(14px + env(safe-area-inset-bottom, 0px)) !important;
     right: 12px !important;
     z-index: 990 !important;
+  }
+  .music-player__hint {
+    top: auto;
+    bottom: calc(100% + 8px);
+    right: 0;
   }
   .music-player__inner {
     height: 42px;
