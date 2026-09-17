@@ -19,8 +19,8 @@ const JPC_PLAYLIST = [
     gain: 0.52
   },
   {
-    title: "Ankooru",
-    fullTitle: "Ankooru",
+    title: "Encore (アンコール)",
+    fullTitle: "Encore (アンコール)",
     src: "Playlist/Ankooru.m4a",
     gain: 0.56
   },
@@ -151,8 +151,8 @@ const JPC_PLAYLIST = [
     gain: 0.42
   },
   {
-    title: "Guren Hana",
-    fullTitle: "Guren Hana",
+    title: "Gurenge",
+    fullTitle: "Gurenge",
     src: "Playlist/Guren Hana.m4a",
     gain: 0.46
   },
@@ -253,8 +253,8 @@ const JPC_PLAYLIST = [
     gain: 0.48
   },
   {
-    title: "Misutaa",
-    fullTitle: "Misutaa",
+    title: "Mister",
+    fullTitle: "Mister",
     src: "Playlist/Misutaa.m4a",
     gain: 0.49
   },
@@ -313,8 +313,8 @@ const JPC_PLAYLIST = [
     gain: 0.76
   },
   {
-    title: "Raburetaa",
-    fullTitle: "Raburetaa",
+    title: "Love Letter",
+    fullTitle: "Love Letter",
     src: "Playlist/Raburetaa.m4a",
     gain: 0.5
   },

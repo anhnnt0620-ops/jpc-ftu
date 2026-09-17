@@ -54,6 +54,13 @@ function initNavToggle() {
       e.stopPropagation();
       const isOpen = aboutDropdown.classList.toggle('is-open');
       aboutParent.setAttribute('aria-expanded', String(isOpen));
+      if (!isOpen && branchOrg) {
+        branchOrg.classList.remove('is-open');
+        if (branchArrowBtn) {
+          branchArrowBtn.setAttribute('aria-expanded', 'false');
+          branchArrowBtn.blur();
+        }
+      }
     });
   }
 
@@ -64,6 +71,9 @@ function initNavToggle() {
       e.stopPropagation();
       const isOpen = branchOrg.classList.toggle('is-open');
       branchArrowBtn.setAttribute('aria-expanded', String(isOpen));
+      if (!isOpen) {
+        branchArrowBtn.blur();
+      }
     });
 
     branchArrowBtn.addEventListener('keydown', (e) => {
@@ -72,6 +82,9 @@ function initNavToggle() {
         e.stopPropagation();
         const isOpen = branchOrg.classList.toggle('is-open');
         branchArrowBtn.setAttribute('aria-expanded', String(isOpen));
+        if (!isOpen) {
+          branchArrowBtn.blur();
+        }
       }
     });
   }
@@ -82,7 +95,10 @@ function initNavToggle() {
       aboutDropdown.classList.remove('is-open');
       if (branchOrg) branchOrg.classList.remove('is-open');
       if (aboutParent) aboutParent.setAttribute('aria-expanded', 'false');
-      if (branchArrowBtn) branchArrowBtn.setAttribute('aria-expanded', 'false');
+      if (branchArrowBtn) {
+        branchArrowBtn.setAttribute('aria-expanded', 'false');
+        branchArrowBtn.blur();
+      }
       if (document.activeElement && aboutDropdown.contains(document.activeElement)) {
         document.activeElement.blur();
       }
@@ -92,7 +108,10 @@ function initNavToggle() {
   if (branchOrg) {
     branchOrg.addEventListener('mouseleave', () => {
       branchOrg.classList.remove('is-open');
-      if (branchArrowBtn) branchArrowBtn.setAttribute('aria-expanded', 'false');
+      if (branchArrowBtn) {
+        branchArrowBtn.setAttribute('aria-expanded', 'false');
+        branchArrowBtn.blur();
+      }
       if (document.activeElement && branchOrg.contains(document.activeElement)) {
         document.activeElement.blur();
       }
@@ -103,14 +122,26 @@ function initNavToggle() {
   document.addEventListener('click', (e) => {
     if (aboutDropdown && !aboutDropdown.contains(e.target) && !navToggle.contains(e.target)) {
       aboutDropdown.classList.remove('is-open');
-      if (branchOrg) branchOrg.classList.remove('is-open');
+      if (branchOrg) {
+        branchOrg.classList.remove('is-open');
+        if (branchArrowBtn) {
+          branchArrowBtn.setAttribute('aria-expanded', 'false');
+          branchArrowBtn.blur();
+        }
+      }
     }
   });
 
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       if (aboutDropdown) aboutDropdown.classList.remove('is-open');
-      if (branchOrg) branchOrg.classList.remove('is-open');
+      if (branchOrg) {
+        branchOrg.classList.remove('is-open');
+        if (branchArrowBtn) {
+          branchArrowBtn.setAttribute('aria-expanded', 'false');
+          branchArrowBtn.blur();
+        }
+      }
       if (navMenu) {
         navMenu.classList.remove('is-open');
         document.body.classList.remove('menu-open');
@@ -456,8 +487,6 @@ function initHeroIntroTimeline() {
   function settleAndStartTyping() {
     document.body.classList.remove('play-intro', 'cards-extracting');
     document.body.classList.add('cards-complete', 'hero-text-active');
-    // Card flight animation has fully settled! Trigger music playback immediately!
-    notifyIntroComplete();
 
     if (!titleTextEl) {
       return;
@@ -576,16 +605,21 @@ let hasUserInteracted = false;
 const playedTrackIndices = new Set();
 
 // BGM Volume Calibration & Loudness Normalization
-// Âm lượng nhạc phát được đặt ở mức 20% (0.20) so với mức âm lượng thực tế của máy tính.
+// Âm lượng BGM: 0.10 trên điện thoại (đảm bảo loa điện thoại êm dịu, không gắt), 0.20 trên máy tính.
 // Mỗi bài hát được chuẩn hóa gain (EBU R128 / RMS) dựa trên bản nhạc không lời Inazuma & Genshin OST
 // giúp các bài hát thương mại (J-Pop / Anime) có âm lượng hoàn toàn đồng dạng với các bản không lời.
-const BGM_BASE_VOLUME = 0.20;
+function getBgmBaseVolume() {
+  const isMobile = window.innerWidth <= 768 || /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+  return isMobile ? 0.10 : 0.20;
+}
+
 let volumeFadeTimer = null;
 
 function getTrackTargetVolume(track) {
   const currentTrack = track || (getPlaylist()[currentTrackIndex]);
   const trackGain = (currentTrack && typeof currentTrack.gain === 'number') ? currentTrack.gain : 1.0;
-  return Math.max(0.01, Math.min(1.0, BGM_BASE_VOLUME * trackGain));
+  const baseVol = getBgmBaseVolume();
+  return Math.max(0.01, Math.min(1.0, baseVol * trackGain));
 }
 
 function applyBgmVolume(smooth = false, track = null) {
@@ -719,6 +753,8 @@ function updateTitleMarquee() {
   const clone = document.getElementById('musicPlayerTitleClone');
   if (!wrap || !title) return;
 
+  const isMobile = window.innerWidth <= 768 || window.matchMedia('(max-width: 768px)').matches;
+
   // 1. Reset state for accurate unconstrained measurement
   if (wrap) wrap.classList.remove('has-marquee');
   if (track) {
@@ -734,14 +770,18 @@ function updateTitleMarquee() {
   const wrapWidth = wrap.clientWidth;
   const titleWidth = title.offsetWidth || title.scrollWidth;
 
-  // 2. If title is long (exceeds container width), start continuous seamless loop marquee
-  if (wrapWidth > 0 && titleWidth > wrapWidth + 2) {
+  // Trên điện thoại: LUÔN CHO TÊN BÀI HÁT MOVE LIÊN TỤC theo phong cách mini walkman / player
+  // Trên desktop: chạy marquee khi tiêu đề vượt quá độ rộng khung
+  const shouldScroll = isMobile ? true : (wrapWidth > 0 && titleWidth > wrapWidth + 2);
+
+  if (shouldScroll && title.textContent && title.textContent.trim().length > 0) {
     if (clone) clone.textContent = title.textContent;
     if (wrap) wrap.classList.add('has-marquee');
 
-    // Pace: ~26px per second for comfortable, readable scrolling
-    const itemDistance = titleWidth + 38;
-    const duration = Math.max(6, Math.round(itemDistance / 26));
+    // Pace: tốc độ trượt êm dịu (~20px/giây), tối thiểu 6 giây
+    const measuredWidth = Math.max(titleWidth, 38);
+    const itemDistance = measuredWidth + 36;
+    const duration = Math.max(6, Math.round(itemDistance / 20));
 
     if (track) {
       track.style.setProperty('--marquee-duration', `${duration}s`);
@@ -772,10 +812,15 @@ function initMusicPlayerUI() {
   titleEl.textContent = initialTrack.title;
   titleEl.setAttribute('title', initialTrack.fullTitle || initialTrack.title);
 
-  // Measure title width and apply back-and-forth marquee if title is long
+  // Measure title width and apply marquee
   setTimeout(updateTitleMarquee, 100);
+  setTimeout(updateTitleMarquee, 600);
+  setTimeout(updateTitleMarquee, 1500);
   if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(updateTitleMarquee);
+    document.fonts.ready.then(() => {
+      updateTitleMarquee();
+      setTimeout(updateTitleMarquee, 100);
+    });
   }
 
   // Recalculate marquee on window resize / mobile orientation change
@@ -783,6 +828,9 @@ function initMusicPlayerUI() {
   window.addEventListener('resize', () => {
     clearTimeout(marqueeResizeTimer);
     marqueeResizeTimer = setTimeout(updateTitleMarquee, 120);
+  }, { passive: true });
+  window.addEventListener('orientationchange', () => {
+    setTimeout(updateTitleMarquee, 200);
   }, { passive: true });
 
   // Initialize single persistent DOM audio element (uninterrupted background playback)
@@ -838,17 +886,6 @@ function initMusicPlayerUI() {
   initMediaSessionHandlers();
   updateMediaSession(initialTrack);
 
-  // Click hint badge -> bật nhạc trực tiếp
-  const hintEl = document.getElementById('musicPlayerHint');
-  if (hintEl) {
-    hintEl.addEventListener('click', (e) => {
-      e.stopPropagation();
-      hasUserInteracted = true;
-      unlockAudioContext();
-      startMusicPlayback();
-    });
-  }
-
   // Click CD disc -> toggle play/pause directly
   cdBtn.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -868,6 +905,7 @@ function initMusicPlayerUI() {
   // Auto-play when hero intro completes
   window.addEventListener('heroIntroComplete', () => {
     startAutoPlay();
+    updateTitleMarquee();
   });
 
   // Setup background audio unlock for any natural interaction (touch, scroll, click, keydown)
@@ -921,12 +959,12 @@ function startAutoPlay() {
 function startMusicPlayback() {
   if (!bgAudio) return;
   unlockAudioContext();
+  updateTitleMarquee();
 
   const playerEl = document.getElementById('musicPlayer');
   isMusicPlaying = true;
   if (playerEl) {
     playerEl.classList.add('is-playing');
-    playerEl.classList.remove('needs-gesture');
   }
 
   // Ensure current track is properly loaded if audio was in error state or empty
@@ -948,7 +986,6 @@ function startMusicPlayback() {
       .then(() => {
         pendingAutoPlay = false;
         if (playerEl) {
-          playerEl.classList.remove('needs-gesture');
           playerEl.classList.add('is-playing');
         }
         updateMediaSession(currentTrack);
@@ -962,7 +999,6 @@ function startMusicPlayback() {
           isMusicPlaying = false;
           if (playerEl) {
             playerEl.classList.remove('is-playing');
-            playerEl.classList.add('needs-gesture');
           }
           if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
         } else {
@@ -982,7 +1018,6 @@ function pauseMusicPlayback() {
   const playerEl = document.getElementById('musicPlayer');
   if (playerEl) {
     playerEl.classList.remove('is-playing');
-    playerEl.classList.remove('needs-gesture');
   }
 
   if (bgAudio) {
@@ -1069,7 +1104,6 @@ function playRandomTrack(isManual = false) {
       .then(() => {
         pendingAutoPlay = false;
         if (playerEl) {
-          playerEl.classList.remove('needs-gesture');
           playerEl.classList.add('is-playing');
         }
         updateMediaSession(nowPlaying);
@@ -1082,7 +1116,6 @@ function playRandomTrack(isManual = false) {
           isMusicPlaying = false;
           if (playerEl) {
             playerEl.classList.remove('is-playing');
-            playerEl.classList.add('needs-gesture');
           }
           if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
         } else {
