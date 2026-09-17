@@ -7,6 +7,38 @@
  * - 4-Phase Hero Intro Timeline Animation with Typewriter Effect
  */
 
+// 0. RELOAD RESET & SCROLL RESTORATION ENGINE
+// Khi người dùng tải lại trang (F5 hoặc Refresh):
+// - Đặt scrollRestoration là 'manual' để trình duyệt không tự cuộn xuống vị trí cũ
+// - Cuộn ngay về đỉnh trang (0, 0)
+// - Reset URL hash về trang chủ (#home), xóa hash cũ để intro animation chạy lại từ đầu
+if ('scrollRestoration' in history) {
+  history.scrollRestoration = 'manual';
+}
+window.scrollTo(0, 0);
+
+const isPageReload = (() => {
+  try {
+    const navEntries = performance.getEntriesByType('navigation');
+    if (navEntries && navEntries.length > 0) {
+      return navEntries[0].type === 'reload';
+    }
+    return performance.navigation && performance.navigation.type === 1;
+  } catch (_) {
+    return false;
+  }
+})();
+
+if (isPageReload && window.location.hash) {
+  try {
+    history.replaceState(null, '', window.location.pathname);
+  } catch (_) {}
+}
+
+window.addEventListener('beforeunload', () => {
+  window.scrollTo(0, 0);
+});
+
 document.addEventListener('DOMContentLoaded', () => {
   initNavToggle();
   initViewNavigation();
@@ -105,13 +137,16 @@ function initNavToggle() {
     });
   }
 
-  if (branchOrg) {
+  if (branchOrg && branchArrowBtn) {
+    branchOrg.addEventListener('mouseenter', () => {
+      if (window.innerWidth > 720) {
+        branchArrowBtn.setAttribute('aria-expanded', 'true');
+      }
+    });
     branchOrg.addEventListener('mouseleave', () => {
       branchOrg.classList.remove('is-open');
-      if (branchArrowBtn) {
-        branchArrowBtn.setAttribute('aria-expanded', 'false');
-        branchArrowBtn.blur();
-      }
+      branchArrowBtn.setAttribute('aria-expanded', 'false');
+      branchArrowBtn.blur();
       if (document.activeElement && branchOrg.contains(document.activeElement)) {
         document.activeElement.blur();
       }
@@ -241,8 +276,8 @@ function initViewNavigation() {
     if (targetId) showView(targetId);
   });
 
-  // Initial view on load
-  const initialHash = window.location.hash.slice(1);
+  // Initial view on load: nếu tải lại trang (reload/F5), luôn reset về 'home'
+  const initialHash = isPageReload ? '' : window.location.hash.slice(1);
   showView(initialHash || 'home');
 }
 
@@ -451,12 +486,16 @@ function initHeroIntroTimeline() {
   function notifyIntroComplete() {
     if (introCompleteNotified) return;
     introCompleteNotified = true;
+    isIntroAnimationFinished = true;
     window.dispatchEvent(new CustomEvent('heroIntroComplete'));
   }
 
-  // Immediately render static final layout if reduced motion is requested
-  // or user navigated directly to another section via hash
-  const initialHash = window.location.hash.slice(1);
+  // Đảm bảo xóa sạch các class cũ nếu DOM được trình duyệt cache lại
+  document.body.classList.remove('cards-complete', 'cards-extracting', 'hero-text-active');
+
+  // Immediately render static final layout ONLY if reduced motion is requested
+  // or user navigated directly from an external link to another section via hash (non-reload)
+  const initialHash = isPageReload ? '' : window.location.hash.slice(1);
   if (prefersReducedMotion || (initialHash && initialHash !== 'home')) {
     finishInstant();
     return;
@@ -487,6 +526,8 @@ function initHeroIntroTimeline() {
   function settleAndStartTyping() {
     document.body.classList.remove('play-intro', 'cards-extracting');
     document.body.classList.add('cards-complete', 'hero-text-active');
+    // Intro animation has finished running (4 cards settled). Automatically start music!
+    notifyIntroComplete();
 
     if (!titleTextEl) {
       return;
@@ -600,7 +641,8 @@ let activeAudio = null;
 let currentTrackIndex = 0;
 let nextPreloadedIndex = 1;
 let isMusicPlaying = false;
-let pendingAutoPlay = true;
+let isIntroAnimationFinished = false;
+let pendingAutoPlay = false;
 let hasUserInteracted = false;
 const playedTrackIndices = new Set();
 
@@ -859,9 +901,21 @@ function initMusicPlayerUI() {
     preloaderAudio.load();
   }
 
-  // Continuous background playback: handle track ended on the same audio element
+  // Continuous background playback: handle track ended on the same audio element (Auto-next)
   bgAudio.addEventListener('ended', () => {
     playRandomTrack(false);
+  });
+
+  // Watchdog: Tự động chuyển bài kế tiếp khi bài hiện tại phát hết (hỗ trợ cả khi sự kiện ended bị trễ)
+  let lastTrackEndTime = 0;
+  bgAudio.addEventListener('timeupdate', () => {
+    if (bgAudio.duration && bgAudio.currentTime >= bgAudio.duration - 0.25 && isMusicPlaying) {
+      const now = Date.now();
+      if (now - lastTrackEndTime > 3500) {
+        lastTrackEndTime = now;
+        playRandomTrack(false);
+      }
+    }
   });
 
   // Audio error fallback - auto recover if active track errors
@@ -869,7 +923,7 @@ function initMusicPlayerUI() {
     console.warn('Audio playback error on track', currentTrackIndex, bgAudio.error);
     setTimeout(() => {
       playRandomTrack(false);
-    }, 100);
+    }, 120);
   });
 
   // Background tab & visibility persistence
@@ -894,16 +948,22 @@ function initMusicPlayerUI() {
     toggleMusicPlayback();
   });
 
-  // Click shuffle button -> chủ động đổi bài: tỉ lệ lặp lại bài đã phát bằng 0%
-  shuffleBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
+  // Click/Touch shuffle button -> chủ động đổi sang bài khác lập tức
+  const handleShuffleNext = (e) => {
+    if (e) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
     hasUserInteracted = true;
     unlockAudioContext();
     playRandomTrack(true);
-  });
+  };
+  shuffleBtn.addEventListener('click', handleShuffleNext);
+  shuffleBtn.addEventListener('touchend', handleShuffleNext, { passive: false });
 
   // Auto-play when hero intro completes
   window.addEventListener('heroIntroComplete', () => {
+    isIntroAnimationFinished = true;
     startAutoPlay();
     updateTitleMarquee();
   });
@@ -912,7 +972,19 @@ function initMusicPlayerUI() {
   setupAudioUnlock();
 }
 
-const unlockEvents = ['click', 'pointerdown', 'pointerup', 'touchstart', 'touchend', 'keydown'];
+const unlockEvents = [
+  'click',
+  'pointerdown',
+  'pointerup',
+  'mousedown',
+  'mouseup',
+  'touchstart',
+  'touchend',
+  'touchmove',
+  'keydown',
+  'scroll',
+  'wheel'
+];
 
 function unlockAudioContext() {
   try {
@@ -934,7 +1006,8 @@ function handleGlobalUserGesture(e) {
   unlockAudioContext();
   if (!activeAudio) return;
 
-  if (pendingAutoPlay && !isMusicPlaying) {
+  // Only trigger music if intro animation has finished and music is waiting to autoplay
+  if (isIntroAnimationFinished && pendingAutoPlay && !isMusicPlaying) {
     startMusicPlayback();
   }
 }
@@ -942,18 +1015,22 @@ function handleGlobalUserGesture(e) {
 function setupAudioUnlock() {
   unlockEvents.forEach((evt) => {
     window.addEventListener(evt, handleGlobalUserGesture, { passive: true, capture: true });
+    document.addEventListener(evt, handleGlobalUserGesture, { passive: true, capture: true });
   });
 }
 
 function removeGlobalUnlockListeners() {
   unlockEvents.forEach((evt) => {
     window.removeEventListener(evt, handleGlobalUserGesture, { capture: true });
+    document.removeEventListener(evt, handleGlobalUserGesture, { capture: true });
   });
 }
 
 function startAutoPlay() {
   pendingAutoPlay = true;
-  startMusicPlayback();
+  if (!isMusicPlaying) {
+    startMusicPlayback();
+  }
 }
 
 function startMusicPlayback() {
@@ -1056,12 +1133,14 @@ function playRandomTrack(isManual = false) {
 
   // 2. Xác định bài tiếp theo:
   // - Khi chủ động đổi bài (isManual = true): tỉ lệ lặp lại bài đã phát là 0%.
-  //   Nếu bài preloaded đã vô tình là bài từng phát, chọn lại 1 bài chưa từng phát.
+  //   Nếu bài preloaded đã là bài từng phát hoặc trùng bài hiện tại, chọn lại bài khác chưa từng phát.
   let targetIndex = nextPreloadedIndex;
-  if (isManual) {
-    if (playedTrackIndices.has(targetIndex)) {
-      targetIndex = getNextRandomIndex(currentTrackIndex, playlist.length, 0.0);
-    }
+  if (isManual || targetIndex === currentTrackIndex || playedTrackIndices.has(targetIndex)) {
+    targetIndex = getNextRandomIndex(currentTrackIndex, playlist.length, isManual ? 0.0 : 0.2);
+  }
+  // Bảo đảm tuyệt đối bài mới luôn khác bài hiện tại (khi playlist có từ 2 bài trở lên)
+  if (targetIndex === currentTrackIndex && playlist.length > 1) {
+    targetIndex = (currentTrackIndex + 1) % playlist.length;
   }
   currentTrackIndex = targetIndex;
   playedTrackIndices.add(currentTrackIndex);

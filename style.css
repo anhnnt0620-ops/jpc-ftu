@@ -810,6 +810,25 @@ a.nav__dropdown-item:hover .nav__dropdown-title,
   pointer-events: auto;
 }
 
+/* Desktop: Hover vào mục "Cơ cấu tổ chức" là dropdown list 5 Ban hiển thị ngay lập tức (không cần click mũi tên) */
+@media (min-width: 721px) {
+  .nav__dropdown-branch:hover .nav__subdropdown,
+  .nav__dropdown-branch:focus-within .nav__subdropdown,
+  .nav__dropdown-branch.is-open .nav__subdropdown {
+    max-height: 280px !important;
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+    pointer-events: auto !important;
+  }
+
+  .nav__dropdown-branch:hover .nav__branch-arrow,
+  .nav__dropdown-branch:focus-within .nav__branch-arrow,
+  .nav__dropdown-branch.is-open .nav__branch-arrow {
+    transform: rotate(180deg) !important;
+    color: var(--gold-bright) !important;
+  }
+}
+
 .nav__sub-item {
   display: flex !important;
   align-items: center;
