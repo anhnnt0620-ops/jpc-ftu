@@ -1045,73 +1045,63 @@ a.nav__dropdown-item:hover .nav__dropdown-title,
 .card__pip--br { bottom: 8px; right: 10px; transform: rotate(180deg); }
 
 /* ==========================================================
-   PHASE 1: 12 CARDS INTRO ARC FLY-IN
+   PHASE 1: 3D SWIRL & CLENCH (CARDS GATHERED IN PALM)
    ========================================================== */
-body.play-intro .deck-card {
+body.play-intro:not(.cards-bursting) .deck-card {
   opacity: 0;
-  animation: arcStreamEnter 1.35s cubic-bezier(0.16, 1, 0.3, 1) var(--stream-delay) both;
-}
-
-@keyframes arcStreamEnter {
-  0% {
-    opacity: 0;
-    transform: translate3d(-62vw, 40px, -60px) rotate(-28deg) scale(0.36);
-  }
-  75% {
-    opacity: 1;
-    transform: translate3d(var(--stream-x), var(--stream-y), 0) rotate(var(--stream-r)) scale(0.53);
-  }
-  100% {
-    opacity: 1;
-    transform: translate3d(var(--stream-x), var(--stream-y), 0) rotate(var(--stream-r)) scale(0.52);
-  }
+  transform: translate3d(0, 0, 0) scale(0) rotate(0deg);
+  pointer-events: none;
 }
 
 /* ==========================================================
-   PHASE 2 & 3: SPLIT & SELECTION, FADE OUT 8, TRANSFORM 4
+   PHASE 2 & 3: SNAP IMPACT & 12 CARDS BURST FROM HAND
    ========================================================== */
-/* 8 exit cards: remain precisely at their arc positions, smoothly sink into depth & fade out */
-body.cards-extracting .deck-card--exit {
-  animation: remainingArcFadeOut 0.8s cubic-bezier(0.33, 1, 0.68, 1) var(--exit-delay) both;
+/* 8 exit cards burst radially outward from hand center, tumble in 3D and dissolve */
+body.cards-bursting .deck-card--exit {
+  animation: exitCardRadialBurst 1.25s cubic-bezier(0.12, 0.9, 0.25, 1) var(--exit-delay) both;
 }
 
-@keyframes remainingArcFadeOut {
+@keyframes exitCardRadialBurst {
   0% {
-    opacity: 1;
-    transform: translate3d(var(--stream-x), var(--stream-y), 0) rotate(var(--stream-r)) scale(0.52);
+    opacity: 0;
+    transform: translate3d(0, 0, 80px) rotate(0deg) scale(0.15);
   }
-  40% {
-    opacity: 0.6;
-    transform: translate3d(var(--stream-x), calc(var(--stream-y) + 8px), -15px) rotate(var(--stream-r)) scale(0.48);
+  20% {
+    opacity: 0.95;
+  }
+  65% {
+    opacity: 0.7;
+    transform: translate3d(calc(var(--stream-x) * 1.3), calc(var(--stream-y) * 1.3 - 40px), -30px) rotateX(160deg) rotateY(calc(var(--stream-r) * 2)) rotateZ(var(--stream-r)) scale(0.48);
   }
   100% {
     opacity: 0;
-    transform: translate3d(var(--stream-x), calc(var(--stream-y) + 22px), -40px) rotate(var(--stream-r)) scale(0.40);
+    transform: translate3d(calc(var(--stream-x) * 1.8), calc(var(--stream-y) * 1.8 - 60px), -90px) rotateX(280deg) rotateY(calc(var(--stream-r) * 3)) rotateZ(calc(var(--stream-r) * 1.5)) scale(0.32);
   }
 }
 
-/* 4 picked cards: swooping continuous 3D arc flight to Home positions with scale-up */
-body.cards-extracting .deck-card--picked {
+/* 4 picked cards: shoot outward directly from the hand center with 3D arc flight to Home */
+body.cards-bursting .deck-card--picked {
   z-index: 10;
-  animation: pickedCardFlight 1.35s cubic-bezier(0.16, 1, 0.3, 1) var(--exit-delay) both;
+  animation: pickedCardBurstFlight 1.45s cubic-bezier(0.16, 1, 0.3, 1) var(--exit-delay) both;
 }
 
-@keyframes pickedCardFlight {
+@keyframes pickedCardBurstFlight {
   0% {
-    opacity: 1;
-    transform: translate3d(var(--stream-x), var(--stream-y), 0) rotate(var(--stream-r)) scale(0.52);
+    opacity: 0;
+    transform: translate3d(0, 0, 110px) rotate(0deg) scale(0.18);
+    box-shadow: 0 0 35px rgba(238, 205, 126, 0.95);
   }
-  25% {
+  18% {
     opacity: 1;
-    transform: translate3d(calc(var(--stream-x) * 0.7 + var(--fx) * 0.3), calc(var(--stream-y) * 0.7 + var(--fy) * 0.3 - 22px), 50px) rotate(calc(var(--stream-r) * 0.5 + var(--fr) * 0.5)) scale(0.76);
+    transform: translate3d(calc(var(--fx) * 0.42), calc(var(--fy) - 38px), 80px) rotate(calc(var(--fr) * 0.45)) scale(0.72);
   }
-  65% {
+  60% {
     opacity: 1;
-    transform: translate3d(calc(var(--stream-x) * 0.12 + var(--fx) * 0.88), calc(var(--fy) - 8px), 25px) rotate(calc(var(--fr) * 0.96)) scale(1.02);
+    transform: translate3d(calc(var(--fx) * 0.88), calc(var(--fy) - 12px), 30px) rotate(calc(var(--fr) * 0.92)) scale(1.04);
   }
-  88% {
+  86% {
     opacity: 1;
-    transform: translate3d(var(--fx), calc(var(--fy) - 1.5px), 8px) rotate(var(--fr)) scale(1.005);
+    transform: translate3d(var(--fx), calc(var(--fy) - 1.5px), 6px) rotate(var(--fr)) scale(1.008);
   }
   100% {
     opacity: 1;
@@ -1120,31 +1110,48 @@ body.cards-extracting .deck-card--picked {
 }
 
 /* 3D card flip in mid-air for the 2 center face cards (JPC & FTU) */
-body.cards-extracting .card-p2 .card__flipper,
-body.cards-extracting .card-p3 .card__flipper {
+body.cards-bursting .card-p2 .card__flipper,
+body.cards-bursting .card-p3 .card__flipper {
   will-change: transform;
-  animation: flipCardInFlight 1.35s cubic-bezier(0.2, 0.9, 0.3, 1) var(--exit-delay) both;
+  animation: flipCardInFlight 1.45s cubic-bezier(0.2, 0.9, 0.3, 1) var(--exit-delay) both;
 }
 
 @keyframes flipCardInFlight {
   0%, 15% {
     transform: rotateY(0deg);
   }
-  72%, 100% {
+  68%, 100% {
     transform: rotateY(180deg);
   }
 }
 
 /* Kanji calligraphy illumination for the 2 outer back cards (一期 & 一会) */
-body.cards-extracting .card-p1 .card__kanji,
-body.cards-extracting .card-p4 .card__kanji {
-  animation: kanjiGlowReveal 0.75s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--exit-delay) + 0.45s) both;
+body.cards-bursting .card-p1 .card__kanji,
+body.cards-bursting .card-p4 .card__kanji {
+  animation: kanjiGlowReveal 0.85s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--exit-delay) + 0.38s) both;
 }
 
 @keyframes kanjiGlowReveal {
-  0%   { opacity: 0; transform: scale(0.75); filter: brightness(0.85); }
-  65%  { opacity: 1; transform: scale(1.06); filter: brightness(1.25); }
+  0%   { opacity: 0; transform: scale(0.65); filter: brightness(0.8); }
+  60%  { opacity: 1; transform: scale(1.08); filter: brightness(1.35); }
   100% { opacity: 1; transform: scale(1); filter: brightness(1); }
+}
+
+/* Golden Screen Snap Flash Overlay */
+.snap-flash {
+  position: fixed;
+  inset: 0;
+  z-index: 95;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 50%, rgba(255, 246, 214, 0.52) 0%, rgba(238, 205, 126, 0.28) 35%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.55s cubic-bezier(0.1, 0.9, 0.2, 1);
+  mix-blend-mode: screen;
+}
+
+.snap-flash.is-active {
+  opacity: 1;
+  transition: none;
 }
 
 /* ==========================================================
@@ -1152,13 +1159,13 @@ body.cards-extracting .card-p4 .card__kanji {
    ========================================================== */
 /* Hide the 8 exit cards completely once settled */
 .cards-complete .deck-card--exit,
-body:not(.play-intro):not(.cards-extracting) .deck-card--exit {
+body:not(.play-intro):not(.cards-extracting):not(.cards-bursting) .deck-card--exit {
   display: none !important;
 }
 
 /* The 4 settled cards resting at home */
 .cards-complete .deck-card--picked,
-body:not(.play-intro):not(.cards-extracting) .deck-card--picked {
+body:not(.play-intro):not(.cards-extracting):not(.cards-bursting) .deck-card--picked {
   opacity: 1;
   pointer-events: auto;
   transform: translate3d(var(--fx), var(--fy), 0) rotate(var(--fr)) scale(1);
@@ -3345,6 +3352,28 @@ section {
   .music-player__title,
   .music-player__title-clone {
     font-size: 0.7rem;
+  }
+}
+
+/* ==========================================================
+   3D WEBGL GRAPHICS CANVAS (THREE.JS)
+   ========================================================== */
+.three-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.85;
+  transition: opacity 0.8s ease;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .three-canvas {
+    opacity: 0.25;
   }
 }
 

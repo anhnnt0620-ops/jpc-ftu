@@ -9,10 +9,14 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;900&family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Noto+Serif+JP:wght@600;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <script src="playlist.js" defer></script>
-  <script src="script.js" defer></script>
+  <!-- Modern 3D & Animation Bundle (Three.js, GSAP, Lenis, Confetti via Node.js / Vite) -->
+  <script type="module" src="./main.js"></script>
 </head>
 <body>
+
+  <!-- 3D WebGL Graphics Canvas -->
+  <canvas id="threeCanvas" class="three-canvas" aria-hidden="true"></canvas>
+  <div class="snap-flash" id="snapFlash" aria-hidden="true"></div>
 
   <!-- Ambient Atmospheric FX (Organic Wandering Light & Shadow) -->
   <div class="bg-ambience" id="bgAmbience" aria-hidden="true">

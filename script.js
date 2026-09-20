@@ -228,6 +228,11 @@ function initViewNavigation() {
       history.pushState(null, '', `#${viewId}`);
     }
 
+    // Synchronize 3D WebGL camera and background depth with current view
+    if (window.JPC3D && typeof window.JPC3D.transitionView === 'function') {
+      window.JPC3D.transitionView(activeView ? activeView.id : viewId);
+    }
+
     if (requestedEl && requestedEl !== activeView) {
       setTimeout(() => {
         requestedEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -501,7 +506,7 @@ function initHeroIntroTimeline() {
     return;
   }
 
-  // Phase 1: Begin Intro with 12 cards on arc
+  // Phase 1: Begin Intro with 3D Swirl & Fist Clench
   document.body.classList.add('play-intro');
 
   if (titleTextEl) {
@@ -511,20 +516,34 @@ function initHeroIntroTimeline() {
     titleCursorEl.classList.add('is-hidden');
   }
 
-  // Phase 2 & 3: At 2.15s, split cards: 8 sink & fade out, 4 swoop along 3D arc to Home
-  extractionTimer = window.setTimeout(() => {
+  const handleSnapTrigger = () => {
     if (hasSkipped) return;
-    document.body.classList.add('cards-extracting');
-  }, 2150);
+    document.body.classList.add('cards-extracting', 'cards-bursting');
+    const snapFlash = document.getElementById('snapFlash');
+    if (snapFlash) {
+      snapFlash.classList.add('is-active');
+      setTimeout(() => {
+        if (snapFlash) snapFlash.classList.remove('is-active');
+      }, 600);
+    }
+  };
 
-  // Phase 4: At 3.70s, 4 cards have fully settled at Home positions. Transition seamlessly to floating & typing!
-  completionTimer = window.setTimeout(() => {
+  const handleIntroComplete = () => {
     if (hasSkipped) return;
     settleAndStartTyping();
-  }, 3700);
+  };
+
+  // Connect directly with Three.js 3D Finger-Snap Intro Engine
+  if (window.JPC3D && typeof window.JPC3D.playSnapIntro === 'function') {
+    window.JPC3D.playSnapIntro(handleSnapTrigger, handleIntroComplete);
+  } else {
+    // Fallback timers if 3D scene is initializing
+    extractionTimer = window.setTimeout(handleSnapTrigger, 1950);
+    completionTimer = window.setTimeout(handleIntroComplete, 3600);
+  }
 
   function settleAndStartTyping() {
-    document.body.classList.remove('play-intro', 'cards-extracting');
+    document.body.classList.remove('play-intro', 'cards-extracting', 'cards-bursting');
     document.body.classList.add('cards-complete', 'hero-text-active');
     // Intro animation has finished running (4 cards settled). Automatically start music!
     notifyIntroComplete();
@@ -591,7 +610,11 @@ function initHeroIntroTimeline() {
     window.clearTimeout(completionTimer);
     window.clearTimeout(typeTimer);
 
-    document.body.classList.remove('play-intro', 'cards-extracting');
+    if (window.JPC3D && typeof window.JPC3D.finishInstant3D === 'function') {
+      window.JPC3D.finishInstant3D();
+    }
+
+    document.body.classList.remove('play-intro', 'cards-extracting', 'cards-bursting');
     document.body.classList.add('cards-complete', 'hero-text-active');
     notifyIntroComplete();
 
@@ -1044,6 +1067,10 @@ function startMusicPlayback() {
     playerEl.classList.add('is-playing');
   }
 
+  if (window.JPC3D && typeof window.JPC3D.pulse === 'function') {
+    window.JPC3D.pulse(1.3);
+  }
+
   // Ensure current track is properly loaded if audio was in error state or empty
   const playlist = getPlaylist();
   const currentTrack = playlist[currentTrackIndex];
@@ -1125,6 +1152,10 @@ function playRandomTrack(isManual = false) {
   if (shuffleBtn && isManual) {
     shuffleBtn.style.transform = 'rotate(180deg) scale(1.15)';
     setTimeout(() => { shuffleBtn.style.transform = ''; }, 280);
+  }
+
+  if (window.JPC3D && typeof window.JPC3D.pulse === 'function') {
+    window.JPC3D.pulse(1.35);
   }
 
   // 1. Instantly silence current track before loading next
