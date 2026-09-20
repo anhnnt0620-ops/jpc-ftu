@@ -173,5 +173,8 @@ if (document.readyState === 'loading') {
 
 // Import subordinate modules (Three.js Scene, Playlist, Application Scripts)
 import './three-scene.js';
-import './playlist.js';
+import JPC_PLAYLIST from './playlist.js';
+if (typeof window !== 'undefined') {
+  window.JPC_PLAYLIST = JPC_PLAYLIST;
+}
 import './script.js';

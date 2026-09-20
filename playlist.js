@@ -481,3 +481,11 @@ const JPC_PLAYLIST = [
     gain: 0.56
   }
 ];
+
+// Expose globally for script.js and application interoperability
+if (typeof window !== 'undefined') {
+  window.JPC_PLAYLIST = JPC_PLAYLIST;
+}
+
+export default JPC_PLAYLIST;
+export { JPC_PLAYLIST };

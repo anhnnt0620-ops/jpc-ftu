@@ -14,8 +14,15 @@ function copyStaticAssets() {
         const src = path.resolve(process.cwd(), folder);
         const dest = path.resolve(outDir, folder);
         if (fs.existsSync(src)) {
-          fs.cpSync(src, dest, { recursive: true, force: true });
-          console.log(`[Vite Build] Copied ${folder}/ -> dist/${folder}/`);
+          try {
+            if (fs.existsSync(dest)) {
+              fs.rmSync(dest, { recursive: true, force: true });
+            }
+            fs.cpSync(src, dest, { recursive: true, force: true });
+            console.log(`[Vite Build] Copied ${folder}/ -> dist/${folder}/`);
+          } catch (err) {
+            console.warn(`[Vite Build] Note: could not overwrite dist/${folder}/ directly (${err.message}). Existing files retained.`);
+          }
         }
       });
     }

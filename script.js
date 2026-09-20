@@ -519,6 +519,11 @@ function initHeroIntroTimeline() {
   const handleSnapTrigger = () => {
     if (hasSkipped) return;
     document.body.classList.add('cards-extracting', 'cards-bursting');
+    
+    // Búng tay là dấu hiệu bật nhạc, búng tay xong là nhạc chạy luôn
+    unlockAudioContext();
+    startMusicPlayback();
+
     const snapFlash = document.getElementById('snapFlash');
     if (snapFlash) {
       snapFlash.classList.add('is-active');
@@ -531,6 +536,9 @@ function initHeroIntroTimeline() {
   const handleIntroComplete = () => {
     if (hasSkipped) return;
     settleAndStartTyping();
+    if (!isMusicPlaying) {
+      startMusicPlayback();
+    }
   };
 
   // Connect directly with Three.js 3D Finger-Snap Intro Engine
@@ -630,23 +638,24 @@ function initHeroIntroTimeline() {
     }
   }
 
-  // Allow clicking anywhere on the hero banner to skip straight to final state
+  // Any tap or click on the hero banner primes audio & user gesture without canceling 3D intro!
   if (hero) {
     hero.addEventListener('click', (e) => {
-      // Don't trigger skip if clicking on a button or link
-      if (e.target.closest('a, button')) return;
+      // Don't interfere if clicking on explicit links, buttons or interactive controls
+      if (e.target.closest('a, button, input, textarea, #musicPlayer')) return;
       hasUserInteracted = true;
-      if (!document.body.classList.contains('cards-complete')) {
-        finishInstant();
-      } else if (typeof startMusicPlayback === 'function' && !isMusicPlaying) {
-        startMusicPlayback();
+      unlockAudioContext();
+      if (pendingAutoPlay || document.body.classList.contains('cards-extracting') || document.body.classList.contains('cards-complete')) {
+        if (!isMusicPlaying) {
+          startMusicPlayback();
+        }
       }
     });
   }
 
-  // Pressing Space or Escape also skips intro
+  // Pressing Escape skips intro if user explicitly wishes to skip
   window.addEventListener('keydown', (e) => {
-    if (e.key === ' ' || e.key === 'Escape') {
+    if (e.key === 'Escape') {
       hasUserInteracted = true;
       if (!document.body.classList.contains('cards-complete')) {
         finishInstant();
@@ -754,8 +763,9 @@ function initMediaSessionHandlers() {
 }
 
 function getPlaylist() {
-  return (typeof JPC_PLAYLIST !== 'undefined' && Array.isArray(JPC_PLAYLIST) && JPC_PLAYLIST.length > 0)
-    ? JPC_PLAYLIST
+  const pl = (typeof window !== 'undefined' && window.JPC_PLAYLIST) || (typeof JPC_PLAYLIST !== 'undefined' ? JPC_PLAYLIST : null);
+  return (pl && Array.isArray(pl) && pl.length > 0)
+    ? pl
     : [
         {
           title: 'Inazuma',
@@ -1029,8 +1039,8 @@ function handleGlobalUserGesture(e) {
   unlockAudioContext();
   if (!activeAudio) return;
 
-  // Only trigger music if intro animation has finished and music is waiting to autoplay
-  if (isIntroAnimationFinished && pendingAutoPlay && !isMusicPlaying) {
+  // Trigger music whenever autoplay is pending
+  if (pendingAutoPlay && !isMusicPlaying) {
     startMusicPlayback();
   }
 }
@@ -1079,7 +1089,8 @@ function startMusicPlayback() {
     bgAudio.load();
   }
 
-  // Apply calibrated BGM volume with gentle ramp if starting from silence
+  // Ensure unmuted & apply calibrated BGM volume with gentle ramp if starting from silence
+  bgAudio.muted = false;
   if (bgAudio.volume < getTrackTargetVolume(currentTrack) * 0.5) {
     applyBgmVolume(true, currentTrack);
   }
@@ -1105,6 +1116,18 @@ function startMusicPlayback() {
             playerEl.classList.remove('is-playing');
           }
           if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
+
+          // Immediate seamless fallback: the very next touch/click anywhere starts music instantly
+          const triggerOnFirstTouch = () => {
+            window.removeEventListener('pointerdown', triggerOnFirstTouch, { capture: true });
+            window.removeEventListener('touchstart', triggerOnFirstTouch, { capture: true });
+            window.removeEventListener('click', triggerOnFirstTouch, { capture: true });
+            unlockAudioContext();
+            startMusicPlayback();
+          };
+          window.addEventListener('pointerdown', triggerOnFirstTouch, { capture: true, once: true });
+          window.addEventListener('touchstart', triggerOnFirstTouch, { capture: true, once: true });
+          window.addEventListener('click', triggerOnFirstTouch, { capture: true, once: true });
         } else {
           // Media decode/network error: auto advance to next playable track
           console.warn('Media error detected, advancing to next track');
