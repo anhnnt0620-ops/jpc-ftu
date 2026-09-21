@@ -678,13 +678,8 @@
       <p class="section__lede">Cùng nhìn lại một trong những sân chơi tiêu biểu của JPC — sự kiện quy tụ những người trẻ đam mê tìm hiểu văn hóa Nhật Bản.</p>
     </div>
 
-    <figure class="event-feature">
-      <img src="Image/event-feature.png" alt="和の決戦 — Quyết Chiến Nhật Bản">
-      <figcaption>
-        <span class="event-feature__title">和の決戦 — Quyết Chiến Nhật Bản</span>
-        <span class="event-feature__desc">Cuộc thi tìm hiểu văn hóa Nhật Bản thường niên của JPC, trải qua ba vòng: Sơ loại, Bán kết và Chung kết.</span>
-      </figcaption>
-    </figure>
+    <!-- Dynamic Timeline & Event Cards rendered by EventsManager -->
+    <div class="events-timeline-container" id="eventsTimelineContainer"></div>
 
     <p class="events__follow">
       Muốn không bỏ lỡ sự kiện tiếp theo? Theo dõi Fanpage và TikTok của JPC FTU ở cuối trang để cập nhật lịch mới nhất.
@@ -761,9 +756,218 @@
         </li>
       </ul>
 
-      <p class="contact__credit">Website made by Nguyễn Ánh · Zuki</p>
+      <p class="contact__credit">
+        Website made by Nguyễn Ánh · Zuki
+        <button type="button" class="admin-secret-lock" id="adminSecretLock" aria-label="Cổng quản trị sự kiện JPC" title="Cổng quản trị sự kiện (Ctrl+Shift+A)">🔒</button>
+      </p>
     </div>
   </footer>
+
+  <!-- ============ EVENT DETAIL MODAL (MÀN HÌNH NHỎ) ============ -->
+  <div class="event-modal" id="eventDetailModal" role="dialog" aria-modal="true" aria-labelledby="eventModalTitle" data-lenis-prevent>
+    <div class="event-modal-backdrop" id="eventModalBackdrop" aria-hidden="true"></div>
+    <div class="event-modal-dialog" data-lenis-prevent>
+      <!-- Animated Fluid / Ripple Background Layer -->
+      <div class="event-modal-bg" aria-hidden="true"></div>
+      <div class="event-modal-overlay" aria-hidden="true"></div>
+
+      <!-- Close Button ('X') -->
+      <button type="button" class="event-modal-close" id="eventModalCloseBtn" aria-label="Đóng cửa sổ chi tiết">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <!-- Modal Body (2 Columns matching Màn hình nhỏ.png) -->
+      <div class="event-modal-body">
+        <!-- Left Column: 1:1 Thumbnail + Title + Date -->
+        <div class="event-modal-col event-modal-col--left">
+          <div class="event-modal-thumb-wrap">
+            <img src="" alt="Thumbnail sự kiện" class="event-modal-thumb" id="eventModalThumb">
+          </div>
+          <h3 class="event-modal-title" id="eventModalTitle">Tên sự kiện</h3>
+          <p class="event-modal-date" id="eventModalDate">DD/MM/YYYY</p>
+        </div>
+
+        <!-- Center Decorative Glowing Gradient 4-point Star Divider -->
+        <div class="event-modal-star-divider" aria-hidden="true">
+          <span class="event-modal-star-ray"></span>
+          <div class="event-modal-star">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 0L14.2 9.8L24 12L14.2 14.2L12 24L9.8 14.2L0 12L9.8 9.8L12 0Z" fill="url(#starGradient)"/>
+              <defs>
+                <radialGradient id="starGradient" cx="0.5" cy="0.5" r="0.5" fx="0.5" fy="0.5">
+                  <stop offset="0%" stop-color="#ffffff"/>
+                  <stop offset="40%" stop-color="#eecd7e"/>
+                  <stop offset="85%" stop-color="#cf9f3f"/>
+                  <stop offset="100%" stop-color="#a82338"/>
+                </radialGradient>
+              </defs>
+            </svg>
+          </div>
+          <span class="event-modal-star-ray"></span>
+        </div>
+
+        <!-- Right Column: Detailed Description with Custom Scrollbar (max-height = thumbnail height) -->
+        <div class="event-modal-col event-modal-col--right">
+          <div class="event-modal-desc" id="eventModalDesc" data-lenis-prevent>
+            <!-- Dynamic Paragraphs -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ ADMIN PIN LOGIN MODAL ============ -->
+  <div class="admin-login-modal" id="adminLoginModal" role="dialog" aria-modal="true" aria-labelledby="adminLoginMainTitle" data-lenis-prevent>
+    <div class="admin-login-modal__backdrop" id="adminLoginBackdrop" aria-hidden="true"></div>
+    <div class="admin-login-modal__dialog" data-lenis-prevent>
+      <button type="button" class="admin-login-modal__close" id="adminLoginCloseBtn" aria-label="Đóng xác thực">✕</button>
+      <div class="admin-login-box">
+        <div class="admin-login-icon" aria-hidden="true">🔐</div>
+        <h3 class="admin-login-title" id="adminLoginMainTitle">Cổng Quản Trị Sự Kiện JPC</h3>
+        <p class="admin-login-sub">Nhập mã PIN xác thực để truy cập giao diện quản trị CMS:</p>
+        <form id="adminLoginForm" class="admin-login-form">
+          <input type="password" id="adminPinInput" class="admin-input admin-input--pin" placeholder="••••••••" autocomplete="current-password" required>
+          <button type="submit" class="admin-btn admin-btn--primary">Đăng nhập Quản trị</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ DEDICATED FULLSCREEN ADMIN STUDIO UI ============ -->
+  <div class="admin-portal" id="adminPortal" role="region" aria-label="Giao diện quản trị sự kiện JPC Event Studio" data-lenis-prevent hidden>
+    <!-- Top Header Bar -->
+    <header class="admin-portal__header">
+      <div class="admin-portal__brand">
+        <span class="admin-portal__logo-icon">⛩️</span>
+        <div class="admin-portal__brand-text">
+          <h2 class="admin-portal__title">JPC Event CMS Studio</h2>
+          <span class="admin-portal__badge">Giao Diện Quản Trị Chuyên Biệt</span>
+        </div>
+      </div>
+
+      <div class="admin-portal__actions">
+        <button type="button" class="admin-portal__btn admin-portal__btn--outline" id="adminBtnExportJSON" title="Sao lưu sự kiện thành file JSON">📥 Xuất JSON</button>
+        <button type="button" class="admin-portal__btn admin-portal__btn--outline" id="adminBtnImportJSON" title="Nhập sự kiện từ file JSON">📤 Nhập JSON</button>
+        <input type="file" id="adminInputImportFile" accept=".json" style="display:none;">
+        <button type="button" class="admin-portal__btn admin-portal__btn--danger-outline" id="adminBtnResetDefaults" title="Khôi phục về 2 sự kiện mẫu ban đầu">↺ Khôi phục gốc</button>
+        <button type="button" class="admin-portal__btn admin-portal__btn--viewsite" id="adminBtnViewSite" title="Xem giao diện website bên ngoài">🌐 Xem Trang Chủ</button>
+        <button type="button" class="admin-portal__btn admin-portal__btn--logout" id="adminBtnLogout" title="Đăng xuất khỏi CMS">🚪 Thoát Admin</button>
+      </div>
+    </header>
+
+    <!-- Main 2-Panel Workspace -->
+    <main class="admin-portal__body">
+      <!-- Left Panel: Event Master List -->
+      <section class="admin-portal__sidebar" data-lenis-prevent>
+        <div class="admin-portal__sidebar-header">
+          <div class="admin-portal__sidebar-meta">
+            <h3 class="admin-portal__sidebar-title">Danh Sách Sự Kiện</h3>
+            <span class="admin-portal__count" id="adminEventCount">2 sự kiện</span>
+          </div>
+          <button type="button" class="admin-portal__btn-create" id="adminBtnAddNew">
+            <span class="admin-portal__btn-icon">＋</span> Thêm Sự Kiện Mới
+          </button>
+        </div>
+
+        <div class="admin-portal__list-scroll" id="adminEventList" data-lenis-prevent>
+          <!-- Dynamic Event Cards injected via JS -->
+        </div>
+      </section>
+
+      <!-- Right Panel: Event Detail Editor Form -->
+      <section class="admin-portal__editor-area" data-lenis-prevent>
+        <div class="admin-portal__editor-header">
+          <div>
+            <span class="admin-portal__editor-tag" id="adminEditorTag">Chế độ chỉnh sửa</span>
+            <h3 class="admin-portal__editor-title" id="adminFormTitle">Chỉnh Sửa Sự Kiện</h3>
+          </div>
+          <div class="admin-portal__editor-quick">
+            <button type="button" class="admin-portal__btn admin-portal__btn--ghost" id="adminBtnCancelForm">✕ Hủy / Tạo mới</button>
+            <button type="button" class="admin-portal__btn admin-portal__btn--save-top" id="adminBtnSaveEventTop">💾 Lưu Sự Kiện</button>
+          </div>
+        </div>
+
+        <div class="admin-portal__editor-scroll" data-lenis-prevent>
+          <form id="adminEventForm" class="admin-portal__form">
+            <div class="admin-portal__form-grid">
+              <!-- Event Title -->
+              <div class="admin-form-group admin-form-group--full">
+                <label for="formEventTitle">Tên sự kiện <span class="req">*</span></label>
+                <input type="text" id="formEventTitle" class="admin-input" placeholder="Ví dụ: 和の決戦 — QUYẾT CHIẾN NHẬT BẢN" required>
+              </div>
+
+              <!-- Event Date for sorting -->
+              <div class="admin-form-group">
+                <label for="formEventDate">Ngày tổ chức (Dùng để SẮP XẾP TỰ ĐỘNG) <span class="req">*</span></label>
+                <input type="date" id="formEventDate" class="admin-input" required>
+                <small class="admin-field-hint">Sự kiện có ngày mới hơn sẽ tự động hiển thị trên cùng.</small>
+              </div>
+
+              <!-- Date Display Text -->
+              <div class="admin-form-group">
+                <label for="formEventDateDisplay">Văn bản ngày hiển thị (Tùy chọn)</label>
+                <input type="text" id="formEventDateDisplay" class="admin-input" placeholder="Ví dụ: 15/02 – 04/04/2026 hoặc 18/10/2026">
+                <small class="admin-field-hint">Nếu để trống, hệ thống tự định dạng ngày DD/MM/YYYY.</small>
+              </div>
+
+              <!-- Timeframe Badge -->
+              <div class="admin-form-group admin-form-group--full">
+                <label for="formEventTimeframe">Mốc Timeframe trên thanh dọc (Tùy chọn)</label>
+                <input type="text" id="formEventTimeframe" class="admin-input" placeholder="Ví dụ: 04/2026 hoặc 10/2026">
+                <small class="admin-field-hint">Hiển thị trên trục thời gian dọc ở mép trái màn hình.</small>
+              </div>
+
+              <!-- Short Description -->
+              <div class="admin-form-group admin-form-group--full">
+                <label for="formEventShortDesc">Mô tả ngắn (Hiển thị ở trang chính dưới ảnh cover) <span class="req">*</span></label>
+                <textarea id="formEventShortDesc" class="admin-textarea" rows="2" placeholder="Tóm tắt ngắn gọn 1-2 câu về sự kiện... (Tối đa 2 dòng hiển thị trên card)" required data-lenis-prevent></textarea>
+              </div>
+
+              <!-- Cover Image Upload -->
+              <div class="admin-form-group">
+                <label>Ảnh Cover / Banner (Khung trang chính — Không mất góc) <span class="req">*</span></label>
+                <div class="admin-file-upload-box">
+                  <input type="file" id="formCoverFile" accept="image/*" class="admin-file-input">
+                  <div class="admin-img-preview admin-img-preview--cover" id="formCoverPreview">
+                    <span class="admin-file-placeholder">Chưa chọn ảnh</span>
+                  </div>
+                  <small class="admin-file-tip">Upload ảnh từ máy tính (Tỷ lệ ~2.56:1 hoặc 16:9, khung hiển thị trọn vẹn không xén góc).</small>
+                </div>
+              </div>
+
+              <!-- Thumbnail 1:1 Image Upload -->
+              <div class="admin-form-group">
+                <label>Ảnh Thumbnail vuông 1:1 (Modal chi tiết) <span class="req">*</span></label>
+                <div class="admin-file-upload-box">
+                  <input type="file" id="formThumbFile" accept="image/*" class="admin-file-input">
+                  <div class="admin-img-preview admin-img-preview--square" id="formThumbPreview">
+                    <span class="admin-file-placeholder">Chưa chọn ảnh</span>
+                  </div>
+                  <small class="admin-file-tip">Ảnh đại diện vuông chuẩn 1:1 cho popup chi tiết sự kiện.</small>
+                </div>
+              </div>
+
+              <!-- Full Detailed Description -->
+              <div class="admin-form-group admin-form-group--full">
+                <label for="formEventFullDesc">Thông tin chi tiết sự kiện (Khung cuộn của Modal) <span class="req">*</span></label>
+                <textarea id="formEventFullDesc" class="admin-textarea" rows="7" placeholder="Nội dung chi tiết, thể lệ, thời gian, các vòng thi, quyền lợi tham gia... (Xuống dòng tự động tạo đoạn văn mới)" required data-lenis-prevent></textarea>
+              </div>
+            </div>
+
+            <!-- Action Bar -->
+            <div class="admin-portal__form-actions">
+              <button type="button" class="admin-portal__btn admin-portal__btn--ghost" id="adminBtnCancelForm2">✕ Hủy bỏ</button>
+              <button type="button" class="admin-portal__btn admin-portal__btn--danger" id="adminBtnDeleteEvent" style="display:none;">🗑️ Xóa Sự Kiện Này</button>
+              <button type="submit" class="admin-portal__btn admin-portal__btn--primary admin-portal__btn--lg" id="adminBtnSaveEvent">💾 Lưu Sự Kiện</button>
+            </div>
+          </form>
+        </div>
+      </section>
+    </main>
+  </div>
 
 </body>
 </html>

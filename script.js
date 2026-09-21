@@ -520,16 +520,31 @@ function initHeroIntroTimeline() {
     if (hasSkipped) return;
     document.body.classList.add('cards-extracting', 'cards-bursting');
     
-    // Búng tay là dấu hiệu bật nhạc, búng tay xong là nhạc chạy luôn
+    // Búng tay là dấu hiệu bật nhạc: Đảm bảo bài Playlist/Inazuma.m4a phát tự động lập tức
     unlockAudioContext();
+
+    const playlist = getPlaylist();
+    const inazumaIdx = playlist.findIndex((t) => t.src && t.src.toLowerCase().includes('inazuma.m4a'));
+    if (inazumaIdx !== -1) {
+      currentTrackIndex = inazumaIdx;
+      if (bgAudio && (!bgAudio.src || !bgAudio.src.toLowerCase().includes('inazuma.m4a'))) {
+        bgAudio.src = encodeURI(playlist[currentTrackIndex].src);
+        bgAudio.load();
+      }
+      const titleEl = document.getElementById('musicPlayerTitle');
+      if (titleEl) {
+        titleEl.textContent = playlist[currentTrackIndex].title;
+        titleEl.setAttribute('title', playlist[currentTrackIndex].fullTitle || playlist[currentTrackIndex].title);
+      }
+      updateTitleMarquee();
+    }
+
     startMusicPlayback();
 
+    // Steady ambient visual - no full-screen flash over the petals
     const snapFlash = document.getElementById('snapFlash');
     if (snapFlash) {
-      snapFlash.classList.add('is-active');
-      setTimeout(() => {
-        if (snapFlash) snapFlash.classList.remove('is-active');
-      }, 600);
+      snapFlash.classList.remove('is-active');
     }
   };
 
@@ -546,8 +561,8 @@ function initHeroIntroTimeline() {
     window.JPC3D.playSnapIntro(handleSnapTrigger, handleIntroComplete);
   } else {
     // Fallback timers if 3D scene is initializing
-    extractionTimer = window.setTimeout(handleSnapTrigger, 1950);
-    completionTimer = window.setTimeout(handleIntroComplete, 3600);
+    extractionTimer = window.setTimeout(handleSnapTrigger, 1350);
+    completionTimer = window.setTimeout(handleIntroComplete, 2500);
   }
 
   function settleAndStartTyping() {
@@ -712,11 +727,11 @@ function applyBgmVolume(smooth = false, track = null) {
     return;
   }
 
-  // Smooth gentle fade-in ramp (500ms) để không bị tiếng to đột ngột khi đổi bài
-  const startVol = Math.min(0.03, targetVol * 0.3);
-  bgAudio.volume = startVol;
-  const duration = 500;
-  const steps = 12;
+  // Smooth gentle fade-in ramp (200ms) starting strictly from 0 to prevent DAC pop or click
+  const startVol = 0.0;
+  bgAudio.volume = 0.0;
+  const duration = 200;
+  const steps = 10;
   const stepTime = duration / steps;
   const volInc = (targetVol - startVol) / steps;
   let currentStep = 0;

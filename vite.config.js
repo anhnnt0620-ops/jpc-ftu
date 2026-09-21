@@ -7,7 +7,7 @@ function copyStaticAssets() {
   return {
     name: 'copy-static-assets',
     closeBundle() {
-      const folders = ['Image', 'Playlist', 'Font'];
+      const folders = ['Image', 'Playlist', 'Font', 'model'];
       const outDir = path.resolve(process.cwd(), 'dist');
       
       folders.forEach((folder) => {
@@ -38,7 +38,10 @@ export default defineConfig({
   server: {
     port: 3000,
     open: true,
-    cors: true
+    cors: true,
+    watch: {
+      ignored: ['**/Minh họa/**', '**/dist/**', '**/.git/**']
+    }
   },
   build: {
     outDir: 'dist',

@@ -53,7 +53,8 @@ function initSmoothScroll() {
     gsap.ticker.add((time) => {
       lenis.raf(time * 1000);
     });
-    gsap.ticker.lagSmoothing(0);
+    // Restore GSAP optimal frame lag smoothing to prevent stutter/jumps during heavy frames
+    gsap.ticker.lagSmoothing(500, 33);
 
     // Synchronize scroll depth with 3D camera parallax
     lenis.on('scroll', ({ scroll, limit }) => {
@@ -111,24 +112,31 @@ function init3DCardHoverPhysics() {
   const cards = document.querySelectorAll('.about__card, .dept__card, .journey__step, .join__card, .timeline__item');
 
   cards.forEach((card) => {
+    let ticking = false;
     card.addEventListener('mousemove', (e) => {
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      const centerX = rect.width / 2;
-      const centerY = rect.height / 2;
-      const rotateX = ((y - centerY) / centerY) * -7;
-      const rotateY = ((x - centerX) / centerX) * 7;
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const rotateX = ((y - centerY) / centerY) * -7;
+        const rotateY = ((x - centerX) / centerX) * 7;
 
-      gsap.to(card, {
-        rotateX: rotateX,
-        rotateY: rotateY,
-        transformPerspective: 1000,
-        scale: 1.02,
-        duration: 0.35,
-        ease: 'power2.out'
+        gsap.to(card, {
+          rotateX: rotateX,
+          rotateY: rotateY,
+          transformPerspective: 1000,
+          scale: 1.02,
+          duration: 0.35,
+          ease: 'power2.out',
+          overwrite: 'auto'
+        });
+        ticking = false;
       });
-    });
+    }, { passive: true });
 
     card.addEventListener('mouseleave', () => {
       gsap.to(card, {
@@ -136,7 +144,8 @@ function init3DCardHoverPhysics() {
         rotateY: 0,
         scale: 1.0,
         duration: 0.6,
-        ease: 'power3.out'
+        ease: 'power3.out',
+        overwrite: 'auto'
       });
     });
   });
@@ -178,3 +187,4 @@ if (typeof window !== 'undefined') {
   window.JPC_PLAYLIST = JPC_PLAYLIST;
 }
 import './script.js';
+import './events-manager.js';

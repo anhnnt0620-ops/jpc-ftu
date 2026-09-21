@@ -42,10 +42,10 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
     gloveColor: 0x222432,
     accentRed: 0xff1e46,
     goldLight: 0xf6d382,
-    particleCount: window.innerWidth <= 768 ? 95 : 185,
-    bloomStrength: 0.68,
-    bloomRadius: 0.45,
-    bloomThreshold: 0.28
+    particleCount: window.innerWidth <= 768 ? 55 : 105,
+    bloomStrength: 0.55,
+    bloomRadius: 0.40,
+    bloomThreshold: 0.32
   };
 
   // Core Engine State
@@ -62,7 +62,7 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
   let isRunning = false;
   let isIntroPlaying = false;
   let introStartTime = 0;
-  const introDuration = 3.6; // seconds
+  const introDuration = 2.5; // seconds (shortened pose hold per user request)
   let hasSnapped = false;
   let onSnapCallback = null;
   let onIntroCompleteCallback = null;
@@ -70,34 +70,34 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
   let cameraRecoilZ = 0;
   const clock = new THREE.Clock();
 
-  // 1. Anatomical Resting Finger Curvature (Directly matching reference image pose)
+  // 1. Anatomical Resting Finger Curvature (Directly matching reference images 2 & 3)
   const ANATOMICAL_REST_POSE = {
-    index:  { p1X: 0.26, p2X: 0.32, p3X: 0.18, rootZ: -0.06 },
-    middle: { p1X: 0.34, p2X: 0.44, p3X: 0.24, rootZ:  0.00 },
-    ring:   { p1X: 0.44, p2X: 0.54, p3X: 0.28, rootZ:  0.06 },
-    pinky:  { p1X: 0.52, p2X: 0.64, p3X: 0.32, rootZ:  0.14 },
-    thumb:  { p1X: 0.28, p1Z: 0.35, p2X: 0.22 },
+    index:  { p1X: 0.22, p2X: 0.26, p3X: 0.16, rootZ: -0.06 },
+    middle: { p1X: 0.30, p2X: 0.38, p3X: 0.20, rootZ:  0.00 },
+    ring:   { p1X: 0.40, p2X: 0.48, p3X: 0.24, rootZ:  0.06 },
+    pinky:  { p1X: 0.48, p2X: 0.58, p3X: 0.28, rootZ:  0.13 },
+    thumb:  { p1X: 0.24, p1Z: 0.32, p2X: 0.18 },
     hand:   { rotX: -0.16, rotY: 0.38, rotZ: -0.10 }
   };
 
-  // 2. High-Tension Stance Pose (Middle finger pad firmly locked against thumb ball)
+  // 2. High-Tension Stance Pose (Middle finger pad locked firmly against thumb pad, index poised)
   const TENSION_POSE = {
-    index:  { p1X: 0.20, p2X: 0.24, p3X: 0.16, rootZ: -0.16 },
-    middle: { p1X: 1.48, p2X: 1.55, p3X: 0.85, rootZ: -0.12 },
-    ring:   { p1X: 1.65, p2X: 1.70, p3X: 1.10, rootZ:  0.06 },
-    pinky:  { p1X: 1.70, p2X: 1.75, p3X: 1.15, rootZ:  0.14 },
-    thumb:  { p1X: 0.76, p1Z: -0.58, p2X: 0.45 },
-    hand:   { rotX: -0.30, rotY: 0.52, rotZ: -0.18 }
+    index:  { p1X: 0.18, p2X: 0.22, p3X: 0.14, rootZ: -0.14 },
+    middle: { p1X: 1.44, p2X: 1.50, p3X: 0.78, rootZ: -0.10 },
+    ring:   { p1X: 1.62, p2X: 1.68, p3X: 1.05, rootZ:  0.06 },
+    pinky:  { p1X: 1.68, p2X: 1.72, p3X: 1.10, rootZ:  0.13 },
+    thumb:  { p1X: 0.72, p1Z: -0.52, p2X: 0.40 },
+    hand:   { rotX: -0.28, rotY: 0.48, rotZ: -0.16 }
   };
 
-  // 3. Post-Snap Impact Pose (Middle finger slammed onto thenar eminence, thumb flicked open)
+  // 3. Post-Snap Impact Pose (Middle finger snapped onto thenar eminence, thumb flicked open)
   const IMPACT_POSE = {
-    index:  { p1X: 0.24, p2X: 0.28, p3X: 0.18, rootZ: -0.16 },
-    middle: { p1X: 2.05, p2X: 1.95, p3X: 1.18, rootZ:  0.04 },
-    ring:   { p1X: 1.68, p2X: 1.72, p3X: 1.10, rootZ:  0.06 },
-    pinky:  { p1X: 1.72, p2X: 1.78, p3X: 1.15, rootZ:  0.14 },
-    thumb:  { p1X: 0.38, p1Z: 0.72, p2X: 0.12 },
-    hand:   { rotX: -0.22, rotY: 0.46, rotZ: -0.10 }
+    index:  { p1X: 0.22, p2X: 0.25, p3X: 0.16, rootZ: -0.14 },
+    middle: { p1X: 2.02, p2X: 1.90, p3X: 1.12, rootZ:  0.02 },
+    ring:   { p1X: 1.64, p2X: 1.70, p3X: 1.06, rootZ:  0.06 },
+    pinky:  { p1X: 1.70, p2X: 1.74, p3X: 1.12, rootZ:  0.13 },
+    thumb:  { p1X: 0.34, p1Z: 0.68, p2X: 0.10 },
+    hand:   { rotX: -0.22, rotY: 0.44, rotZ: -0.10 }
   };
 
   function applyAnatomicalRestPose() {
@@ -186,7 +186,7 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
       return;
     }
 
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.15;
@@ -262,30 +262,35 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
   /**
    * 3. LIGHTING RIG
    */
+  let globalCardTexture = null;
+
   function setupLighting() {
-    ambientLight = new THREE.AmbientLight(0xfff7ee, 1.15);
+    // Clean, rich ambient light so dark glove details don't crush to pitch black
+    ambientLight = new THREE.AmbientLight(0x403440, 1.25);
     scene.add(ambientLight);
 
-    goldLight = new THREE.PointLight(CONFIG.goldLight, 3.2, 45, 1.1);
-    goldLight.position.set(4.5, 5.5, 7.5);
+    // Warm champagne studio key light shining directly on hand & fingers
+    goldLight = new THREE.DirectionalLight(0xffeedd, 3.2);
+    goldLight.position.set(3.2, 4.8, 7.2);
     scene.add(goldLight);
 
-    // Powerful Crimson Silhouette Rim Light grazing the hand from behind-left
-    rimLight = new THREE.PointLight(0xff123d, 6.5, 28, 1.2);
-    rimLight.position.set(-3.2, 1.0, 1.8);
+    // Refined Crimson Silhouette Rim Light from back-left (softened so aura is clean without harsh glare)
+    rimLight = new THREE.PointLight(0xff2855, 4.8, 32, 1.2);
+    rimLight.position.set(-3.5, 1.8, 2.5);
     scene.add(rimLight);
 
-    // Secondary Crimson Back-Light directly behind hand for halo effect
-    const handBackLight = new THREE.PointLight(0xee0028, 4.8, 20, 1.3);
-    handBackLight.position.set(0.12, 0.2, 1.0);
-    scene.add(handBackLight);
+    // Secondary Rose-Violet Rim Light from back-right
+    const rimRight = new THREE.PointLight(0xff5588, 2.6, 25, 1.3);
+    rimRight.position.set(3.4, 2.0, 1.8);
+    scene.add(rimRight);
 
-    // Warm Golden Key Light illuminating the palmar details
-    skinFillLight = new THREE.DirectionalLight(0xffeedb, 1.35);
-    skinFillLight.position.set(1.5, 3.0, 8.0);
+    // Rose studio fill light to sculpt anatomical palm & finger muscles
+    skinFillLight = new THREE.DirectionalLight(0xffbcc8, 1.4);
+    skinFillLight.position.set(1.2, 2.2, 6.5);
     scene.add(skinFillLight);
 
-    snapFlashLight = new THREE.PointLight(0xfffae8, 0, 48, 2);
+    // Snap flash light: deep blood-crimson pulse
+    snapFlashLight = new THREE.PointLight(0xcc1436, 0, 48, 2);
     snapFlashLight.position.set(0, 0, 4);
     scene.add(snapFlashLight);
   }
@@ -297,46 +302,67 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
     cardRainGroup = new THREE.Group();
     cardRainData = [];
 
-    const cardGeo = new THREE.PlaneGeometry(0.55, 0.82);
+    const cardGeo = new THREE.PlaneGeometry(0.52, 0.78);
 
     // Canvas texture for traditional Japanese JPC playing cards
     const cardCanvas = document.createElement('canvas');
-    cardCanvas.width = 128;
-    cardCanvas.height = 192;
+    cardCanvas.width = 256;
+    cardCanvas.height = 384;
     const cCtx = cardCanvas.getContext('2d');
     
-    // Crimson lacquered back with golden diamond foil border
-    cCtx.fillStyle = '#7a1414';
-    cCtx.fillRect(0, 0, 128, 192);
-    cCtx.strokeStyle = '#eecd7e';
-    cCtx.lineWidth = 4;
-    cCtx.strokeRect(6, 6, 116, 180);
-    cCtx.strokeRect(10, 10, 108, 172);
+    // Crimson lacquered back with soft pink inner glow
+    const cardGrad = cCtx.createLinearGradient(0, 0, 256, 384);
+    cardGrad.addColorStop(0.00, '#b8263e');
+    cardGrad.addColorStop(0.45, '#781220');
+    cardGrad.addColorStop(1.00, '#26040a');
+    cCtx.fillStyle = cardGrad;
+    cCtx.fillRect(0, 0, 256, 384);
 
-    // Golden inner diamond crest
-    cCtx.fillStyle = '#eecd7e';
-    cCtx.beginPath();
-    cCtx.moveTo(64, 52);
-    cCtx.lineTo(96, 96);
-    cCtx.lineTo(64, 140);
-    cCtx.lineTo(32, 96);
-    cCtx.closePath();
-    cCtx.fill();
+    // Gold foil double border
+    cCtx.strokeStyle = '#ffd778';
+    cCtx.lineWidth = 5;
+    cCtx.strokeRect(10, 10, 236, 364);
+    cCtx.strokeStyle = '#ffb7c5';
+    cCtx.lineWidth = 2;
+    cCtx.strokeRect(18, 18, 220, 348);
 
-    // Inner sakura accent
-    cCtx.fillStyle = '#7a1414';
+    // Four corner sakura accents
+    const corners = [[32, 32], [224, 32], [32, 352], [224, 352]];
+    cCtx.fillStyle = '#ffb7c5';
+    corners.forEach(([cx, cy]) => {
+      cCtx.beginPath();
+      cCtx.arc(cx, cy, 6, 0, Math.PI * 2);
+      cCtx.fill();
+    });
+
+    // Golden Japanese Sakura flower crest in center
+    cCtx.fillStyle = '#ffd778';
+    const centerX = 128, centerY = 192;
+    for (let p = 0; p < 5; p++) {
+      const angle = (p / 5) * Math.PI * 2 - Math.PI / 2;
+      const px = centerX + Math.cos(angle) * 36;
+      const py = centerY + Math.sin(angle) * 36;
+      cCtx.beginPath();
+      cCtx.arc(px, py, 22, 0, Math.PI * 2);
+      cCtx.fill();
+    }
+    // Inner ruby center
+    cCtx.fillStyle = '#8a1220';
     cCtx.beginPath();
-    cCtx.arc(64, 96, 14, 0, Math.PI * 2);
+    cCtx.arc(centerX, centerY, 16, 0, Math.PI * 2);
     cCtx.fill();
 
     const cardTexture = new THREE.CanvasTexture(cardCanvas);
     cardTexture.minFilter = THREE.LinearFilter;
     cardTexture.generateMipmaps = false;
+    globalCardTexture = cardTexture;
 
-    const cardMaterial = new THREE.MeshToonMaterial({
+    const cardMaterial = new THREE.MeshStandardMaterial({
       map: cardTexture,
       side: THREE.DoubleSide,
       transparent: true,
+      roughness: 0.35,
+      metalness: 0.25,
       opacity: 0.95
     });
 
@@ -382,7 +408,7 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
   }
 
   /**
-   * 5. ANIME FEMALE GLOVE & STILETTO CLAW MATERIALS ENGINE
+   * 5. ANIME FEMALE GLOVE & STILETTO CLAW MATERIALS ENGINE (ARLECCHINO AESTHETIC)
    */
   function createAnimeCelMaterials() {
     // 5.1 4-Step Discrete Quantized Anime Cel Gradient Ramp for Obsidian Black Glove
@@ -391,8 +417,8 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
     rampCanvas.height = 1;
     const rCtx = rampCanvas.getContext('2d');
     
-    // Anime cel color steps: [Deep Inky Slate, Midnight Charcoal, Twilight Tone, Moonlit Sheen]
-    const animeColors = ['#181a26', '#2b3044', '#3d4460', '#646f99'];
+    // Cel color steps: [Deep Inky Void, Charcoal Black, Dark Burgundy Slate, Subtle Crimson Edge]
+    const animeColors = ['#0c0d14', '#161922', '#222634', '#3c2530'];
     for (let i = 0; i < 4; i++) {
       rCtx.fillStyle = animeColors[i];
       rCtx.fillRect(i, 0, 1, 1);
@@ -403,80 +429,79 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
     gradientMap.magFilter = THREE.NearestFilter;
     gradientMap.generateMipmaps = false;
 
-    // 5.2 Deep Manga Ink Contour Material (Inverted Hull)
+    // 5.2 Deep Manga Ink Contour Outline Material (Inverted Hull)
     const outlineMaterial = new THREE.MeshBasicMaterial({
-      color: 0x141624,
+      color: 0x07080e,
       side: THREE.BackSide
     });
 
-    // 5.2b Translucent Deep Crimson Red Aura Material (Wrapping the outer contour of the hand)
+    // 5.2b Translucent Deep Crimson Edge Material - used only on subtle accents, NOT stacked additive
     const crimsonAuraMaterial = new THREE.MeshBasicMaterial({
-      color: 0xff143c,
+      color: 0x940c20,
       side: THREE.BackSide,
       transparent: true,
-      opacity: 0.75,
-      blending: THREE.AdditiveBlending,
+      opacity: 0.28,
       depthWrite: false
     });
     crimsonAuraMaterialRef = crimsonAuraMaterial;
 
-    // 5.3 Anime Dark Leather/Fabric Glove Material (with Crimson Subsurface Tone)
+    // 5.3 Anime Dark Leather/Fabric Glove Material (Arlecchino Midnight Obsidian with subtle crimson undertone)
     const animeGloveMaterial = new THREE.MeshToonMaterial({
-      color: 0x30364c,
+      color: 0x261e2a,
       gradientMap: gradientMap,
-      emissive: 0x480816,
-      emissiveIntensity: 0.40
+      emissive: 0x420c18,
+      emissiveIntensity: 0.24
     });
 
-    // 5.4 Anime Glove Palmar Material
+    // 5.4 Anime Glove Palmar Material (Sleek dark glove palm with anatomical muscle definition)
     const animeGlovePalmMaterial = new THREE.MeshToonMaterial({
-      color: 0x222638,
+      color: 0x201824,
       gradientMap: gradientMap,
-      emissive: 0x360610,
-      emissiveIntensity: 0.32
+      emissive: 0x360914,
+      emissiveIntensity: 0.20
     });
 
     // 5.5 High-Gloss Silver Jewelry Material (Rings & Diamond filigree)
     const silverJewelryMaterial = new THREE.MeshStandardMaterial({
-      color: 0xffffff,
-      emissive: 0x3c4558,
-      emissiveIntensity: 0.50,
-      roughness: 0.08,
-      metalness: 0.98
+      color: 0xe8ecf2,
+      emissive: 0x1a1d24,
+      emissiveIntensity: 0.18,
+      roughness: 0.12,
+      metalness: 0.96
     });
 
     // 5.6 Obsidian Glossy Stiletto Claw Material (Thumb, Middle, Ring, Pinky)
     const obsidianClawMaterial = new THREE.MeshStandardMaterial({
-      color: 0x181a24,
-      emissive: 0x3d0812,
-      emissiveIntensity: 0.35,
+      color: 0x0c0e15,
+      emissive: 0x160408,
+      emissiveIntensity: 0.16,
       roughness: 0.10,
-      metalness: 0.90
+      metalness: 0.92
     });
 
-    // 5.7 Vibrant Crimson Red Stiletto Claw Material (Index Finger Highlight)
+    // 5.7 Arlecchino's Signature Blood-Crimson Stiletto Claw (Index Finger Highlight)
     const crimsonClawMaterial = new THREE.MeshStandardMaterial({
-      color: 0xff1744,
-      emissive: 0xd60028,
-      emissiveIntensity: 1.55,
-      roughness: 0.10,
-      metalness: 0.60
+      color: 0xd61234,
+      emissive: 0xb80c26,
+      emissiveIntensity: 0.95,
+      roughness: 0.12,
+      metalness: 0.70
     });
 
-    // 5.8 Forearm Gothic Diamond Cross-Hatch Argyle Texture (Matching Arlecchino Sleeve Reference)
+    // 5.8 Forearm Gothic Diamond Argyle Pattern (Arlecchino Sleeve Reference)
     const sleeveCanvas = document.createElement('canvas');
     sleeveCanvas.width = 512;
     sleeveCanvas.height = 512;
     const sCtx = sleeveCanvas.getContext('2d');
 
-    // Deep midnight charcoal base
-    sCtx.fillStyle = '#161922';
+    // Deep charcoal base with subtle warm undertone
+    sCtx.fillStyle = '#1a1d28';
     sCtx.fillRect(0, 0, 512, 512);
 
     // Cross-hatching argyle diamond lattice bands
     const step = 64;
     sCtx.lineWidth = 5.0;
-    sCtx.strokeStyle = '#090a10'; // Deep inky seams
+    sCtx.strokeStyle = '#0a0d16'; // Deep inky seams
     for (let x = -512; x < 1024; x += step) {
       sCtx.beginPath();
       sCtx.moveTo(x, 0);
@@ -490,9 +515,9 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
       sCtx.stroke();
     }
 
-    // Secondary subtle crimson gothic pinstripes
-    sCtx.lineWidth = 1.8;
-    sCtx.strokeStyle = 'rgba(215, 25, 60, 0.40)';
+    // Secondary vibrant crimson gothic pinstripes
+    sCtx.lineWidth = 2.0;
+    sCtx.strokeStyle = 'rgba(235, 40, 75, 0.65)';
     for (let x = -512; x < 1024; x += step) {
       sCtx.beginPath();
       sCtx.moveTo(x + 2, 0);
@@ -501,7 +526,7 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
     }
 
     // Inner diamond core accents
-    sCtx.fillStyle = '#1f2432';
+    sCtx.fillStyle = '#262a3a';
     for (let y = 0; y < 512; y += step) {
       for (let x = 0; x < 512; x += step) {
         sCtx.beginPath();
@@ -520,12 +545,12 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
     forearmDiamondTex.repeat.set(2, 4);
 
     const forearmGloveMaterial = new THREE.MeshToonMaterial({
-      color: 0x222634,
+      color: 0x282030,
       map: forearmDiamondTex,
       gradientMap: gradientMap,
-      emissive: 0x3d0812,
-      emissiveIntensity: 0.35,
-      roughness: 0.30
+      emissive: 0x450f1a,
+      emissiveIntensity: 0.32,
+      roughness: 0.32
     });
 
     return {
@@ -541,9 +566,9 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
   }
 
   /**
-   * Helper: Attach Inverted Hull Anime Line-Art Outline + Translucent Crimson Aura Shell
+   * Helper: Attach Inverted Hull Anime Line-Art Outline
    */
-  function buildAnimeMesh(geometry, fillMaterial, outlineMaterial, auraMaterial, outlineScale = 1.025, auraScale = 1.095) {
+  function buildAnimeMesh(geometry, fillMaterial, outlineMaterial, outlineScale = 1.022) {
     const group = new THREE.Group();
     const fillMesh = new THREE.Mesh(geometry, fillMaterial);
     group.add(fillMesh);
@@ -554,50 +579,37 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
       group.add(outlineMesh);
     }
 
-    if (auraMaterial) {
-      const auraMesh = new THREE.Mesh(geometry, auraMaterial);
-      auraMesh.scale.set(auraScale, auraScale, auraScale);
-      group.add(auraMesh);
-    }
-
     return { group, fillMesh };
   }
 
   /**
-   * Helper: Curved Razor-Sharp Stiletto Claw Builder with Crimson Aura
+   * Helper: Curved Razor-Sharp Stiletto Claw Builder
    */
-  function createAnimeStilettoClaw(baseRadius, length, clawMaterial, outlineMat, auraMat) {
+  function createAnimeStilettoClaw(baseRadius, length, clawMaterial, outlineMat) {
     const group = new THREE.Group();
     const curvePoints = [];
-    const segments = 14;
+    const segments = 16;
     for (let i = 0; i <= segments; i++) {
       const t = i / segments;
       const y = t * length;
-      const r = baseRadius * Math.pow(1.0 - t, 1.45);
+      // Slender lethal curve: needle-sharp tip
+      const r = baseRadius * Math.pow(1.0 - t, 1.35);
       curvePoints.push(new THREE.Vector2(r, y));
     }
-    const clawGeo = new THREE.LatheGeometry(curvePoints, 16);
+    const clawGeo = new THREE.LatheGeometry(curvePoints, 18);
     clawGeo.computeVertexNormals();
 
     const clawMesh = new THREE.Mesh(clawGeo, clawMaterial);
-    clawMesh.rotation.x = -0.16;
-    clawMesh.position.set(0, 0, -baseRadius * 0.10);
+    clawMesh.rotation.x = -0.15;
+    clawMesh.position.set(0, 0, -baseRadius * 0.08);
     group.add(clawMesh);
 
     if (outlineMat) {
       const outMesh = new THREE.Mesh(clawGeo, outlineMat);
-      outMesh.scale.set(1.04, 1.03, 1.04);
-      outMesh.rotation.x = -0.16;
-      outMesh.position.set(0, 0, -baseRadius * 0.10);
+      outMesh.scale.set(1.035, 1.025, 1.035);
+      outMesh.rotation.x = -0.15;
+      outMesh.position.set(0, 0, -baseRadius * 0.08);
       group.add(outMesh);
-    }
-
-    if (auraMat) {
-      const auraMesh = new THREE.Mesh(clawGeo, auraMat);
-      auraMesh.scale.set(1.14, 1.08, 1.14);
-      auraMesh.rotation.x = -0.16;
-      auraMesh.position.set(0, 0, -baseRadius * 0.10);
-      group.add(auraMesh);
     }
 
     return group;
@@ -631,165 +643,206 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
       crimsonAuraMaterial
     } = createAnimeCelMaterials();
 
-    // 6.1 Slender Gothic Forearm with Diamond Lattice Pattern (Arlecchino Sleeve Proportion)
-    // Forearm height = 4.2, radiusTop = 0.34, radiusBottom = 0.52 (graceful long anime taper)
-    const forearmGeo = new THREE.CylinderGeometry(0.34, 0.52, 4.2, 32, 8, false);
-    const fPos = forearmGeo.attributes.position;
-    for (let i = 0; i < fPos.count; i++) {
-      const fx = fPos.getX(i);
-      const fy = fPos.getY(i);
-      const fz = fPos.getZ(i);
-      const t = (fy + 2.1) / 4.2; // 0 at base cut, 1 at wrist
-      // Graceful anime arm silhouette with slender wrist
-      if (t > 0.60) {
-        const taper = Math.sin(((t - 0.60) / 0.40) * Math.PI * 0.5) * 0.04;
-        fPos.setX(i, fx * (1 - taper));
-        fPos.setZ(i, fz * (1 - taper));
-      }
-    }
-    forearmGeo.computeVertexNormals();
+    // 6.1 Unified Continuous Anatomical Arm, Wrist & Palm Geometry (Zero Roblox seams!)
+    function createSeamlessArmAndPalmGeometry() {
+      const geo = new THREE.BufferGeometry();
+      const numSlices = 38;
+      const numRadial = 48;
+      const positions = [];
+      const uvs = [];
+      const indices = [];
 
-    const forearmObj = buildAnimeMesh(forearmGeo, forearmGloveMaterial, outlineMaterial, crimsonAuraMaterial, 1.02, 1.075);
-    wristMesh = forearmObj.fillMesh;
-    forearmObj.group.position.set(0.08, -2.42, -0.06);
-    forearmObj.group.rotation.z = -0.05;
-    humanHandGroup.add(forearmObj.group);
+      const forearmSplitSlice = 22; // Boundary between forearm texture and palm glove
+
+      for (let s = 0; s < numSlices; s++) {
+        const v = s / (numSlices - 1);
+        // y from -2.4 (base of forearm) to +0.86 (metacarpal knuckle arch)
+        const y = -2.4 + v * 3.26;
+
+        let rx, rz, cx = 0, cz = 0;
+
+        if (y < -0.45) {
+          // Forearm region: smooth athletic taper from base to wrist
+          const armT = (y + 2.4) / 1.95; // 0 at base, 1 at wrist
+          rx = THREE.MathUtils.lerp(0.46, 0.29, Math.pow(armT, 0.82));
+          rz = THREE.MathUtils.lerp(0.44, 0.20, Math.pow(armT, 0.82));
+          cx = Math.sin(armT * Math.PI) * 0.022;
+          cz = -Math.sin(armT * Math.PI) * 0.012;
+        } else if (y < -0.08) {
+          // Carpal Wrist: slender, elegant, continuous transition
+          const wristT = (y + 0.45) / 0.37;
+          rx = THREE.MathUtils.lerp(0.29, 0.37, wristT);
+          rz = THREE.MathUtils.lerp(0.20, 0.21, wristT);
+          cx = 0.01;
+          cz = 0;
+        } else {
+          // Palm region: flares smoothly towards knuckles
+          const palmT = (y + 0.08) / 0.94;
+          rx = THREE.MathUtils.lerp(0.37, 0.48, Math.pow(palmT, 0.72));
+          rz = THREE.MathUtils.lerp(0.21, 0.15, palmT);
+          cx = THREE.MathUtils.lerp(0.01, 0.02, palmT);
+          cz = THREE.MathUtils.lerp(0.0, -0.015, palmT);
+        }
+
+        for (let r = 0; r < numRadial; r++) {
+          const u = r / numRadial;
+          const theta = u * Math.PI * 2;
+          let px = Math.cos(theta) * rx + cx;
+          let pz = Math.sin(theta) * rz + cz;
+          let py = y;
+
+          // Sculpt organic anatomical contours into the palm region
+          if (y >= -0.08) {
+            const palmT = (y + 0.08) / 0.94;
+
+            // 1. Thenar Eminence (Thumb muscle ball on thumb-palmar side: px < 0, pz > 0)
+            if (px < -0.05 && pz > 0 && palmT < 0.65) {
+              const thenarDistX = Math.abs(px + 0.26) / 0.26;
+              const thenarDistY = Math.abs(palmT - 0.30) / 0.28;
+              if (thenarDistX < 1.0 && thenarDistY < 1.0) {
+                const thenarStrength = Math.cos(thenarDistX * Math.PI * 0.5) * Math.cos(thenarDistY * Math.PI * 0.5);
+                pz += thenarStrength * 0.10;
+                px -= thenarStrength * 0.055;
+              }
+            }
+
+            // 2. Hypothenar Eminence (Pinky side muscle pad: px > 0.10, pz > 0)
+            if (px > 0.10 && pz > 0 && palmT < 0.55) {
+              const hypoDistX = Math.abs(px - 0.28) / 0.22;
+              const hypoDistY = Math.abs(palmT - 0.28) / 0.25;
+              if (hypoDistX < 1.0 && hypoDistY < 1.0) {
+                const hypoStrength = Math.cos(hypoDistX * Math.PI * 0.5) * Math.cos(hypoDistY * Math.PI * 0.5);
+                pz += hypoStrength * 0.045;
+              }
+            }
+
+            // 3. Palm Hollow (Lòng bàn tay cupped depression)
+            if (Math.abs(px) < 0.12 && pz > 0.02 && palmT > 0.15 && palmT < 0.75) {
+              const cupStrength = Math.cos((px / 0.12) * Math.PI * 0.5) * Math.sin(((palmT - 0.15) / 0.60) * Math.PI);
+              pz -= cupStrength * 0.038;
+            }
+
+            // 4. Metacarpal Knuckle Arch height curvature
+            if (palmT > 0.65) {
+              const archT = (palmT - 0.65) / 0.35;
+              const knuckleYOffset = Math.sin((px + 0.46) / 0.92 * Math.PI) * 0.07 * archT;
+              py += knuckleYOffset;
+            }
+          }
+
+          positions.push(px, py, pz);
+          uvs.push(u, v * 3.0);
+        }
+      }
+
+      for (let s = 0; s < numSlices - 1; s++) {
+        for (let r = 0; r < numRadial; r++) {
+          const nextR = (r + 1) % numRadial;
+          const i0 = s * numRadial + r;
+          const i1 = s * numRadial + nextR;
+          const i2 = (s + 1) * numRadial + nextR;
+          const i3 = (s + 1) * numRadial + r;
+
+          indices.push(i0, i1, i2);
+          indices.push(i0, i2, i3);
+        }
+      }
+
+      geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+      geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+      geo.setIndex(indices);
+
+      // Define multi-material groups for seamless normal continuation:
+      // Group 0: Forearm argyle diamond lattice
+      const forearmIndexCount = forearmSplitSlice * numRadial * 6;
+      geo.addGroup(0, forearmIndexCount, 0);
+      // Group 1: Palm midnight obsidian glove
+      const palmIndexCount = indices.length - forearmIndexCount;
+      geo.addGroup(forearmIndexCount, palmIndexCount, 1);
+
+      geo.computeVertexNormals();
+      return geo;
+    }
+
+    const armPalmGeo = createSeamlessArmAndPalmGeometry();
+    const armPalmMesh = new THREE.Mesh(armPalmGeo, [forearmGloveMaterial, animeGlovePalmMaterial]);
+    wristMesh = armPalmMesh;
+    humanHandGroup.add(armPalmMesh);
 
     // Anatomical base cut cap and sleek silver rim
-    const cutCapGeo = new THREE.CircleGeometry(0.52, 32);
+    const cutCapGeo = new THREE.CircleGeometry(0.46, 32);
     const cutCapMesh = new THREE.Mesh(cutCapGeo, animeGloveMaterial);
     cutCapMesh.rotation.x = Math.PI / 2;
-    cutCapMesh.position.set(0, -2.1, 0);
-    forearmObj.group.add(cutCapMesh);
+    cutCapMesh.position.set(0, -2.4, 0);
+    humanHandGroup.add(cutCapMesh);
 
-    const cutRimGeo = new THREE.TorusGeometry(0.52, 0.022, 8, 32);
+    const cutRimGeo = new THREE.TorusGeometry(0.46, 0.018, 8, 32);
     const cutRimMesh = new THREE.Mesh(cutRimGeo, silverJewelryMaterial);
     cutRimMesh.rotation.x = Math.PI / 2;
-    cutRimMesh.position.set(0, -2.1, 0);
-    forearmObj.group.add(cutRimMesh);
-
-    // Carpal Wrist Transition (Slender flattened oval)
-    const wristJointGeo = new THREE.SphereGeometry(0.34, 24, 20);
-    const wristJointObj = buildAnimeMesh(wristJointGeo, animeGloveMaterial, outlineMaterial, crimsonAuraMaterial, 1.025, 1.080);
-    wristJointObj.group.position.set(0.03, -0.32, -0.02);
-    wristJointObj.group.scale.set(1.08, 0.72, 0.85);
-    humanHandGroup.add(wristJointObj.group);
-
-    // 6.2 Slender, Elongated Palm (Gothic Anime Aristocratic Silhouette)
-    // Narrower, slimmer, elegant: width = 1.06, height = 1.54, depth = 0.28
-    const palmGeo = new THREE.BoxGeometry(1.06, 1.54, 0.28, 14, 16, 8);
-    const pPos = palmGeo.attributes.position;
-    for (let i = 0; i < pPos.count; i++) {
-      let px = pPos.getX(i);
-      let py = pPos.getY(i);
-      let pz = pPos.getZ(i);
-
-      const ny = (py + 0.77) / 1.54; // 0 at wrist, 1 at knuckles
-      // Slender trapezoid flare: narrower at wrist (0.82), graceful at knuckles (1.04)
-      const widthFactor = THREE.MathUtils.lerp(0.82, 1.04, ny);
-      px *= widthFactor;
-
-      // Smooth anatomical hollow on palm face (pz > 0)
-      if (pz > 0 && Math.abs(px) < 0.38 && py > -0.40 && py < 0.50) {
-        pz -= 0.055 * Math.cos((px / 0.38) * Math.PI * 0.5) * Math.sin(ny * Math.PI);
-      }
-      // Streamlined thenar muscle contour smoothly sculpted into palm mesh (no bulky spheres!)
-      if (pz > 0 && px < -0.15 && py < 0.20) {
-        pz += 0.038 * (1 - Math.abs(px + 0.35) / 0.35) * Math.sin(((py + 0.5) / 0.7) * Math.PI);
-      }
-      // Smooth dorsal curve
-      if (pz < 0) {
-        pz -= Math.sin(ny * Math.PI) * 0.028;
-      }
-
-      pPos.setXYZ(i, px, py, pz);
-    }
-    palmGeo.computeVertexNormals();
-
-    const palmObj = buildAnimeMesh(palmGeo, animeGloveMaterial, outlineMaterial, crimsonAuraMaterial, 1.025, 1.075);
-    palmObj.group.position.set(0.02, 0.22, 0);
-    humanHandGroup.add(palmObj.group);
-
-    // Subtle sleek knuckle markers across metacarpal arch
-    const knuckleData = [
-      { x: -0.35, y: 0.86, z: 0.04, r: 0.16 },  // Index
-      { x: -0.08, y: 0.90, z: 0.05, r: 0.17 },  // Middle (Highest)
-      { x:  0.18, y: 0.86, z: 0.04, r: 0.16 },  // Ring
-      { x:  0.42, y: 0.74, z: 0.03, r: 0.14 }   // Pinky
-    ];
-    knuckleData.forEach(kd => {
-      const kGeo = new THREE.SphereGeometry(kd.r, 16, 14);
-      const kObj = buildAnimeMesh(kGeo, animeGloveMaterial, outlineMaterial, crimsonAuraMaterial, 1.02, 1.080);
-      kObj.group.position.set(kd.x, kd.y, kd.z);
-      kObj.group.scale.set(0.95, 0.75, 0.85);
-      humanHandGroup.add(kObj.group);
-    });
+    cutRimMesh.position.set(0, -2.4, 0);
+    humanHandGroup.add(cutRimMesh);
 
     // Iconic Geometric Diamond Motif on Dorsal Hand (Back of hand)
     const dorsalDiamondShape = new THREE.Shape();
-    dorsalDiamondShape.moveTo(0, 0.52);
-    dorsalDiamondShape.lineTo(0.28, 0.10);
-    dorsalDiamondShape.lineTo(0, -0.40);
-    dorsalDiamondShape.lineTo(-0.28, 0.10);
+    dorsalDiamondShape.moveTo(0, 0.48);
+    dorsalDiamondShape.lineTo(0.25, 0.10);
+    dorsalDiamondShape.lineTo(0, -0.36);
+    dorsalDiamondShape.lineTo(-0.25, 0.10);
     dorsalDiamondShape.closePath();
 
     const innerHole = new THREE.Path();
-    innerHole.moveTo(0, 0.40);
-    innerHole.lineTo(0.20, 0.10);
-    innerHole.lineTo(0, -0.30);
-    innerHole.lineTo(-0.20, 0.10);
+    innerHole.moveTo(0, 0.36);
+    innerHole.lineTo(0.18, 0.10);
+    innerHole.lineTo(0, -0.26);
+    innerHole.lineTo(-0.18, 0.10);
     innerHole.closePath();
     dorsalDiamondShape.holes.push(innerHole);
 
     const dorsalDiamondGeo = new THREE.ShapeGeometry(dorsalDiamondShape);
     const dorsalMesh = new THREE.Mesh(dorsalDiamondGeo, silverJewelryMaterial);
-    dorsalMesh.position.set(0.02, 0.24, -0.16);
+    dorsalMesh.position.set(0.02, 0.22, -0.14);
     dorsalMesh.rotation.y = Math.PI;
-    dorsalMesh.scale.set(0.85, 0.85, 1);
+    dorsalMesh.scale.set(0.80, 0.80, 1);
     humanHandGroup.add(dorsalMesh);
 
-    // 6.3 Slender Phalanx Builder with Needle Stiletto Claws
-    function createAnimePhalanx(radBase, radTip, length, isTip, isIndexClaw = false) {
+    // 6.3 Organic Phalanx Builder (Seamless nested profile, NO Roblox ball joints!)
+    function createOrganicPhalanx(radBase, radTip, length, isTip, isIndexClaw = false) {
       const group = new THREE.Group();
 
       const points = [];
-      const segments = 14;
+      const segments = 16;
       for (let i = 0; i <= segments; i++) {
         const t = i / segments;
         const y = t * length;
         const waist = Math.sin(t * Math.PI) * 0.055;
-        const r = THREE.MathUtils.lerp(radBase, radTip, t) * (1.0 - waist);
-        points.push(new THREE.Vector2(r, y));
+        let r = THREE.MathUtils.lerp(radBase, radTip, t) * (1.0 - waist);
+        // Soft rounded proximal dome at base (t < 0.15) to sleeve smoothly into parent joint
+        if (t < 0.15) {
+          const capT = t / 0.15;
+          r = radBase * (0.85 + 0.15 * Math.sin(capT * Math.PI * 0.5));
+        }
+        points.push(new THREE.Vector2(Math.max(0.002, r), y));
       }
 
       const latheGeo = new THREE.LatheGeometry(points, 20);
       latheGeo.computeVertexNormals();
-      const latheObj = buildAnimeMesh(latheGeo, animeGloveMaterial, outlineMaterial, crimsonAuraMaterial, 1.025, 1.085);
-      group.add(latheObj.group);
+      const phalanxMesh = new THREE.Mesh(latheGeo, animeGloveMaterial);
+      group.add(phalanxMesh);
 
-      const jointGeo = new THREE.SphereGeometry(radBase * 1.02, 16, 14);
-      const jointObj = buildAnimeMesh(jointGeo, animeGloveMaterial, outlineMaterial, crimsonAuraMaterial, 1.025, 1.085);
-      group.add(jointObj.group);
-
-      // Fingertip Dome & Deadly Stiletto Claw
+      // Fingertip & Deadly Stiletto Claw (Connected directly without separate sphere joints)
       if (isTip) {
-        const tipDomeGeo = new THREE.SphereGeometry(radTip, 16, 16);
-        const tipDomeObj = buildAnimeMesh(tipDomeGeo, animeGloveMaterial, outlineMaterial, crimsonAuraMaterial, 1.025, 1.085);
-        tipDomeObj.group.position.set(0, length, 0);
-        group.add(tipDomeObj.group);
-
         const clawMat = isIndexClaw ? crimsonClawMaterial : obsidianClawMaterial;
-        const clawLen = length * (isIndexClaw ? 0.95 : 0.82);
-        const stilettoClaw = createAnimeStilettoClaw(radTip * 0.98, clawLen, clawMat, outlineMaterial, crimsonAuraMaterial);
-        stilettoClaw.position.set(0, length * 0.88, 0);
+        const clawLen = length * (isIndexClaw ? 0.98 : 0.85);
+        const stilettoClaw = createAnimeStilettoClaw(radTip * 0.96, clawLen, clawMat, null);
+        stilettoClaw.position.set(0, length * 0.90, 0);
         group.add(stilettoClaw);
       }
 
       return group;
     }
 
-    // Helper: Double silver ring band (matching reference image)
-    function createDoubleSilverRingBand(radius, tubeRadius, spacing = 0.045) {
+    // Helper: Double silver ring band (matching reference image 1)
+    function createDoubleSilverRingBand(radius, tubeRadius, spacing = 0.042) {
       const ringGroup = new THREE.Group();
       const ringGeo = new THREE.TorusGeometry(radius, tubeRadius, 8, 22);
 
@@ -811,15 +864,15 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
       root.position.set(rootX, rootY, 0.02);
       root.rotation.z = restSpread;
 
-      const p1 = createAnimePhalanx(r1, r2, l1, false);
+      const p1 = createOrganicPhalanx(r1, r2, l1, false);
       root.add(p1);
 
-      const p2 = createAnimePhalanx(r2, r3, l2, false);
-      p2.position.set(0, l1, 0);
+      const p2 = createOrganicPhalanx(r2, r3, l2, false);
+      p2.position.set(0, l1 * 0.95, 0); // Smooth sleeve overlap
       p1.add(p2);
 
-      const p3 = createAnimePhalanx(r3, r4, l3, true, isIndex);
-      p3.position.set(0, l2, 0);
+      const p3 = createOrganicPhalanx(r3, r4, l3, true, isIndex);
+      p3.position.set(0, l2 * 0.95, 0); // Smooth sleeve overlap
       p2.add(p3);
 
       humanHandGroup.add(root);
@@ -827,118 +880,120 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
       return { root, p1, p2, p3 };
     }
 
-    // 6.4 5 Slender, Elegant Digits (Matching Arlecchino Reference Anatomy)
-    // Thumb: Slender opposition with double silver rings and sharp obsidian claw
+    // 6.4 5 Slender, Elegant Digits (Anatomical Proportions from Images 2 & 3)
+    // Thumb: Starts on radial side of palm, smooth natural opposition
     handFingers.thumb = (function () {
       const thumbRoot = new THREE.Group();
-      thumbRoot.position.set(-0.48, 0.04, 0.10);
-      thumbRoot.rotation.set(0.30, 0.40, 0.48);
+      thumbRoot.position.set(-0.42, 0.04, 0.08);
+      thumbRoot.rotation.set(0.28, 0.42, 0.45);
 
-      const p1 = createAnimePhalanx(0.20, 0.165, 0.58, false);
+      const p1 = createOrganicPhalanx(0.175, 0.145, 0.58, false);
       thumbRoot.add(p1);
 
-      // Double silver rings on thumb proximal joint
-      const tRings = createDoubleSilverRingBand(0.20, 0.022, 0.05);
+      // Double silver rings on thumb
+      const tRings = createDoubleSilverRingBand(0.175, 0.018, 0.045);
       tRings.position.set(0, 0.28, 0);
       p1.add(tRings);
 
-      const p2 = createAnimePhalanx(0.165, 0.13, 0.48, true, false);
-      p2.position.set(0, 0.58, 0);
+      const p2 = createOrganicPhalanx(0.145, 0.115, 0.46, true, false);
+      p2.position.set(0, 0.58 * 0.95, 0);
       p1.add(p2);
 
       humanHandGroup.add(thumbRoot);
       return { root: thumbRoot, p1, p2 };
     })();
 
-    // Index Finger: Slender, elongated with double silver rings + LETHAL BLOOD-CRIMSON CLAW
-    handFingers.index = createAnimeFinger('index', -0.35, 0.86, 0.58, 0.45, 0.36, 0.155, 0.135, 0.115, 0.095, -0.06, true);
-    const idxRings1 = createDoubleSilverRingBand(0.155, 0.018, 0.045);
-    idxRings1.position.set(0, 0.24, 0);
+    // Index Finger: Slender, elongated with double silver rings + ARLECCHINO'S BLOOD-CRIMSON CLAW
+    // Proportions: l1 = 0.60, l2 = 0.46, l3 = 0.34 (~1.40)
+    handFingers.index = createAnimeFinger('index', -0.33, 0.86, 0.60, 0.46, 0.34, 0.148, 0.132, 0.116, 0.092, -0.06, true);
+    const idxRings1 = createDoubleSilverRingBand(0.148, 0.016, 0.042);
+    idxRings1.position.set(0, 0.25, 0);
     handFingers.index.p1.add(idxRings1);
-    const idxRings2 = createDoubleSilverRingBand(0.135, 0.018, 0.042);
+    const idxRings2 = createDoubleSilverRingBand(0.132, 0.016, 0.038);
     idxRings2.position.set(0, 0.20, 0);
     handFingers.index.p2.add(idxRings2);
 
-    // Middle Finger: Dominant center digit ~1.65 length with double silver rings
-    handFingers.middle = createAnimeFinger('middle', -0.08, 0.90, 0.66, 0.50, 0.40, 0.165, 0.145, 0.125, 0.10, 0.00, false);
-    const midRings1 = createDoubleSilverRingBand(0.165, 0.020, 0.048);
+    // Middle Finger: Dominant center digit ~1.58 length with double silver rings
+    // Proportions: l1 = 0.68, l2 = 0.52, l3 = 0.38 (~1.58)
+    handFingers.middle = createAnimeFinger('middle', -0.07, 0.94, 0.68, 0.52, 0.38, 0.155, 0.138, 0.120, 0.095, 0.00, false);
+    const midRings1 = createDoubleSilverRingBand(0.155, 0.017, 0.044);
     midRings1.position.set(0, 0.28, 0);
     handFingers.middle.p1.add(midRings1);
-    const midRings2 = createDoubleSilverRingBand(0.145, 0.018, 0.044);
+    const midRings2 = createDoubleSilverRingBand(0.138, 0.016, 0.040);
     midRings2.position.set(0, 0.22, 0);
     handFingers.middle.p2.add(midRings2);
 
-    // Ring Finger: Slender digit with double silver rings + obsidian claw
-    handFingers.ring = createAnimeFinger('ring', 0.18, 0.86, 0.60, 0.46, 0.38, 0.155, 0.135, 0.115, 0.095, 0.06, false);
-    const ringRings1 = createDoubleSilverRingBand(0.155, 0.018, 0.045);
+    // Ring Finger: Second longest digit ~1.46 length with double silver rings
+    // Proportions: l1 = 0.62, l2 = 0.48, l3 = 0.36 (~1.46)
+    handFingers.ring = createAnimeFinger('ring', 0.18, 0.88, 0.62, 0.48, 0.36, 0.145, 0.130, 0.115, 0.090, 0.06, false);
+    const ringRings1 = createDoubleSilverRingBand(0.145, 0.016, 0.042);
     ringRings1.position.set(0, 0.26, 0);
     handFingers.ring.p1.add(ringRings1);
-    const ringRings2 = createDoubleSilverRingBand(0.135, 0.018, 0.042);
+    const ringRings2 = createDoubleSilverRingBand(0.130, 0.015, 0.038);
     ringRings2.position.set(0, 0.21, 0);
     handFingers.ring.p2.add(ringRings2);
 
-    // Pinky Finger: Petite, elegant digit with silver ring + obsidian claw
-    handFingers.pinky = createAnimeFinger('pinky', 0.42, 0.74, 0.46, 0.35, 0.28, 0.135, 0.115, 0.095, 0.075, 0.13, false);
-    const pinkyRings = createDoubleSilverRingBand(0.135, 0.016, 0.040);
+    // Pinky Finger: Petite, elegant digit ~1.08 length
+    // Proportions: l1 = 0.46, l2 = 0.35, l3 = 0.27 (~1.08)
+    handFingers.pinky = createAnimeFinger('pinky', 0.41, 0.73, 0.46, 0.35, 0.27, 0.125, 0.110, 0.095, 0.075, 0.13, false);
+    const pinkyRings = createDoubleSilverRingBand(0.125, 0.014, 0.036);
     pinkyRings.position.set(0, 0.18, 0);
     handFingers.pinky.p1.add(pinkyRings);
 
     // Set Initial Natural Resting Curvature
     applyAnatomicalRestPose();
 
-    // 6.5 Volumetric Crimson Aura Energy Disc (Behind Hand for Supreme Visibility & Contrast)
+    // 6.5 Soft Crimson-Wine Backdrop Disc (Highlights hand & forearm, softened so aura is delicate)
     const auraCanvas = document.createElement('canvas');
-    auraCanvas.width = 256;
-    auraCanvas.height = 256;
+    auraCanvas.width = 512;
+    auraCanvas.height = 512;
     const aCtx = auraCanvas.getContext('2d');
-    const aGrad = aCtx.createRadialGradient(128, 128, 0, 128, 128, 128);
-    aGrad.addColorStop(0.00, 'rgba(255, 25, 65, 0.68)'); // Brilliant ruby red center
-    aGrad.addColorStop(0.35, 'rgba(215, 18, 55, 0.42)');
-    aGrad.addColorStop(0.68, 'rgba(135, 10, 32, 0.18)');
-    aGrad.addColorStop(0.92, 'rgba(55, 5, 15, 0.05)');
+    const aGrad = aCtx.createRadialGradient(256, 256, 0, 256, 256, 256);
+    aGrad.addColorStop(0.00, 'rgba(205, 32, 68, 0.34)'); // Softened gentle crimson core
+    aGrad.addColorStop(0.38, 'rgba(135, 16, 42, 0.20)');
+    aGrad.addColorStop(0.72, 'rgba(50, 6, 16, 0.07)');
     aGrad.addColorStop(1.00, 'rgba(0, 0, 0, 0)');
     aCtx.fillStyle = aGrad;
-    aCtx.fillRect(0, 0, 256, 256);
+    aCtx.fillRect(0, 0, 512, 512);
 
     const auraTexture = new THREE.CanvasTexture(auraCanvas);
-    const handAuraPlaneGeo = new THREE.PlaneGeometry(5.4, 6.6);
+    const handAuraPlaneGeo = new THREE.PlaneGeometry(5.2, 6.5);
     const handAuraPlaneMat = new THREE.MeshBasicMaterial({
       map: auraTexture,
       transparent: true,
-      blending: THREE.AdditiveBlending,
       depthWrite: false,
-      opacity: 0.88
+      opacity: 0.45
     });
     handBackAuraMesh = new THREE.Mesh(handAuraPlaneGeo, handAuraPlaneMat);
-    handBackAuraMesh.position.set(-0.04, 0.25, -0.38);
+    handBackAuraMesh.position.set(-0.02, 0.15, -0.38);
     humanHandGroup.add(handBackAuraMesh);
 
     mainGroup.add(humanHandGroup);
 
-    // 6.6 Glowing Energy Shards & Card Vortex
+    // 6.6 3D CARDS VORTEX (Lá bài 3D xoáy tụ về bàn tay thay cho pháo bông!)
     vortexGroup = new THREE.Group();
     vortexShards = [];
 
-    const shardGeo = new THREE.PlaneGeometry(0.35, 0.48);
-    const shardMat = new THREE.MeshToonMaterial({
-      color: 0xffdf88,
-      emissive: 0x9e1b1b,
-      emissiveIntensity: 0.75,
+    const vortexCardGeo = new THREE.PlaneGeometry(0.44, 0.68);
+    const vortexCardMat = new THREE.MeshStandardMaterial({
+      map: globalCardTexture,
       side: THREE.DoubleSide,
       transparent: true,
-      opacity: 0.88
+      roughness: 0.35,
+      metalness: 0.30,
+      opacity: 0.95
     });
 
-    const vortexCount = 68;
-    for (let i = 0; i < vortexCount; i++) {
-      const mesh = new THREE.Mesh(shardGeo, shardMat.clone());
-      const radius = 2.4 + Math.random() * 5.6;
-      const angle = (i / vortexCount) * Math.PI * 6 + Math.random() * 0.5;
-      const y = (Math.random() - 0.5) * 4.2;
-      const z = (Math.random() - 0.5) * 3.0;
+    const vortexCardCount = 38;
+    for (let i = 0; i < vortexCardCount; i++) {
+      const mesh = new THREE.Mesh(vortexCardGeo, vortexCardMat.clone());
+      const radius = 3.6 + Math.random() * 5.4;
+      const angle = (i / vortexCardCount) * Math.PI * 4 + Math.random() * 0.8;
+      const y = -1.2 + (Math.random() - 0.5) * 4.6;
+      const z = (Math.random() - 0.5) * 3.5;
 
       mesh.position.set(Math.cos(angle) * radius, y, Math.sin(angle) * radius + z);
-      mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
+      mesh.rotation.set(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2);
       vortexGroup.add(mesh);
 
       vortexShards.push({
@@ -946,10 +1001,13 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
         initRadius: radius,
         currentRadius: radius,
         angle,
-        speed: 2.2 + Math.random() * 2.8,
-        y,
-        z,
-        scale: 0.4 + Math.random() * 0.65
+        speed: 2.2 + Math.random() * 2.5,
+        initY: y,
+        initZ: z,
+        rotSpeedX: 0.03 + Math.random() * 0.05,
+        rotSpeedY: 0.04 + Math.random() * 0.06,
+        rotSpeedZ: 0.02 + Math.random() * 0.04,
+        scale: 0.75 + Math.random() * 0.45
       });
     }
     mainGroup.add(vortexGroup);
@@ -960,15 +1018,15 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
     flareCanvas.height = 64;
     const fCtx = flareCanvas.getContext('2d');
     const fGrad = fCtx.createRadialGradient(256, 32, 0, 256, 32, 256);
-    fGrad.addColorStop(0.00, 'rgba(255, 245, 220, 1.0)');  // Golden-white core
-    fGrad.addColorStop(0.12, 'rgba(255, 30, 75, 0.95)');   // Brilliant crimson red
-    fGrad.addColorStop(0.40, 'rgba(180, 10, 40, 0.40)');   // Deep blood aura
+    fGrad.addColorStop(0.00, 'rgba(255, 210, 220, 0.95)');  // Soft crimson-white core
+    fGrad.addColorStop(0.18, 'rgba(200, 18, 48, 0.85)');   // Deep blood crimson
+    fGrad.addColorStop(0.55, 'rgba(120, 8, 26, 0.35)');   // Dark wine aura
     fGrad.addColorStop(1.00, 'rgba(0, 0, 0, 0)');
     fCtx.fillStyle = fGrad;
     fCtx.fillRect(0, 0, 512, 64);
 
     const flareTex = new THREE.CanvasTexture(flareCanvas);
-    const flareGeo = new THREE.PlaneGeometry(1.0, 0.28);
+    const flareGeo = new THREE.PlaneGeometry(1.0, 0.22);
     const flareMat = new THREE.MeshBasicMaterial({
       map: flareTex,
       transparent: true,
@@ -978,61 +1036,107 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
       side: THREE.DoubleSide
     });
     anamorphicFlareMesh = new THREE.Mesh(flareGeo, flareMat);
-    anamorphicFlareMesh.position.set(-0.18, 0.32, 4.10);
+    anamorphicFlareMesh.position.set(-0.16, 0.32, 4.08);
     mainGroup.add(anamorphicFlareMesh);
 
-    // 6.8 Razor-Thin Sovereign Shockwave Ring (Crimson & Gold Energy Wave)
-    const shockwaveGeo = new THREE.RingGeometry(0.16, 0.20, 64);
+    // 6.8 Razor-Thin Crimson Eclipse Shockwave Ring (No star sparkles, purely elegant and occult)
+    const shockwaveGeo = new THREE.RingGeometry(0.14, 0.17, 64);
     const shockwaveMat = new THREE.MeshBasicMaterial({
-      color: 0xff143c,
+      color: 0xcc1436,
       side: THREE.DoubleSide,
       transparent: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
       opacity: 0
     });
     sovereignRingMesh = new THREE.Mesh(shockwaveGeo, shockwaveMat);
-    sovereignRingMesh.position.set(-0.18, 0.32, 4.05);
+    sovereignRingMesh.position.set(-0.16, 0.32, 4.05);
     mainGroup.add(sovereignRingMesh);
 
-    // 6.9 Sovereign Dark Crystal Embers (Gothic diamond shards, NO cartoon stars!)
+    // 6.8b Occult Crimson Thread Slashes (Arlecchino's signature blood-thread slashes cutting reality)
     sovereignEmbersGroup = new THREE.Group();
     sovereignEmberData = [];
 
-    const emberShape = new THREE.Shape();
-    emberShape.moveTo(0, 0.16);
-    emberShape.lineTo(0.028, 0);
-    emberShape.lineTo(0, -0.16);
-    emberShape.lineTo(-0.028, 0);
-    emberShape.closePath();
-    const emberGeo = new THREE.ShapeGeometry(emberShape);
+    const slashAngles = [-0.58, 0.30, 1.18, -1.32];
+    const slashLengths = [3.8, 3.4, 4.0, 3.2];
 
-    const emberCrimsonMat = new THREE.MeshBasicMaterial({
-      color: 0xff1744,
-      side: THREE.DoubleSide,
-      transparent: true,
-      opacity: 1
-    });
-    const emberGoldMat = new THREE.MeshBasicMaterial({
-      color: 0xf5c678,
-      side: THREE.DoubleSide,
-      transparent: true,
-      opacity: 1
-    });
+    const slashCanvas = document.createElement('canvas');
+    slashCanvas.width = 256;
+    slashCanvas.height = 16;
+    const slCtx = slashCanvas.getContext('2d');
+    const slGrad = slCtx.createLinearGradient(0, 0, 256, 0);
+    slGrad.addColorStop(0.00, 'rgba(190, 14, 42, 0)');
+    slGrad.addColorStop(0.25, 'rgba(215, 18, 52, 0.7)');
+    slGrad.addColorStop(0.50, 'rgba(255, 60, 90, 1.0)'); // Razor-thin core
+    slGrad.addColorStop(0.75, 'rgba(215, 18, 52, 0.7)');
+    slGrad.addColorStop(1.00, 'rgba(190, 14, 42, 0)');
+    slCtx.fillStyle = slGrad;
+    slCtx.fillRect(0, 0, 256, 16);
 
-    for (let i = 0; i < 42; i++) {
-      const isGold = i % 3 === 0;
-      const emberMesh = new THREE.Mesh(emberGeo, isGold ? emberGoldMat.clone() : emberCrimsonMat.clone());
-      emberMesh.visible = false;
-      sovereignEmbersGroup.add(emberMesh);
+    const slashTex = new THREE.CanvasTexture(slashCanvas);
+
+    for (let i = 0; i < 4; i++) {
+      const sGeo = new THREE.PlaneGeometry(slashLengths[i], 0.032);
+      const sMat = new THREE.MeshBasicMaterial({
+        map: slashTex,
+        transparent: true,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        opacity: 0,
+        side: THREE.DoubleSide
+      });
+      const sMesh = new THREE.Mesh(sGeo, sMat);
+      sMesh.rotation.z = slashAngles[i];
+      sMesh.position.set(-0.16, 0.32, 4.08);
+      sMesh.visible = false;
+      sovereignEmbersGroup.add(sMesh);
       sovereignEmberData.push({
-        mesh: emberMesh,
-        vx: 0,
-        vy: 0,
-        vz: 0,
-        alpha: 0,
-        rotSpeed: (Math.random() - 0.5) * 0.14,
-        decay: 0.022 + Math.random() * 0.022
+        mesh: sMesh,
+        angle: slashAngles[i],
+        alpha: 0
       });
     }
+
+    // 6.9 Eerie Dark Crimson Ether Mist (Mythical & occult vapor, replacing cartoon star sparkles)
+    const mistCanvas = document.createElement('canvas');
+    mistCanvas.width = 128;
+    mistCanvas.height = 128;
+    const mCtx = mistCanvas.getContext('2d');
+    const mGrad = mCtx.createRadialGradient(64, 64, 0, 64, 64, 64);
+    mGrad.addColorStop(0.00, 'rgba(150, 12, 34, 0.50)');
+    mGrad.addColorStop(0.45, 'rgba(80, 8, 20, 0.22)');
+    mGrad.addColorStop(1.00, 'rgba(0, 0, 0, 0)');
+    mCtx.fillStyle = mGrad;
+    mCtx.fillRect(0, 0, 128, 128);
+
+    const mistTex = new THREE.CanvasTexture(mistCanvas);
+    const mistGeo = new THREE.PlaneGeometry(1.1, 1.1);
+
+    for (let i = 0; i < 6; i++) {
+      const mMat = new THREE.MeshBasicMaterial({
+        map: mistTex,
+        transparent: true,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        opacity: 0,
+        side: THREE.DoubleSide
+      });
+      const mMesh = new THREE.Mesh(mistGeo, mMat);
+      mMesh.visible = false;
+      mMesh.position.set(-0.16, 0.32, 4.02);
+      sovereignEmbersGroup.add(mMesh);
+      sovereignEmberData.push({
+        mesh: mMesh,
+        isMist: true,
+        angle: (i / 6) * Math.PI * 2,
+        dist: 0.05,
+        speed: 0.35 + Math.random() * 0.45,
+        alpha: 0,
+        scale: 0.6 + Math.random() * 0.3,
+        rotSpeed: (Math.random() - 0.5) * 0.015
+      });
+    }
+
     mainGroup.add(sovereignEmbersGroup);
   }
 
@@ -1051,35 +1155,54 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
     petalShape.bezierCurveTo(-0.22, -0.05, -0.18, 0.22, 0, 0.25);
     const petalGeo = new THREE.ShapeGeometry(petalShape, 12);
     
-    const sakuraMaterial = new THREE.MeshStandardMaterial({
-      color: 0xf5b5c5,
-      emissive: 0x4a1820,
-      emissiveIntensity: 0.35,
-      roughness: 0.4,
+    // Base natural sakura petals (soft translucent, NO emissive glow = 80% of petals)
+    const baseSakuraMaterial = new THREE.MeshStandardMaterial({
+      color: 0xffb7c5,
+      emissive: 0x000000,
+      emissiveIntensity: 0,
+      roughness: 0.45,
+      metalness: 0.05,
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0.72
+    });
+
+    // Rare glowing sakura petals (only ~20% of petals glow, soft subtle emissive glow = 0.32)
+    const glowingSakuraMaterial = new THREE.MeshStandardMaterial({
+      color: 0xffb7c5,
+      emissive: 0xff8098,
+      emissiveIntensity: 0.32,
+      roughness: 0.35,
       metalness: 0.1,
       side: THREE.DoubleSide,
       transparent: true,
-      opacity: 0.75
+      opacity: 0.85
     });
 
     const goldDustMaterial = new THREE.MeshStandardMaterial({
       color: 0xffe28a,
       emissive: 0x8a5e0d,
-      emissiveIntensity: 0.75,
-      roughness: 0.2,
-      metalness: 0.85,
+      emissiveIntensity: 0.45,
+      roughness: 0.25,
+      metalness: 0.80,
       transparent: true,
-      opacity: 0.88
+      opacity: 0.80
     });
 
-    const sphereGeo = new THREE.SphereGeometry(0.048, 8, 8);
+    const sphereGeo = new THREE.SphereGeometry(0.042, 8, 8);
 
     for (let i = 0; i < count; i++) {
       const isSakura = i % 3 !== 0;
-      const mesh = new THREE.Mesh(
-        isSakura ? petalGeo : sphereGeo,
-        isSakura ? sakuraMaterial.clone() : goldDustMaterial.clone()
-      );
+      const isGlowingSakura = isSakura && (i % 5 === 0); // Only 1 in 5 sakura petals glow!
+      
+      let mat;
+      if (isSakura) {
+        mat = isGlowingSakura ? glowingSakuraMaterial.clone() : baseSakuraMaterial.clone();
+      } else {
+        mat = goldDustMaterial.clone();
+      }
+
+      const mesh = new THREE.Mesh(isSakura ? petalGeo : sphereGeo, mat);
 
       const x = (Math.random() - 0.5) * 24;
       const y = (Math.random() - 0.5) * 18;
@@ -1088,7 +1211,7 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
       mesh.position.set(x, y, z);
       mesh.rotation.set(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2);
 
-      const scale = isSakura ? (0.35 + Math.random() * 0.45) : (0.4 + Math.random() * 0.8);
+      const scale = isSakura ? (0.35 + Math.random() * 0.45) : (0.35 + Math.random() * 0.65);
       mesh.scale.set(scale, scale, scale);
 
       particleSystem.add(mesh);
@@ -1096,6 +1219,9 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
       particleData.push({
         mesh,
         baseY: y,
+        isSakura,
+        isGlowing: isGlowingSakura,
+        baseGlow: isGlowingSakura ? 0.32 : 0,
         speedY: 0.006 + Math.random() * 0.012,
         speedX: (Math.random() - 0.5) * 0.005,
         speedZ: (Math.random() - 0.5) * 0.004,
@@ -1143,39 +1269,32 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
   }
 
   /**
-   * Triggers the High-Energy Finger Snap Burst
+   * Triggers the High-Energy Finger Snap Burst (Mature Occult Crimson Aesthetic)
    */
   function triggerSnapBurst() {
     hasSnapped = true;
 
-    // 1. Synthesize Web Audio Snap Sound (Authentic crisp finger-snap)
+    // 1. Silent Web Audio hook (No synthetic thump/click oscillators = zero "bục bục" noise)
     playSnapChimeSound();
 
     // 2. Trigger 3D Card Rain ("mưa bài rơi xuống")
     triggerCardRain();
 
-    // 3. Light flash spike & Bloom flare spike
+    // 3. Steady ambient bloom - completely eliminate bloom/light flash so sakura petals never blink
     if (snapFlashLight) {
-      snapFlashLight.intensity = 6.5;
-      if (typeof gsap !== 'undefined') {
-        gsap.to(snapFlashLight, { intensity: 0, duration: 0.65, ease: 'power2.out' });
-      }
+      snapFlashLight.intensity = 0;
+    }
+    if (bloomPass) {
+      bloomPass.strength = CONFIG.bloomStrength;
     }
 
-    if (bloomPass && typeof gsap !== 'undefined') {
-      gsap.fromTo(bloomPass,
-        { strength: 2.4 },
-        { strength: CONFIG.bloomStrength, duration: 0.85, ease: 'power2.out' }
-      );
-    }
-
-    // 4. Anamorphic Crimson Blade Slash & Sovereign Shockwave Ring
+    // 4. Anamorphic Crimson Slash Flare & Crimson Eclipse Shockwave Ring
     if (anamorphicFlareMesh) {
-      anamorphicFlareMesh.material.opacity = 1.0;
-      anamorphicFlareMesh.scale.set(0.1, 0.28, 1.0);
+      anamorphicFlareMesh.material.opacity = 0.95;
+      anamorphicFlareMesh.scale.set(0.1, 0.22, 1.0);
       if (typeof gsap !== 'undefined') {
-        gsap.to(anamorphicFlareMesh.scale, { x: 32.0, y: 0.01, duration: 0.38, ease: 'power4.out' });
-        gsap.to(anamorphicFlareMesh.material, { opacity: 0, duration: 0.38, ease: 'power2.out' });
+        gsap.to(anamorphicFlareMesh.scale, { x: 26.0, y: 0.01, duration: 0.28, ease: 'power4.out' });
+        gsap.to(anamorphicFlareMesh.material, { opacity: 0, duration: 0.28, ease: 'power2.out' });
       }
     }
 
@@ -1183,145 +1302,53 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
       sovereignRingMesh.material.opacity = 0.95;
       sovereignRingMesh.scale.set(0.1, 0.1, 0.1);
       if (typeof gsap !== 'undefined') {
-        gsap.to(sovereignRingMesh.scale, { x: 22.0, y: 22.0, z: 22.0, duration: 0.65, ease: 'power3.out' });
-        gsap.to(sovereignRingMesh.material, { opacity: 0, duration: 0.65, ease: 'power2.out' });
+        gsap.to(sovereignRingMesh.scale, { x: 24.0, y: 24.0, z: 24.0, duration: 0.52, ease: 'power3.out' });
+        gsap.to(sovereignRingMesh.material, { opacity: 0, duration: 0.52, ease: 'power2.out' });
       }
     }
 
-    // 5. Sovereign Dark Crystal Embers (Elegant diamond shards)
+    // 5. Trigger Occult Crimson Thread Slashes & Eerie Ether Mist (No star sparkles!)
     for (let i = 0; i < sovereignEmberData.length; i++) {
       const s = sovereignEmberData[i];
       s.mesh.visible = true;
-      s.mesh.position.set(-0.18, 0.32, 4.05);
-      const theta = Math.random() * Math.PI * 2;
-      const phi = (Math.random() - 0.5) * Math.PI;
-      const speed = 0.14 + Math.random() * 0.26;
+      s.mesh.position.set(-0.16, 0.32, 4.05);
 
-      s.vx = Math.cos(theta) * Math.cos(phi) * speed;
-      s.vy = Math.sin(phi) * speed + 0.03;
-      s.vz = Math.sin(theta) * Math.cos(phi) * speed;
-      s.alpha = 1.0;
-      if (s.mesh.material) {
-        s.mesh.material.opacity = 1.0;
+      if (s.isMist) {
+        s.alpha = 0.65;
+        s.dist = 0.05;
+        if (s.mesh.material) s.mesh.material.opacity = 0.65;
+        s.mesh.scale.set(s.scale, s.scale, s.scale);
+      } else {
+        // Razor slash flash
+        s.alpha = 1.0;
+        if (s.mesh.material) s.mesh.material.opacity = 1.0;
+        s.mesh.scale.set(1.0, 1.0, 1.0);
+        if (typeof gsap !== 'undefined') {
+          gsap.fromTo(s.mesh.scale,
+            { x: 0.2, y: 1.0 },
+            { x: 1.2, y: 0.01, duration: 0.22, ease: 'power3.out' }
+          );
+          gsap.to(s.mesh.material, { opacity: 0, duration: 0.22, ease: 'power2.out' });
+        }
       }
-      const initialScale = 0.8 + Math.random() * 0.5;
-      s.mesh.scale.set(initialScale, initialScale, initialScale);
     }
 
-    // 6. Notify DOM (Starts music immediately + 4 hero cards fly to home)
+    // 6. Notify DOM (Starts Inazuma.m4a immediately + 4 hero cards fly to home)
     if (onSnapCallback) {
       onSnapCallback();
     }
 
-    // 7. Camera slight kinetic recoil (smooth impulse damped in render loop)
-    cameraRecoilZ = -0.55;
+    // 7. Camera slight kinetic recoil
+    cameraRecoilZ = -0.45;
   }
 
   /**
-   * Synthesize crisp snap and mysterious sovereign resonance using Web Audio API
+   * Silenced snap hook: Eliminates all synthetic click/thump oscillators ("bục bục" sound)
+   * Ensures 100% clean, pure auto-playback directly into Inazuma.m4a with zero artifacts.
    */
   function playSnapChimeSound() {
-    try {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtx) return;
-      if (!window._jpcAudioCtx) window._jpcAudioCtx = new AudioCtx();
-      const ctx = window._jpcAudioCtx;
-      if (ctx.state === 'suspended') ctx.resume();
-
-      const t = ctx.currentTime;
-
-      // 1. Friction snap transient (Sharp Click Pop)
-      const clickOsc = ctx.createOscillator();
-      const clickGain = ctx.createGain();
-      const clickFilter = ctx.createBiquadFilter();
-      clickFilter.type = 'bandpass';
-      clickFilter.frequency.setValueAtTime(3200, t);
-      clickFilter.Q.setValueAtTime(3.2, t);
-
-      clickOsc.type = 'triangle';
-      clickOsc.frequency.setValueAtTime(4200, t);
-      clickOsc.frequency.exponentialRampToValueAtTime(180, t + 0.024);
-
-      clickGain.gain.setValueAtTime(0.85, t);
-      clickGain.gain.exponentialRampToValueAtTime(0.0001, t + 0.030);
-
-      clickOsc.connect(clickFilter);
-      clickFilter.connect(clickGain);
-      clickGain.connect(ctx.destination);
-      clickOsc.start(t);
-      clickOsc.stop(t + 0.032);
-
-      // 2. Sovereign Sub-Bass Thump (Authoritative physical presence)
-      const thumpOsc = ctx.createOscillator();
-      const thumpGain = ctx.createGain();
-      thumpOsc.type = 'sine';
-      thumpOsc.frequency.setValueAtTime(140, t);
-      thumpOsc.frequency.exponentialRampToValueAtTime(52, t + 0.09);
-
-      thumpGain.gain.setValueAtTime(0.75, t);
-      thumpGain.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
-
-      thumpOsc.connect(thumpGain);
-      thumpGain.connect(ctx.destination);
-      thumpOsc.start(t);
-      thumpOsc.stop(t + 0.13);
-
-      // 3. Crisp Noise Burst (Acoustic Snap Release)
-      const bufferSize = Math.floor(ctx.sampleRate * 0.022);
-      const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-      const output = noiseBuffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        output[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.20));
-      }
-      const noise = ctx.createBufferSource();
-      noise.buffer = noiseBuffer;
-      const noiseFilter = ctx.createBiquadFilter();
-      noiseFilter.type = 'bandpass';
-      noiseFilter.frequency.setValueAtTime(2600, t);
-      noiseFilter.Q.setValueAtTime(1.8, t);
-      const noiseGain = ctx.createGain();
-      noiseGain.gain.setValueAtTime(0.55, t);
-      noiseGain.gain.exponentialRampToValueAtTime(0.001, t + 0.022);
-
-      noise.connect(noiseFilter);
-      noiseFilter.connect(noiseGain);
-      noiseGain.connect(ctx.destination);
-      noise.start(t);
-
-      // 4. Mysterious Sovereign Resonance (Aristocratic low-mid crystal chord C#4 + G#4)
-      setTimeout(() => {
-        try {
-          const rootOsc = ctx.createOscillator();
-          const fifthOsc = ctx.createOscillator();
-          const resFilter = ctx.createBiquadFilter();
-          const resGain = ctx.createGain();
-
-          resFilter.type = 'lowpass';
-          resFilter.frequency.setValueAtTime(950, ctx.currentTime);
-
-          rootOsc.type = 'triangle';
-          rootOsc.frequency.setValueAtTime(277.18, ctx.currentTime); // C#4
-          rootOsc.frequency.exponentialRampToValueAtTime(276.0, ctx.currentTime + 0.55);
-
-          fifthOsc.type = 'sine';
-          fifthOsc.frequency.setValueAtTime(415.30, ctx.currentTime); // G#4
-          fifthOsc.frequency.exponentialRampToValueAtTime(414.0, ctx.currentTime + 0.55);
-
-          resGain.gain.setValueAtTime(0.24, ctx.currentTime);
-          resGain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.55);
-
-          rootOsc.connect(resFilter);
-          fifthOsc.connect(resFilter);
-          resFilter.connect(resGain);
-          resGain.connect(ctx.destination);
-
-          rootOsc.start(ctx.currentTime);
-          fifthOsc.start(ctx.currentTime);
-          rootOsc.stop(ctx.currentTime + 0.58);
-          fifthOsc.stop(ctx.currentTime + 0.58);
-        } catch (_) {}
-      }, 15);
-    } catch (_) {}
+    // Pure silence: Eliminates all synthetic click/thump oscillators ("bục bục" sound)
+    // Audio playback is directly and purely handled by Playlist/Inazuma.m4a
   }
 
   /**
@@ -1352,13 +1379,13 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
       goldLight.position.y = 5.5 - mouse.y * 2.5 + scrollYOffset;
     }
 
-    // Dynamic breathing pulse on the Crimson Aura & Back Halo
+    // Dynamic breathing pulse on the subtle dark silhouette halo
     if (crimsonAuraMaterialRef) {
-      crimsonAuraMaterialRef.opacity = 0.72 + Math.sin(elapsedTime * 3.8) * 0.12;
+      crimsonAuraMaterialRef.opacity = 0.28 + Math.sin(elapsedTime * 3.2) * 0.06;
     }
-    if (handBackAuraMesh) {
-      handBackAuraMesh.material.opacity = 0.85 + Math.sin(elapsedTime * 3.2) * 0.12;
-      const s = 1.0 + Math.sin(elapsedTime * 2.8) * 0.035;
+    if (handBackAuraMesh && handBackAuraMesh.material) {
+      handBackAuraMesh.material.opacity = 0.42 + Math.sin(elapsedTime * 2.6) * 0.08;
+      const s = 1.0 + Math.sin(elapsedTime * 2.4) * 0.025;
       handBackAuraMesh.scale.set(s, s, 1);
     }
 
@@ -1366,54 +1393,57 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
     if (isIntroPlaying) {
       const progress = elapsedTime - introStartTime;
 
-      // Phase 1: (0.0s -> 1.40s) Smooth Gathering & Convergence to Tension
-      if (progress < 1.40) {
-        const u = smoothstep(0, 1.35, progress);
+      // Phase 1: (0.0s -> 0.95s) 3D Cards swirl and converge smoothly into palm, hand raises gracefully
+      if (progress < 0.95) {
+        const u = smoothstep(0, 0.90, progress);
         const easeU = easeInOutCubic(u);
-        const breathe = Math.sin(progress * 3.2) * 0.02 * (1 - u);
+        const breathe = Math.sin(progress * 3.5) * 0.010 * (1 - u);
 
-        // Vortex energy shards spiral tightly into snap epicenter
+        // 3D Cards spiral smoothly and gather into palm
         for (let i = 0; i < vortexShards.length; i++) {
           const vs = vortexShards[i];
-          vs.angle += vs.speed * 0.04;
-          vs.currentRadius = vs.initRadius * (1 - easeU * 0.90) + 0.22;
-          vs.mesh.position.x = Math.cos(vs.angle) * vs.currentRadius;
-          vs.mesh.position.z = Math.sin(vs.angle) * vs.currentRadius + vs.z * (1 - easeU);
-          vs.mesh.position.y = vs.y * (1 - easeU * 0.88) + Math.sin(vs.angle * 2.0) * 0.15;
-          vs.mesh.rotation.x += 0.04;
-          vs.mesh.rotation.y += 0.06;
-          vs.mesh.scale.setScalar(vs.scale * (1 - easeU * 0.35));
+          vs.angle += vs.speed * 0.040;
+          vs.currentRadius = vs.initRadius * (1 - easeU * 0.96) + 0.12;
+          vs.mesh.position.x = Math.cos(vs.angle) * vs.currentRadius + 0.10 * easeU;
+          vs.mesh.position.z = Math.sin(vs.angle) * vs.currentRadius + 0.20 * easeU + vs.initZ * (1 - easeU);
+          vs.mesh.position.y = vs.initY * (1 - easeU) + 0.35 * easeU;
+          vs.mesh.rotation.x += vs.rotSpeedX;
+          vs.mesh.rotation.y += vs.rotSpeedY;
+          vs.mesh.rotation.z += vs.rotSpeedZ;
+          const cardScale = vs.scale * Math.max(0.01, 1 - easeU * 0.85);
+          vs.mesh.scale.setScalar(cardScale);
+          vs.mesh.material.opacity = Math.max(0, 0.95 * (1 - easeU * 0.90));
         }
 
-        // Seamless continuous interpolation from REST POSE to TENSION POSE
+        // Smooth continuous rise from REST POSE towards pre-snap poise
         if (handFingers.index) {
-          handFingers.index.p1.rotation.x = THREE.MathUtils.lerp(ANATOMICAL_REST_POSE.index.p1X, TENSION_POSE.index.p1X, easeU) + breathe;
-          handFingers.index.p2.rotation.x = THREE.MathUtils.lerp(ANATOMICAL_REST_POSE.index.p2X, TENSION_POSE.index.p2X, easeU) + breathe;
+          handFingers.index.p1.rotation.x = THREE.MathUtils.lerp(ANATOMICAL_REST_POSE.index.p1X, TENSION_POSE.index.p1X * 0.75, easeU) + breathe;
+          handFingers.index.p2.rotation.x = THREE.MathUtils.lerp(ANATOMICAL_REST_POSE.index.p2X, TENSION_POSE.index.p2X * 0.75, easeU) + breathe;
           handFingers.index.p3.rotation.x = THREE.MathUtils.lerp(ANATOMICAL_REST_POSE.index.p3X, TENSION_POSE.index.p3X, easeU);
           handFingers.index.root.rotation.z = THREE.MathUtils.lerp(ANATOMICAL_REST_POSE.index.rootZ, TENSION_POSE.index.rootZ, easeU);
         }
         if (handFingers.middle) {
-          handFingers.middle.p1.rotation.x = THREE.MathUtils.lerp(ANATOMICAL_REST_POSE.middle.p1X, TENSION_POSE.middle.p1X, easeU) + breathe;
-          handFingers.middle.p2.rotation.x = THREE.MathUtils.lerp(ANATOMICAL_REST_POSE.middle.p2X, TENSION_POSE.middle.p2X, easeU) + breathe;
+          handFingers.middle.p1.rotation.x = THREE.MathUtils.lerp(ANATOMICAL_REST_POSE.middle.p1X, TENSION_POSE.middle.p1X * 0.75, easeU) + breathe;
+          handFingers.middle.p2.rotation.x = THREE.MathUtils.lerp(ANATOMICAL_REST_POSE.middle.p2X, TENSION_POSE.middle.p2X * 0.75, easeU) + breathe;
           handFingers.middle.p3.rotation.x = THREE.MathUtils.lerp(ANATOMICAL_REST_POSE.middle.p3X, TENSION_POSE.middle.p3X, easeU);
           handFingers.middle.root.rotation.z = THREE.MathUtils.lerp(ANATOMICAL_REST_POSE.middle.rootZ, TENSION_POSE.middle.rootZ, easeU);
         }
         if (handFingers.ring) {
-          handFingers.ring.p1.rotation.x = THREE.MathUtils.lerp(ANATOMICAL_REST_POSE.ring.p1X, TENSION_POSE.ring.p1X, easeU) + breathe;
-          handFingers.ring.p2.rotation.x = THREE.MathUtils.lerp(ANATOMICAL_REST_POSE.ring.p2X, TENSION_POSE.ring.p2X, easeU) + breathe;
+          handFingers.ring.p1.rotation.x = THREE.MathUtils.lerp(ANATOMICAL_REST_POSE.ring.p1X, TENSION_POSE.ring.p1X * 0.85, easeU) + breathe;
+          handFingers.ring.p2.rotation.x = THREE.MathUtils.lerp(ANATOMICAL_REST_POSE.ring.p2X, TENSION_POSE.ring.p2X * 0.85, easeU) + breathe;
           handFingers.ring.p3.rotation.x = THREE.MathUtils.lerp(ANATOMICAL_REST_POSE.ring.p3X, TENSION_POSE.ring.p3X, easeU);
           handFingers.ring.root.rotation.z = THREE.MathUtils.lerp(ANATOMICAL_REST_POSE.ring.rootZ, TENSION_POSE.ring.rootZ, easeU);
         }
         if (handFingers.pinky) {
-          handFingers.pinky.p1.rotation.x = THREE.MathUtils.lerp(ANATOMICAL_REST_POSE.pinky.p1X, TENSION_POSE.pinky.p1X, easeU) + breathe;
-          handFingers.pinky.p2.rotation.x = THREE.MathUtils.lerp(ANATOMICAL_REST_POSE.pinky.p2X, TENSION_POSE.pinky.p2X, easeU) + breathe;
+          handFingers.pinky.p1.rotation.x = THREE.MathUtils.lerp(ANATOMICAL_REST_POSE.pinky.p1X, TENSION_POSE.pinky.p1X * 0.85, easeU) + breathe;
+          handFingers.pinky.p2.rotation.x = THREE.MathUtils.lerp(ANATOMICAL_REST_POSE.pinky.p2X, TENSION_POSE.pinky.p2X * 0.85, easeU) + breathe;
           handFingers.pinky.p3.rotation.x = THREE.MathUtils.lerp(ANATOMICAL_REST_POSE.pinky.p3X, TENSION_POSE.pinky.p3X, easeU);
           handFingers.pinky.root.rotation.z = THREE.MathUtils.lerp(ANATOMICAL_REST_POSE.pinky.rootZ, TENSION_POSE.pinky.rootZ, easeU);
         }
         if (handFingers.thumb) {
-          handFingers.thumb.p1.rotation.x = THREE.MathUtils.lerp(ANATOMICAL_REST_POSE.thumb.p1X, TENSION_POSE.thumb.p1X, easeU);
-          handFingers.thumb.p1.rotation.z = THREE.MathUtils.lerp(ANATOMICAL_REST_POSE.thumb.p1Z, TENSION_POSE.thumb.p1Z, easeU);
-          handFingers.thumb.p2.rotation.x = THREE.MathUtils.lerp(ANATOMICAL_REST_POSE.thumb.p2X, TENSION_POSE.thumb.p2X, easeU);
+          handFingers.thumb.p1.rotation.x = THREE.MathUtils.lerp(ANATOMICAL_REST_POSE.thumb.p1X, TENSION_POSE.thumb.p1X * 0.80, easeU);
+          handFingers.thumb.p1.rotation.z = THREE.MathUtils.lerp(ANATOMICAL_REST_POSE.thumb.p1Z, TENSION_POSE.thumb.p1Z * 0.80, easeU);
+          handFingers.thumb.p2.rotation.x = THREE.MathUtils.lerp(ANATOMICAL_REST_POSE.thumb.p2X, TENSION_POSE.thumb.p2X * 0.80, easeU);
         }
 
         if (humanHandGroup) {
@@ -1422,50 +1452,37 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
           humanHandGroup.rotation.z = THREE.MathUtils.lerp(ANATOMICAL_REST_POSE.hand.rotZ, TENSION_POSE.hand.rotZ, easeU);
         }
       }
-      // Phase 2: (1.40s -> 1.75s) Elastic Stance Tension & Micro-Vibration
-      else if (progress >= 1.40 && progress < 1.75) {
-        // High-velocity orbital spin around contact point (no freeze!)
-        for (let i = 0; i < vortexShards.length; i++) {
-          const vs = vortexShards[i];
-          vs.angle += vs.speed * 0.07;
-          vs.mesh.position.x = Math.cos(vs.angle) * 0.22;
-          vs.mesh.position.z = Math.sin(vs.angle) * 0.22;
-          vs.mesh.position.y = Math.sin(vs.angle * 3.0) * 0.12;
-          vs.mesh.rotation.x += 0.08;
-          vs.mesh.rotation.y += 0.10;
-        }
+      // Phase 2: (0.95s -> 1.35s) Quick, deliberate tension sweep (0.40s tempo - no sluggish wait!)
+      else if (progress >= 0.95 && progress < 1.35) {
+        const tP2 = (progress - 0.95) / 0.40;
+        const easeP2 = easeInOutCubic(tP2);
 
-        // Delicate, authentic muscle tension quiver
-        const quiver = Math.sin((progress - 1.40) * 38.0) * 0.005;
-
+        // Smooth tension sweep: middle finger pad glides firmly against thumb pad, compressing with natural bio-mechanical force
         if (handFingers.middle) {
-          handFingers.middle.p1.rotation.x = TENSION_POSE.middle.p1X + quiver;
-          handFingers.middle.p2.rotation.x = TENSION_POSE.middle.p2X + quiver;
-          handFingers.middle.p3.rotation.x = TENSION_POSE.middle.p3X;
+          handFingers.middle.p1.rotation.x = THREE.MathUtils.lerp(TENSION_POSE.middle.p1X * 0.75, TENSION_POSE.middle.p1X, easeP2);
+          handFingers.middle.p2.rotation.x = THREE.MathUtils.lerp(TENSION_POSE.middle.p2X * 0.75, TENSION_POSE.middle.p2X, easeP2);
+          handFingers.middle.p3.rotation.x = THREE.MathUtils.lerp(TENSION_POSE.middle.p3X, TENSION_POSE.middle.p3X + 0.12, easeP2);
           handFingers.middle.root.rotation.z = TENSION_POSE.middle.rootZ;
         }
         if (handFingers.thumb) {
-          handFingers.thumb.p1.rotation.x = TENSION_POSE.thumb.p1X + quiver * 0.8;
-          handFingers.thumb.p1.rotation.z = TENSION_POSE.thumb.p1Z;
-          handFingers.thumb.p2.rotation.x = TENSION_POSE.thumb.p2X;
+          handFingers.thumb.p1.rotation.x = THREE.MathUtils.lerp(TENSION_POSE.thumb.p1X * 0.80, TENSION_POSE.thumb.p1X, easeP2);
+          handFingers.thumb.p1.rotation.z = THREE.MathUtils.lerp(TENSION_POSE.thumb.p1Z * 0.80, TENSION_POSE.thumb.p1Z, easeP2);
+          handFingers.thumb.p2.rotation.x = THREE.MathUtils.lerp(TENSION_POSE.thumb.p2X * 0.80, TENSION_POSE.thumb.p2X, easeP2);
         }
         if (handFingers.index) {
-          handFingers.index.p1.rotation.x = TENSION_POSE.index.p1X;
-          handFingers.index.p2.rotation.x = TENSION_POSE.index.p2X;
+          // Arlecchino's poised index finger gracefully arches upwards
+          handFingers.index.p1.rotation.x = THREE.MathUtils.lerp(TENSION_POSE.index.p1X * 0.75, TENSION_POSE.index.p1X, easeP2);
+          handFingers.index.p2.rotation.x = THREE.MathUtils.lerp(TENSION_POSE.index.p2X * 0.75, TENSION_POSE.index.p2X, easeP2);
           handFingers.index.p3.rotation.x = TENSION_POSE.index.p3X;
           handFingers.index.root.rotation.z = TENSION_POSE.index.rootZ;
         }
         if (handFingers.ring) {
-          handFingers.ring.p1.rotation.x = TENSION_POSE.ring.p1X;
-          handFingers.ring.p2.rotation.x = TENSION_POSE.ring.p2X;
-          handFingers.ring.p3.rotation.x = TENSION_POSE.ring.p3X;
-          handFingers.ring.root.rotation.z = TENSION_POSE.ring.rootZ;
+          handFingers.ring.p1.rotation.x = THREE.MathUtils.lerp(TENSION_POSE.ring.p1X * 0.85, TENSION_POSE.ring.p1X, easeP2);
+          handFingers.ring.p2.rotation.x = THREE.MathUtils.lerp(TENSION_POSE.ring.p2X * 0.85, TENSION_POSE.ring.p2X, easeP2);
         }
         if (handFingers.pinky) {
-          handFingers.pinky.p1.rotation.x = TENSION_POSE.pinky.p1X;
-          handFingers.pinky.p2.rotation.x = TENSION_POSE.pinky.p2X;
-          handFingers.pinky.p3.rotation.x = TENSION_POSE.pinky.p3X;
-          handFingers.pinky.root.rotation.z = TENSION_POSE.pinky.rootZ;
+          handFingers.pinky.p1.rotation.x = THREE.MathUtils.lerp(TENSION_POSE.pinky.p1X * 0.85, TENSION_POSE.pinky.p1X, easeP2);
+          handFingers.pinky.p2.rotation.x = THREE.MathUtils.lerp(TENSION_POSE.pinky.p2X * 0.85, TENSION_POSE.pinky.p2X, easeP2);
         }
 
         if (humanHandGroup) {
@@ -1474,9 +1491,13 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
           humanHandGroup.rotation.z = TENSION_POSE.hand.rotZ;
           humanHandGroup.position.z = 3.8;
         }
+
+        if (vortexGroup && vortexGroup.visible) {
+          vortexGroup.visible = false;
+        }
       }
-      // Phase 3: (1.75s -> 2.15s) High-Speed Snap Impact & Damped Recoil
-      else if (progress >= 1.75 && progress < 2.15) {
+      // Phase 3: (1.35s -> 1.65s) Crisp Snap Strike & Recoil Trigger (0.30s)
+      else if (progress >= 1.35 && progress < 1.65) {
         if (!hasSnapped) {
           triggerSnapBurst();
         }
@@ -1485,8 +1506,8 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
           vortexGroup.visible = false;
         }
 
-        const snapT = progress - 1.75;
-        const strikeDuration = 0.075;
+        const snapT = progress - 1.35;
+        const strikeDuration = 0.12; // Clean, readable strike duration
 
         if (snapT <= strikeDuration) {
           // Explosive strike acceleration onto thenar eminence
@@ -1496,7 +1517,7 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
           if (handFingers.middle) {
             handFingers.middle.p1.rotation.x = THREE.MathUtils.lerp(TENSION_POSE.middle.p1X, IMPACT_POSE.middle.p1X, sEase);
             handFingers.middle.p2.rotation.x = THREE.MathUtils.lerp(TENSION_POSE.middle.p2X, IMPACT_POSE.middle.p2X, sEase);
-            handFingers.middle.p3.rotation.x = THREE.MathUtils.lerp(TENSION_POSE.middle.p3X, IMPACT_POSE.middle.p3X, sEase);
+            handFingers.middle.p3.rotation.x = THREE.MathUtils.lerp(TENSION_POSE.middle.p3X + 0.12, IMPACT_POSE.middle.p3X, sEase);
             handFingers.middle.root.rotation.z = THREE.MathUtils.lerp(TENSION_POSE.middle.rootZ, IMPACT_POSE.middle.rootZ, sEase);
           }
           if (handFingers.thumb) {
@@ -1515,39 +1536,54 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
             humanHandGroup.rotation.z = THREE.MathUtils.lerp(TENSION_POSE.hand.rotZ, IMPACT_POSE.hand.rotZ, sEase);
           }
         } else {
-          // Beautiful critically-damped biological recoil (smooth 1.5 cycles, no jittering)
+          // Smooth organic biological recoil oscillation
           const tau = snapT - strikeDuration;
-          const bounceMiddle = Math.exp(-tau * 14.0) * Math.sin(tau * 26.0) * 0.08;
-          const bounceThumb = Math.exp(-tau * 12.0) * Math.sin(tau * 22.0) * 0.05;
-          const bounceHand = Math.exp(-tau * 15.0) * Math.sin(tau * 24.0) * 0.12;
+          const bounceMiddle = Math.exp(-tau * 9.0) * Math.sin(tau * 18.0) * 0.05;
+          const bounceThumb = Math.exp(-tau * 8.0) * Math.sin(tau * 16.0) * 0.03;
+          const bounceHand = Math.exp(-tau * 10.0) * Math.sin(tau * 18.0) * 0.05;
 
           if (handFingers.middle) {
             handFingers.middle.p1.rotation.x = IMPACT_POSE.middle.p1X + bounceMiddle;
             handFingers.middle.p2.rotation.x = IMPACT_POSE.middle.p2X + bounceMiddle * 0.7;
-            handFingers.middle.p3.rotation.x = IMPACT_POSE.middle.p3X;
-            handFingers.middle.root.rotation.z = IMPACT_POSE.middle.rootZ;
           }
           if (handFingers.thumb) {
             handFingers.thumb.p1.rotation.z = IMPACT_POSE.thumb.p1Z + bounceThumb;
-            handFingers.thumb.p1.rotation.x = IMPACT_POSE.thumb.p1X;
-            handFingers.thumb.p2.rotation.x = IMPACT_POSE.thumb.p2X;
           }
-          if (handFingers.index) {
-            handFingers.index.p1.rotation.x = IMPACT_POSE.index.p1X + bounceMiddle * 0.3;
-            handFingers.index.p2.rotation.x = IMPACT_POSE.index.p2X + bounceMiddle * 0.2;
-          }
-
           if (humanHandGroup) {
             humanHandGroup.position.z = 3.8 - bounceHand;
-            humanHandGroup.rotation.x = IMPACT_POSE.hand.rotX + bounceHand * 0.4;
-            humanHandGroup.rotation.y = IMPACT_POSE.hand.rotY;
-            humanHandGroup.rotation.z = IMPACT_POSE.hand.rotZ + bounceHand * 0.2;
+            humanHandGroup.rotation.x = IMPACT_POSE.hand.rotX + bounceHand * 0.35;
           }
         }
       }
-      // Phase 4: (2.15s -> 3.5s) Post-Snap Drift & Seamless Hand Dissolution
-      else if (progress >= 2.15 && progress <= introDuration) {
-        const t = (progress - 2.15) / (introDuration - 2.15);
+      // Phase 4: (1.65s -> 1.95s) Crisp Post-Snap Aftermath Hold (0.30s - shortened per user request)
+      else if (progress >= 1.65 && progress < 1.95) {
+        const settleProgress = (progress - 1.65) / 0.30;
+        const settleBreathe = Math.sin(settleProgress * Math.PI) * 0.008;
+
+        if (handFingers.middle) {
+          handFingers.middle.p1.rotation.x = IMPACT_POSE.middle.p1X + settleBreathe;
+          handFingers.middle.p2.rotation.x = IMPACT_POSE.middle.p2X;
+          handFingers.middle.p3.rotation.x = IMPACT_POSE.middle.p3X;
+        }
+        if (handFingers.thumb) {
+          handFingers.thumb.p1.rotation.z = IMPACT_POSE.thumb.p1Z;
+          handFingers.thumb.p1.rotation.x = IMPACT_POSE.thumb.p1X;
+        }
+        if (handFingers.index) {
+          handFingers.index.p1.rotation.x = IMPACT_POSE.index.p1X;
+          handFingers.index.p2.rotation.x = IMPACT_POSE.index.p2X;
+        }
+
+        if (humanHandGroup) {
+          humanHandGroup.position.z = 3.8;
+          humanHandGroup.rotation.x = IMPACT_POSE.hand.rotX + settleBreathe * 0.4;
+          humanHandGroup.rotation.y = IMPACT_POSE.hand.rotY;
+          humanHandGroup.rotation.z = IMPACT_POSE.hand.rotZ;
+        }
+      }
+      // Phase 5: (1.95s -> 2.50s) Post-Snap Drift & Seamless Hand Dissolution (0.55s)
+      else if (progress >= 1.95 && progress <= introDuration) {
+        const t = (progress - 1.95) / (introDuration - 1.95);
         const easeT = easeInOutCubic(t);
         const fade = Math.max(0, 1 - easeT);
 
@@ -1562,7 +1598,7 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
           handFingers.index.p1.rotation.x = THREE.MathUtils.lerp(IMPACT_POSE.index.p1X, 0.30, easeT);
         }
 
-        // Bàn tay lùi dần vào chiều sâu z và mờ dần opacity, tan biến hoàn toàn
+        // Bàn tay lùi dần vào chiều sâu z và tan biến vào sương đỏ
         if (humanHandGroup) {
           humanHandGroup.position.z = 3.8 - easeT * 9.5;
           humanHandGroup.position.y = -0.32 - easeT * 1.8;
@@ -1573,17 +1609,17 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
         }
 
         if (crimsonAuraMaterialRef) {
-          crimsonAuraMaterialRef.opacity = 0.75 * fade;
+          crimsonAuraMaterialRef.opacity = 0.28 * fade;
         }
         if (handBackAuraMesh && handBackAuraMesh.material) {
-          handBackAuraMesh.material.opacity = 0.85 * fade;
+          handBackAuraMesh.material.opacity = 0.45 * fade;
         }
 
         if (vortexGroup && vortexGroup.visible) {
           vortexGroup.visible = false;
         }
       }
-      // Phase 5: Intro Complete - Bàn tay biến mất sạch sẽ, về UI Home
+      // Phase 6: Intro Complete - Bàn tay biến mất sạch sẽ, về UI Home
       else if (progress > introDuration) {
         isIntroPlaying = false;
         if (humanHandGroup) humanHandGroup.visible = false;
@@ -1596,23 +1632,20 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
     }
 
 
-    // 8.3 Animate Sovereign Dark Crystal Embers (Physics, Drag & Alpha Fade)
+    // 8.3 Animate Eerie Occult Crimson Ether Mist (Dissolves gracefully into void)
     if (sovereignEmbersGroup) {
       for (let i = 0; i < sovereignEmberData.length; i++) {
         const s = sovereignEmberData[i];
-        if (s.mesh.visible) {
-          s.mesh.position.x += s.vx;
-          s.mesh.position.y += s.vy;
-          s.mesh.position.z += s.vz;
-          s.mesh.rotation.z += s.rotSpeed || 0.06;
-          s.vx *= 0.96;
-          s.vz *= 0.96;
-          s.vy -= 0.0035;
-          s.alpha -= s.decay;
+        if (s.isMist && s.mesh.visible) {
+          s.dist += s.speed * 0.025;
+          s.mesh.position.x = -0.16 + Math.cos(s.angle) * s.dist;
+          s.mesh.position.y = 0.32 + Math.sin(s.angle) * s.dist * 0.75 + Math.sin(elapsedTime * 2.5 + i) * 0.02;
+          s.mesh.rotation.z += s.rotSpeed;
+          s.alpha -= 0.016;
           if (s.mesh.material) {
             s.mesh.material.opacity = Math.max(0, s.alpha);
           }
-          const scale = Math.max(0.01, s.alpha * 1.1);
+          const scale = Math.max(0.01, s.scale * (1.0 + (1 - s.alpha) * 0.8));
           s.mesh.scale.set(scale, scale, scale);
           if (s.alpha <= 0) {
             s.mesh.visible = false;
@@ -1665,10 +1698,20 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
       m.rotation.y += p.rotSpeedY;
       m.rotation.z += p.rotSpeedZ;
 
+      // Càng xuống đáy thì hết phát sáng dần:
+      // Ở trên cao (y >= 4) phát sáng nhẹ (baseGlow ~ 0.32), từ y = 4 xuống y = -5 tắt dần về 0
+      if (p.isGlowing && m.material) {
+        const fallProgress = Math.max(0, Math.min(1, (m.position.y - (-5)) / 9));
+        m.material.emissiveIntensity = p.baseGlow * fallProgress;
+      }
+
       if (m.position.y < -10) {
         m.position.y = 10;
         m.position.x = (Math.random() - 0.5) * 24;
         m.position.z = (Math.random() - 0.5) * 14 - 1;
+        if (p.isGlowing && m.material) {
+          m.material.emissiveIntensity = p.baseGlow;
+        }
       }
     }
 
@@ -1737,7 +1780,7 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
     camera.updateProjectionMatrix();
 
     renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
 
     if (composer) {
       composer.setSize(width, height);
@@ -1897,6 +1940,20 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
             ease: 'power2.out'
           });
         }
+      },
+
+      /**
+       * Pause rendering loop to save 100% GPU resources when modal/portal is open
+       */
+      pause: function () {
+        stopAnimationLoop();
+      },
+
+      /**
+       * Resume rendering loop smoothly
+       */
+      resume: function () {
+        startAnimationLoop();
       }
     };
   }
