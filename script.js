@@ -244,20 +244,297 @@ function initViewNavigation() {
     }
   };
 
-  internalLinks.forEach((link) => {
+  const DEPT_IDS = ['dept-btc', 'dept-bcm', 'dept-btt', 'dept-bns', 'dept-bdn'];
+  let isBanTransitionRunning = false;
+  let currentBanTimeline = null;
+  let banSafetyTimer = null;
+
+  /**
+   * 3-Phase Cinematic Department Transition:
+   * Phase 1 (1.8s): 5 Ban cards spin rapidly as a pentagonal loading vortex (Xoay load.png)
+   * Phase 2 (2.2s): Decelerates & locks upright on chosen card (12h) with golden bloom & confetti (Lá bài của ban được chọn.png)
+   * Phase 3 (1.7s): Golden-crimson aura expands 360° -> switches view silently at peak & resets scroll to (0, 0) -> fades out cleanly
+   * Total duration: ~5.7s
+   */
+  const playBanTransition = (targetDeptId, onPageSwitchReady, onFinish) => {
+    if (isBanTransitionRunning && currentBanTimeline) {
+      currentBanTimeline.kill();
+      isBanTransitionRunning = false;
+    }
+    isBanTransitionRunning = true;
+    if (banSafetyTimer) clearTimeout(banSafetyTimer);
+
+    const overlay = document.getElementById('banTransitionOverlay');
+    const ring = document.getElementById('banTransitionRing');
+    const aura = document.getElementById('banTransitionAura');
+    const pulseRipple = document.getElementById('banTransitionPulseRipple');
+    const vortexCards = overlay ? [...overlay.querySelectorAll('.ban-vortex-card')] : [];
+
+    if (!overlay || !ring || !aura || vortexCards.length === 0) {
+      console.warn('[JPC Ban Transition] Elements missing, navigating directly.');
+      if (typeof onPageSwitchReady === 'function') onPageSwitchReady();
+      window.scrollTo(0, 0);
+      if (window.lenis) window.lenis.scrollTo(0, { immediate: true });
+      if (typeof onFinish === 'function') onFinish();
+      isBanTransitionRunning = false;
+      return;
+    }
+
+    // Safety timeout to ensure isBanTransitionRunning never locks
+    banSafetyTimer = setTimeout(() => {
+      if (isBanTransitionRunning) {
+        overlay.classList.remove('is-active');
+        document.body.classList.remove('ban-transition-active');
+        if (window.JPC3D && typeof window.JPC3D.stopCardRainLoop === 'function') {
+          window.JPC3D.stopCardRainLoop();
+        }
+        isBanTransitionRunning = false;
+      }
+    }, 8500);
+
+    const deptOrder = ['dept-btc', 'dept-bcm', 'dept-btt', 'dept-bns', 'dept-bdn'];
+    let targetIndex = deptOrder.indexOf(targetDeptId);
+    if (targetIndex === -1) targetIndex = 0;
+
+    // Card 0 (BTC) at 0deg, Card 1 (BCM) at 72deg, Card 2 (BTT) at 144deg, Card 3 (BNS) at 216deg, Card 4 (BDN) at 288deg
+    // To lock selected card at 0deg (top, 12 o'clock upright position):
+    // targetIndex * 72 + finalRotation = 360 * spins => finalRotation = 360 * spins - targetIndex * 72
+    const spins = 4;
+    const finalRotation = 360 * spins - targetIndex * 72;
+
+    console.info(`[JPC Ban Transition] Starting transition to: ${targetDeptId} (stop rotation: ${finalRotation}deg)`);
+
+    // Giữ nguyên hiệu ứng cánh hoa và mưa bài 3D liên tục ở nền trong suốt quá trình xoay bài
+    if (window.JPC3D && typeof window.JPC3D.startCardRainLoop === 'function') {
+      window.JPC3D.startCardRainLoop();
+    }
+
+    // Activate overlay and reset card states
+    overlay.classList.add('is-active');
+    document.body.classList.add('ban-transition-active');
+    overlay.setAttribute('aria-hidden', 'false');
+    vortexCards.forEach((c) => {
+      c.classList.remove('is-selected', 'is-dimmed', 'is-dash-out');
+      c.style.removeProperty('opacity');
+      c.style.removeProperty('transform');
+    });
+
+    const gsapRef = window.gsap || (typeof gsap !== 'undefined' ? gsap : null);
+
+    if (gsapRef) {
+      // Initialize GSAP values
+      gsapRef.set(ring, { rotation: 0 });
+      gsapRef.set(aura, { scale: 0, opacity: 0 });
+      if (pulseRipple) gsapRef.set(pulseRipple, { scale: 0.1, opacity: 0 });
+      gsapRef.set('#banTransitionStage', { opacity: 1 });
+      gsapRef.set('#banTransitionRipples', { opacity: 1 });
+      gsapRef.set(overlay, { opacity: 1 });
+      gsapRef.set(vortexCards, { opacity: 1 });
+
+      const tl = gsapRef.timeline({
+        onComplete: () => {
+          clearTimeout(banSafetyTimer);
+          overlay.classList.remove('is-active');
+          document.body.classList.remove('ban-transition-active');
+          overlay.setAttribute('aria-hidden', 'true');
+          vortexCards.forEach((c) => {
+            c.classList.remove('is-selected', 'is-dimmed', 'is-dash-out');
+            c.style.removeProperty('opacity');
+            c.style.removeProperty('transform');
+          });
+          gsapRef.set(ring, { rotation: 0 });
+          gsapRef.set(aura, { scale: 0, opacity: 0 });
+          if (pulseRipple) gsapRef.set(pulseRipple, { scale: 0.1, opacity: 0 });
+          gsapRef.set('#banTransitionStage', { opacity: 1 });
+          gsapRef.set('#banTransitionRipples', { opacity: 1 });
+          gsapRef.set(overlay, { opacity: 1 });
+          if (window.JPC3D && typeof window.JPC3D.stopCardRainLoop === 'function') {
+            window.JPC3D.stopCardRainLoop();
+          }
+          isBanTransitionRunning = false;
+          currentBanTimeline = null;
+          console.info('[JPC Ban Transition] Transition complete.');
+          if (typeof onFinish === 'function') onFinish();
+        }
+      });
+      currentBanTimeline = tl;
+
+      // --- GIAI ĐOẠN 1: Tụ về tâm & Xoay nhanh vòng xoay load (1.8 giây: 0.0s -> 1.8s) ---
+      // 5 lá bài Ban quay nhanh quanh tâm, chữ hướng vào trong (Xoay load.png)
+      tl.fromTo(ring,
+        { rotation: 0 },
+        { rotation: finalRotation, duration: 1.8, ease: 'power2.inOut' },
+        0
+      );
+
+      // --- GIAI ĐOẠN 2: Dừng & Khóa lá bài ban được chọn ở đỉnh 12h (1.8s -> 3.5s, giữ 1.7 giây) ---
+      // Lá bài ban được chọn nổi bật ở vị trí 12h, viền phát sáng vàng, 4 lá còn lại mờ đi (Lá bài của ban được chọn.png)
+      tl.add(() => {
+        console.info(`[JPC Ban Transition] Phase 2: Locked on selected card: ${targetDeptId}`);
+        vortexCards.forEach((c) => {
+          if (c.getAttribute('data-dept') === targetDeptId) {
+            c.classList.add('is-selected');
+          } else {
+            c.classList.add('is-dimmed');
+          }
+        });
+        if (typeof window.fireJapaneseConfetti === 'function') {
+          window.fireJapaneseConfetti(0.5, 0.35);
+        }
+        if (window.JPC3D && typeof window.JPC3D.pulse === 'function') {
+          window.JPC3D.pulse(1.4);
+        }
+      }, 1.8);
+
+      // Xung sóng gợn nước lan tỏa từ tâm khi lá bài được chọn khóa vị trí 12h
+      if (pulseRipple) {
+        tl.fromTo(pulseRipple,
+          { scale: 0.2, opacity: 0.95 },
+          { scale: 3.6, opacity: 0, duration: 1.35, ease: 'power2.out', immediateRender: false },
+          1.8
+        );
+      }
+
+      // --- GIAI ĐOẠN 3: Lá bài vụt ra khỏi màn hình, gợn sóng biến mất & làm rõ dần UI riêng của Ban (từ 3.5s) ---
+      // 1. Tại 3.5s: 4 lá bài mờ biến mất, vòng tròn gợn sóng ở giữa màn hình cũng đồng thời biến mất
+      tl.to('.ban-vortex-card.is-dimmed', {
+        opacity: 0,
+        duration: 0.25,
+        ease: 'power2.out'
+      }, 3.5);
+
+      tl.to('#banTransitionRipples', {
+        opacity: 0,
+        duration: 0.3,
+        ease: 'power2.out'
+      }, 3.5);
+
+      // 2. Gợn sóng chỉ chiếu đến đoạn lan ra toàn màn hình và hết (dissipates hoàn toàn tại viền màn hình)
+      tl.fromTo(aura,
+        { scale: 0.2, opacity: 0.95 },
+        { scale: 42, opacity: 0, duration: 0.85, ease: 'power2.out', immediateRender: false },
+        3.5
+      );
+
+      // 3. Lá bài của Ban được chọn phóng vụt ra khỏi màn hình (cardDashOut animation)
+      tl.add(() => {
+        console.info(`[JPC Ban Transition] Phase 3: Card dashing out towards screen for ${targetDeptId}...`);
+        vortexCards.forEach((c) => {
+          if (c.getAttribute('data-dept') === targetDeptId) {
+            c.classList.add('is-dash-out');
+          }
+        });
+      }, 3.5);
+
+      // 4. Khi lá bài vụt ra khỏi màn hình (3.75s) -> âm thầm chuyển sang UI riêng của Ban và làm rõ dần luôn!
+      tl.add(() => {
+        console.info(`[JPC Ban Transition] Card dashed out: Switching view to ${targetDeptId} & revealing Ban UI...`);
+        if (typeof onPageSwitchReady === 'function') {
+          onPageSwitchReady();
+        }
+        window.scrollTo(0, 0);
+        if (window.lenis) {
+          window.lenis.scrollTo(0, { immediate: true });
+        }
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+        // Bắt đầu làm rõ dần UI riêng của Ban (gỡ bỏ làm mờ & tối)
+        document.body.classList.remove('ban-transition-active');
+      }, 3.75);
+
+      // 5. Overlay làm mờ biến mất mượt mà để lộ hoàn toàn UI sắc nét của Ban
+      tl.to(overlay, {
+        opacity: 0,
+        duration: 0.55,
+        ease: 'power2.out'
+      }, 3.8);
+
+    } else {
+      // CSS/JS Fallback if GSAP is not loaded
+      vortexCards.forEach((c) => {
+        c.style.opacity = '1';
+        c.classList.remove('is-selected', 'is-dimmed', 'is-dash-out');
+      });
+      ring.style.transition = 'transform 1.8s cubic-bezier(0.2, 0.8, 0.2, 1)';
+      ring.style.transform = `rotate(${finalRotation}deg)`;
+
+      setTimeout(() => {
+        vortexCards.forEach((c) => {
+          if (c.getAttribute('data-dept') === targetDeptId) {
+            c.classList.add('is-selected');
+          } else {
+            c.classList.add('is-dimmed');
+          }
+        });
+        if (typeof window.fireJapaneseConfetti === 'function') {
+          window.fireJapaneseConfetti(0.5, 0.35);
+        }
+
+        setTimeout(() => {
+          // Dash card out & ripples fade out
+          const centerRipples = document.getElementById('banTransitionRipples');
+          if (centerRipples) centerRipples.style.opacity = '0';
+          vortexCards.forEach((c) => {
+            if (c.getAttribute('data-dept') === targetDeptId) {
+              c.classList.add('is-dash-out');
+            } else {
+              c.style.opacity = '0';
+            }
+          });
+
+          aura.style.transition = 'transform 0.75s ease-out, opacity 0.75s ease-out';
+          aura.style.transform = 'scale(42)';
+          aura.style.opacity = '0';
+
+          setTimeout(() => {
+            if (typeof onPageSwitchReady === 'function') onPageSwitchReady();
+            window.scrollTo(0, 0);
+            if (window.lenis) window.lenis.scrollTo(0, { immediate: true });
+            document.documentElement.scrollTop = 0;
+            document.body.scrollTop = 0;
+            document.body.classList.remove('ban-transition-active');
+
+            overlay.style.transition = 'opacity 0.5s ease-out';
+            overlay.style.opacity = '0';
+
+            setTimeout(() => {
+              clearTimeout(banSafetyTimer);
+              overlay.classList.remove('is-active');
+              overlay.style.removeProperty('opacity');
+              if (centerRipples) centerRipples.style.removeProperty('opacity');
+              vortexCards.forEach((c) => {
+                c.classList.remove('is-selected', 'is-dimmed', 'is-dash-out');
+                c.style.removeProperty('opacity');
+              });
+              isBanTransitionRunning = false;
+              if (typeof onFinish === 'function') onFinish();
+            }, 550);
+          }, 250);
+        }, 1700);
+      }, 1800);
+    }
+  };
+
+  window.playBanTransition = (deptId) => {
+    playBanTransition(deptId, () => showView(deptId, true));
+  };
+
+  // Robust document-level click delegation for all internal links & department navigation
+  document.addEventListener('click', (event) => {
+    const link = event.target.closest('a[href^="#"]');
+    if (!link) return;
+
     // Dropdown parent toggles (Về JPC) only toggle options on click, not page navigation!
     if (link.classList.contains('nav__link--parent') || link.id === 'navAboutParent') {
       return;
     }
 
-    link.addEventListener('click', (event) => {
-      const targetId = link.getAttribute('href').slice(1);
-      if (!targetId) return;
+    const targetId = link.getAttribute('href').slice(1);
+    if (!targetId) return;
 
-      event.preventDefault();
-      showView(targetId, true);
+    event.preventDefault();
 
-      // Blur active link to prevent :focus-within from keeping dropdown open after selection
+    const closeMenus = () => {
       if (document.activeElement) {
         document.activeElement.blur();
       }
@@ -273,7 +550,29 @@ function initViewNavigation() {
       const branchOrg = document.getElementById('navBranchOrg');
       if (aboutDropdown) aboutDropdown.classList.remove('is-open');
       if (branchOrg) branchOrg.classList.remove('is-open');
-    });
+    };
+
+    const isDeptTarget = DEPT_IDS.includes(targetId);
+
+    // CHỈ kích hoạt hiệu ứng xoay bài khi bấm vào ban ở:
+    // 1. UI Ban (thẻ ban tại phần About: .about-org-card hoặc .dept-card)
+    // 2. Options (menu dropdown trên nav: .nav__sub-item hoặc bên trong #navBranchOrg)
+    // Còn khi bấm vào xem ban khác ở cuối trang (.dept__nav-pill) -> trực tiếp chuyển trang luôn!
+    const isFromAboutSection = Boolean(link.closest('.about-org-card') || link.closest('.dept-card'));
+    const isFromNavDropdown = Boolean(link.closest('.nav__sub-item') || link.closest('#navBranchOrg'));
+    const shouldPlayVortex = isDeptTarget && (isFromAboutSection || isFromNavDropdown);
+
+    if (shouldPlayVortex) {
+      closeMenus();
+      playBanTransition(targetId, () => {
+        showView(targetId, true);
+      });
+      return;
+    }
+
+    // Trực tiếp chuyển trang cho các link khác (bao gồm cả pill xem ban khác ở cuối trang)
+    showView(targetId, true);
+    closeMenus();
   });
 
   window.addEventListener('hashchange', () => {

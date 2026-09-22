@@ -109,7 +109,7 @@ window.fireJapaneseConfetti = fireJapaneseConfetti;
  * 3. 3D Magnetic Card Hover Physics
  */
 function init3DCardHoverPhysics() {
-  const cards = document.querySelectorAll('.about__card, .dept__card, .journey__step, .join__card, .timeline__item');
+  const cards = document.querySelectorAll('.about__card, .dept__card, .journey__step, .join__card, .timeline__item, .dept-card');
 
   cards.forEach((card) => {
     let ticking = false;

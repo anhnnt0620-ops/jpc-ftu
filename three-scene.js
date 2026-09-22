@@ -55,7 +55,8 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
   let cardRainGroup, cardRainData = [];
   let humanHandGroup, handFingers = {}, wristMesh;
   let handBackAuraMesh, crimsonAuraMaterialRef;
-  let vortexGroup, sovereignRingMesh, anamorphicFlareMesh, sovereignEmbersGroup;
+  let vortexGroup, sovereignRingMesh, waterRippleMesh, waterRippleEchoMesh, anamorphicFlareMesh, sovereignEmbersGroup;
+  let isCardRainLooping = false;
   let sovereignEmberData = [];
   let goldLight, rimLight, ambientLight, snapFlashLight, skinFillLight;
   let animationFrameId = null;
@@ -1039,19 +1040,78 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
     anamorphicFlareMesh.position.set(-0.16, 0.32, 4.08);
     mainGroup.add(anamorphicFlareMesh);
 
-    // 6.8 Razor-Thin Crimson Eclipse Shockwave Ring (No star sparkles, purely elegant and occult)
-    const shockwaveGeo = new THREE.RingGeometry(0.14, 0.17, 64);
-    const shockwaveMat = new THREE.MeshBasicMaterial({
-      color: 0xcc1436,
-      side: THREE.DoubleSide,
+    // 6.8 Soft Concentric Water Ripple Shockwave in White & Deep Crimson (Sắc nét, thanh thoát như lúc búng tay)
+    const rippleCanvas = document.createElement('canvas');
+    rippleCanvas.width = 512;
+    rippleCanvas.height = 512;
+    const rCtx = rippleCanvas.getContext('2d');
+    
+    // Procedural multi-ring water ripple gradient in Crisp White & Deep Crimson
+    const rGrad = rCtx.createRadialGradient(256, 256, 0, 256, 256, 256);
+    rGrad.addColorStop(0.00, 'rgba(204, 20, 54, 0)');
+    rGrad.addColorStop(0.12, 'rgba(204, 20, 54, 0.08)');
+    // Wave 1 (Deep Crimson base with Crisp Pure White crest)
+    rGrad.addColorStop(0.19, 'rgba(204, 20, 54, 0.75)');
+    rGrad.addColorStop(0.23, 'rgba(255, 255, 255, 0.98)');
+    rGrad.addColorStop(0.27, 'rgba(153, 27, 27, 0.35)');
+    rGrad.addColorStop(0.36, 'rgba(10, 1, 4, 0.15)');
+    // Wave 2
+    rGrad.addColorStop(0.42, 'rgba(225, 29, 72, 0.75)');
+    rGrad.addColorStop(0.46, 'rgba(255, 255, 255, 1.00)');
+    rGrad.addColorStop(0.50, 'rgba(159, 18, 57, 0.38)');
+    rGrad.addColorStop(0.60, 'rgba(10, 1, 4, 0.18)');
+    // Wave 3 (Main outer crest)
+    rGrad.addColorStop(0.68, 'rgba(244, 63, 94, 0.80)');
+    rGrad.addColorStop(0.72, 'rgba(255, 255, 255, 1.00)');
+    rGrad.addColorStop(0.76, 'rgba(190, 18, 60, 0.40)');
+    rGrad.addColorStop(0.85, 'rgba(10, 1, 4, 0.20)');
+    // Wave 4 (Outermost dissipating ripple)
+    rGrad.addColorStop(0.90, 'rgba(225, 29, 72, 0.60)');
+    rGrad.addColorStop(0.93, 'rgba(255, 255, 255, 0.75)');
+    rGrad.addColorStop(1.00, 'rgba(10, 1, 4, 0)');
+    rCtx.fillStyle = rGrad;
+    rCtx.fillRect(0, 0, 512, 512);
+
+    // Subtle 3D crest highlight & deep crimson feathering
+    const waveRadii = [56, 116, 182, 230];
+    const waveWidths = [10, 14, 20, 16];
+    for (let w = 0; w < waveRadii.length; w++) {
+      // Crimson body aura
+      rCtx.beginPath();
+      rCtx.arc(256, 256, waveRadii[w], 0, Math.PI * 2);
+      rCtx.strokeStyle = 'rgba(204, 20, 54, 0.70)';
+      rCtx.lineWidth = waveWidths[w];
+      rCtx.stroke();
+
+      // Sharp pure white specular catch-light on the wave crest
+      rCtx.beginPath();
+      rCtx.arc(256, 255, waveRadii[w], 0, Math.PI * 2);
+      rCtx.strokeStyle = 'rgba(255, 255, 255, 0.98)';
+      rCtx.lineWidth = 3;
+      rCtx.stroke();
+    }
+
+    const waterRippleTex = new THREE.CanvasTexture(rippleCanvas);
+    const rippleGeo = new THREE.PlaneGeometry(3.6, 3.6);
+    const rippleMat = new THREE.MeshBasicMaterial({
+      map: waterRippleTex,
       transparent: true,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
-      opacity: 0
+      opacity: 0,
+      side: THREE.DoubleSide
     });
-    sovereignRingMesh = new THREE.Mesh(shockwaveGeo, shockwaveMat);
-    sovereignRingMesh.position.set(-0.16, 0.32, 4.05);
-    mainGroup.add(sovereignRingMesh);
+    waterRippleMesh = new THREE.Mesh(rippleGeo, rippleMat);
+    waterRippleMesh.position.set(-0.16, 0.32, 4.05);
+    mainGroup.add(waterRippleMesh);
+
+    // Trailing echo ripple mesh for natural water dispersion
+    const rippleEchoMat = rippleMat.clone();
+    waterRippleEchoMesh = new THREE.Mesh(rippleGeo, rippleEchoMat);
+    waterRippleEchoMesh.position.set(-0.16, 0.32, 4.04);
+    mainGroup.add(waterRippleEchoMesh);
+
+    sovereignRingMesh = waterRippleMesh;
 
     // 6.8b Occult Crimson Thread Slashes (Arlecchino's signature blood-thread slashes cutting reality)
     sovereignEmbersGroup = new THREE.Group();
@@ -1288,7 +1348,7 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
       bloomPass.strength = CONFIG.bloomStrength;
     }
 
-    // 4. Anamorphic Crimson Slash Flare & Crimson Eclipse Shockwave Ring
+    // 4. Anamorphic Crimson Slash Flare & Water Ripple Waves
     if (anamorphicFlareMesh) {
       anamorphicFlareMesh.material.opacity = 0.95;
       anamorphicFlareMesh.scale.set(0.1, 0.22, 1.0);
@@ -1298,12 +1358,22 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
       }
     }
 
-    if (sovereignRingMesh) {
-      sovereignRingMesh.material.opacity = 0.95;
-      sovereignRingMesh.scale.set(0.1, 0.1, 0.1);
+    if (waterRippleMesh) {
+      waterRippleMesh.material.opacity = 0.95;
+      waterRippleMesh.scale.set(0.1, 0.1, 0.1);
       if (typeof gsap !== 'undefined') {
-        gsap.to(sovereignRingMesh.scale, { x: 24.0, y: 24.0, z: 24.0, duration: 0.52, ease: 'power3.out' });
-        gsap.to(sovereignRingMesh.material, { opacity: 0, duration: 0.52, ease: 'power2.out' });
+        gsap.to(waterRippleMesh.scale, { x: 26.0, y: 26.0, z: 26.0, duration: 0.68, ease: 'power2.out' });
+        gsap.to(waterRippleMesh.material, { opacity: 0, duration: 0.68, ease: 'power2.out' });
+      }
+    }
+
+    if (waterRippleEchoMesh) {
+      waterRippleEchoMesh.material.opacity = 0;
+      waterRippleEchoMesh.scale.set(0.08, 0.08, 0.08);
+      if (typeof gsap !== 'undefined') {
+        gsap.to(waterRippleEchoMesh.material, { opacity: 0.75, duration: 0.1, delay: 0.08 });
+        gsap.to(waterRippleEchoMesh.scale, { x: 22.0, y: 22.0, z: 22.0, duration: 0.62, delay: 0.08, ease: 'power2.out' });
+        gsap.to(waterRippleEchoMesh.material, { opacity: 0, duration: 0.54, delay: 0.18, ease: 'power2.out' });
       }
     }
 
@@ -1678,9 +1748,15 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
         if (c.mesh.position.y < -8) {
           c.active = false;
           c.mesh.visible = false;
+          if (isCardRainLooping) {
+            c.mesh.position.set(c.initX, c.initY + Math.random() * 2, c.initZ);
+            c.mesh.material.opacity = 0.95;
+            c.mesh.visible = true;
+            c.active = true;
+          }
         }
       }
-      if (!anyActive && !isIntroPlaying) {
+      if (!anyActive && !isIntroPlaying && !isCardRainLooping) {
         cardRainGroup.visible = false;
       }
     }
@@ -1809,6 +1885,20 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
        */
       playSnapIntro: function (onSnap, onComplete) {
         startIntroTimeline(onSnap, onComplete);
+      },
+
+      /**
+       * Card rain controls for page transitions
+       */
+      startCardRainLoop: function () {
+        isCardRainLooping = true;
+        triggerCardRain();
+      },
+      stopCardRainLoop: function () {
+        isCardRainLooping = false;
+      },
+      triggerCardRain: function () {
+        triggerCardRain();
       },
 
       /**

@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 220" width="100%" height="100%">
+  <defs>
+    <!-- Gradients for Ban Chuyen Mon (Royal Indigo & Jade Green) -->
+    <radialGradient id="faceGradBCM" cx="45%" cy="40%" r="55%">
+      <stop offset="0%" stop-color="#fff8f0" />
+      <stop offset="70%" stop-color="#faeed9" />
+      <stop offset="100%" stop-color="#ebd8be" />
+    </radialGradient>
+    <linearGradient id="hairGradBCM" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2a2430" />
+      <stop offset="60%" stop-color="#15121c" />
+      <stop offset="100%" stop-color="#08070d" />
+    </linearGradient>
+    <linearGradient id="kimonoGradBCM" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e3a8a" />
+      <stop offset="45%" stop-color="#172554" />
+      <stop offset="100%" stop-color="#091430" />
+    </linearGradient>
+    <linearGradient id="jadeTrimBCM" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#6ee7b7" />
+      <stop offset="50%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#047857" />
+    </linearGradient>
+    <linearGradient id="obiGradBCM" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="50%" stop-color="#0284c7" />
+      <stop offset="100%" stop-color="#075985" />
+    </linearGradient>
+    <filter id="kokeshiShadowBCM" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="4" flood-color="#000000" flood-opacity="0.35" />
+    </filter>
+  </defs>
+
+  <g filter="url(#kokeshiShadowBCM)">
+    <!-- Base Shadow -->
+    <ellipse cx="80" cy="210" rx="36" ry="7" fill="#070a12" opacity="0.4" />
+
+    <!-- Wooden Torso / Kimono (Ban Chuyen Mon - Royal Indigo) -->
+    <path d="M 52 110 C 44 135, 42 175, 46 205 C 54 212, 106 212, 114 205 C 118 175, 116 135, 108 110 Z" 
+          fill="url(#kimonoGradBCM)" stroke="url(#jadeTrimBCM)" stroke-width="1.8" />
+
+    <!-- Kimono Lapels (Eri) -->
+    <path d="M 62 108 L 80 142 L 72 142 Z" fill="#fff8f0" opacity="0.9" />
+    <path d="M 98 108 L 78 144 L 84 144 Z" fill="url(#jadeTrimBCM)" />
+    <path d="M 64 110 L 80 142 L 96 110" fill="none" stroke="url(#jadeTrimBCM)" stroke-width="2" />
+
+    <!-- Kimono Pattern (Scholar's Scroll & Seigaiha Waves) -->
+    <g transform="translate(80, 175)" opacity="0.9">
+      <!-- Traditional Scroll (Makimono) -->
+      <rect x="-18" y="-6" width="36" height="13" rx="3" fill="#faeed9" stroke="url(#jadeTrimBCM)" stroke-width="1" />
+      <line x1="-12" y1="-2" x2="12" y2="-2" stroke="#172554" stroke-width="1" stroke-dasharray="2 1" />
+      <line x1="-12" y1="2" x2="12" y2="2" stroke="#172554" stroke-width="1" stroke-dasharray="2 1" />
+      <!-- Kanji symbol 学 (Learning / Academic) -->
+      <circle cx="0" cy="0" r="1.5" fill="#0284c7" />
+      <!-- Calligraphy Brush (Fude) -->
+      <path d="M 12 14 L 20 -10 L 22 -9 L 14 15 Z" fill="#78350f" />
+      <path d="M 20 -10 L 22 -14 L 23 -9 Z" fill="#ffffff" />
+      <path d="M 21 -13 L 22 -14 L 22 -11 Z" fill="#000000" />
+      <!-- Wave waves (Seigaiha) -->
+      <path d="M -24 16 A 6 6 0 0 1 -12 16" fill="none" stroke="#38bdf8" stroke-width="1" opacity="0.6" />
+      <path d="M -12 16 A 6 6 0 0 1 0 16" fill="none" stroke="#38bdf8" stroke-width="1" opacity="0.6" />
+    </g>
+
+    <!-- Obi Sash (Cyan / Sapphire) -->
+    <rect x="50" y="140" width="60" height="15" rx="3" fill="url(#obiGradBCM)" stroke="url(#jadeTrimBCM)" stroke-width="1" />
+    <!-- Obi-jime Cord -->
+    <line x1="50" y1="147.5" x2="110" y2="147.5" stroke="#fff8f0" stroke-width="1.5" />
+    <circle cx="80" cy="147.5" r="3" fill="#10b981" stroke="#6ee7b7" stroke-width="1" />
+
+    <!-- Wooden Head (Spherical Kokeshi) -->
+    <circle cx="80" cy="68" r="36" fill="url(#faceGradBCM)" stroke="url(#jadeTrimBCM)" stroke-width="1.2" />
+
+    <!-- Scholarly Hair (Hime Cut with Topknot Bun) -->
+    <path d="M 45 68 C 45 35, 60 22, 80 22 C 100 22, 115 35, 115 68 C 115 76, 113 88, 110 94 C 106 82, 104 60, 104 55 C 96 50, 64 50, 56 55 C 56 60, 54 82, 50 94 C 47 88, 45 76, 45 68 Z" 
+          fill="url(#hairGradBCM)" />
+    <!-- Topknot Bun (Chignon) -->
+    <circle cx="80" cy="20" r="14" fill="url(#hairGradBCM)" />
+    <!-- Bangs -->
+    <path d="M 56 55 Q 80 62 104 55 Q 80 44 56 55 Z" fill="url(#hairGradBCM)" />
+
+    <!-- Jade Kanzashi Pin -->
+    <g transform="translate(94, 22)">
+      <line x1="-15" y1="5" x2="15" y2="-5" stroke="url(#jadeTrimBCM)" stroke-width="2.5" stroke-linecap="round" />
+      <circle cx="15" cy="-5" r="4" fill="#34d399" />
+      <path d="M 15 -2 Q 20 8 18 14" stroke="#38bdf8" stroke-width="1.4" fill="none" />
+    </g>
+
+    <!-- Eyes (Scholarly, Calm) -->
+    <path d="M 64 68 Q 70 65 74 68" fill="none" stroke="#1e1b29" stroke-width="2.2" stroke-linecap="round" />
+    <path d="M 86 68 Q 90 65 96 68" fill="none" stroke="#1e1b29" stroke-width="2.2" stroke-linecap="round" />
+
+    <!-- Rosy Blush Cheeks -->
+    <ellipse cx="63" cy="76" rx="5.5" ry="3" fill="#f43f5e" opacity="0.32" />
+    <ellipse cx="97" cy="76" rx="5.5" ry="3" fill="#f43f5e" opacity="0.32" />
+
+    <!-- Gentle Smile -->
+    <path d="M 77 81 Q 80 83.5 83 81" fill="none" stroke="#be123c" stroke-width="1.8" stroke-linecap="round" />
+    <!-- Eyebrows -->
+    <path d="M 66 61 Q 70 59 74 61" fill="none" stroke="#383042" stroke-width="1.4" stroke-linecap="round" />
+    <path d="M 86 61 Q 90 59 94 61" fill="none" stroke="#383042" stroke-width="1.4" stroke-linecap="round" />
+  </g>
+</svg>

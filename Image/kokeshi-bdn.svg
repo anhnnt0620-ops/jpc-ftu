@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 220" width="100%" height="100%">
+  <defs>
+    <!-- Gradients for Ban Doi Ngoai (Imperial Amber Gold & Obsidian Lacquer) -->
+    <radialGradient id="faceGradBDN" cx="45%" cy="40%" r="55%">
+      <stop offset="0%" stop-color="#fff8f0" />
+      <stop offset="70%" stop-color="#faeed9" />
+      <stop offset="100%" stop-color="#ebd8be" />
+    </radialGradient>
+    <linearGradient id="hairGradBDN" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2c2420" />
+      <stop offset="60%" stop-color="#17120f" />
+      <stop offset="100%" stop-color="#080605" />
+    </linearGradient>
+    <linearGradient id="kimonoGradBDN" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#d97706" />
+      <stop offset="45%" stop-color="#92400e" />
+      <stop offset="100%" stop-color="#451a03" />
+    </linearGradient>
+    <linearGradient id="imperialGoldBDN" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#fef08a" />
+      <stop offset="45%" stop-color="#eab308" />
+      <stop offset="100%" stop-color="#ca8a04" />
+    </linearGradient>
+    <linearGradient id="obiGradBDN" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#292524" />
+      <stop offset="50%" stop-color="#1c1917" />
+      <stop offset="100%" stop-color="#0c0a09" />
+    </linearGradient>
+    <filter id="kokeshiShadowBDN" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="4" flood-color="#000000" flood-opacity="0.35" />
+    </filter>
+  </defs>
+
+  <g filter="url(#kokeshiShadowBDN)">
+    <!-- Base Shadow -->
+    <ellipse cx="80" cy="210" rx="36" ry="7" fill="#080604" opacity="0.4" />
+
+    <!-- Wooden Torso / Kimono (Ban Doi Ngoai - Imperial Amber) -->
+    <path d="M 52 110 C 44 135, 42 175, 46 205 C 54 212, 106 212, 114 205 C 118 175, 116 135, 108 110 Z" 
+          fill="url(#kimonoGradBDN)" stroke="url(#imperialGoldBDN)" stroke-width="1.8" />
+
+    <!-- Kimono Lapels (Eri) -->
+    <path d="M 62 108 L 80 142 L 72 142 Z" fill="#fff8f0" opacity="0.9" />
+    <path d="M 98 108 L 78 144 L 84 144 Z" fill="url(#imperialGoldBDN)" />
+    <path d="M 64 110 L 80 142 L 96 110" fill="none" stroke="url(#imperialGoldBDN)" stroke-width="2" />
+
+    <!-- Kimono Pattern (Golden Koban Coin & Mizuhiki Harmony Knot) -->
+    <g transform="translate(80, 175)" opacity="0.95">
+      <!-- Oval Gold Coin (Koban) / Crest Motif -->
+      <rect x="-14" y="-7" width="28" height="15" rx="7" fill="url(#imperialGoldBDN)" stroke="#78350f" stroke-width="0.8" />
+      <line x1="-8" y1="0.5" x2="8" y2="0.5" stroke="#78350f" stroke-width="1" />
+      <circle cx="-4" cy="0.5" r="1.2" fill="#78350f" />
+      <circle cx="4" cy="0.5" r="1.2" fill="#78350f" />
+      <!-- Torii gate accents / Mizuhiki loops -->
+      <path d="M -18 16 Q -12 8 -6 16" fill="none" stroke="url(#imperialGoldBDN)" stroke-width="1.2" />
+      <path d="M 6 16 Q 12 8 18 16" fill="none" stroke="url(#imperialGoldBDN)" stroke-width="1.2" />
+      <circle cx="-16" cy="-10" r="2.2" fill="#fef08a" />
+      <circle cx="16" cy="-10" r="2.2" fill="#fef08a" />
+    </g>
+
+    <!-- Obi Sash (Obsidian Lacquer with Gold Border) -->
+    <rect x="50" y="140" width="60" height="15" rx="3" fill="url(#obiGradBDN)" stroke="url(#imperialGoldBDN)" stroke-width="1.2" />
+    <!-- Obi-jime Cord (Red & Gold) -->
+    <line x1="50" y1="147.5" x2="110" y2="147.5" stroke="#b91c1c" stroke-width="1.5" />
+    <circle cx="80" cy="147.5" r="3" fill="url(#imperialGoldBDN)" stroke="#fef08a" stroke-width="0.8" />
+
+    <!-- Wooden Head (Spherical Kokeshi) -->
+    <circle cx="80" cy="68" r="36" fill="url(#faceGradBDN)" stroke="url(#imperialGoldBDN)" stroke-width="1.2" />
+
+    <!-- Noble Updo Hairstyle (Shimada / Traditional Elegant Braid) -->
+    <path d="M 45 68 C 45 35, 60 22, 80 22 C 100 22, 115 35, 115 68 C 115 76, 113 88, 110 94 C 106 82, 104 60, 104 55 C 96 50, 64 50, 56 55 C 56 60, 54 82, 50 94 C 47 88, 45 76, 45 68 Z" 
+          fill="url(#hairGradBDN)" />
+    <!-- Updo Crest -->
+    <path d="M 66 24 C 66 14, 94 14, 94 24 Z" fill="url(#hairGradBDN)" />
+    <!-- Bangs -->
+    <path d="M 56 55 Q 80 62 104 55 Q 80 44 56 55 Z" fill="url(#hairGradBDN)" />
+
+    <!-- Golden Comb (Kushi) -->
+    <g transform="translate(80, 26)">
+      <path d="M -16 0 Q 0 -6 16 0 L 14 5 L -14 5 Z" fill="url(#imperialGoldBDN)" />
+      <circle cx="0" cy="-1" r="2" fill="#b91c1c" />
+    </g>
+
+    <!-- Eyes (Confident, Hospitable, Dignified) -->
+    <path d="M 64 68 Q 70 64 74 68" fill="none" stroke="#231c19" stroke-width="2.2" stroke-linecap="round" />
+    <path d="M 86 68 Q 90 64 96 68" fill="none" stroke="#231c19" stroke-width="2.2" stroke-linecap="round" />
+    <path d="M 74 67.5 L 75.5 66" stroke="#231c19" stroke-width="1.2" stroke-linecap="round" />
+    <path d="M 86 67.5 L 84.5 66" stroke="#231c19" stroke-width="1.2" stroke-linecap="round" />
+
+    <!-- Rosy Cheeks -->
+    <ellipse cx="63" cy="76" rx="5.5" ry="3" fill="#f59e0b" opacity="0.32" />
+    <ellipse cx="97" cy="76" rx="5.5" ry="3" fill="#f59e0b" opacity="0.32" />
+
+    <!-- Welcoming Smile -->
+    <path d="M 77 81 Q 80 84 83 81" fill="none" stroke="#b45309" stroke-width="1.8" stroke-linecap="round" />
+    <!-- Eyebrows -->
+    <path d="M 66 61 Q 70 58.5 74 61" fill="none" stroke="#3d332e" stroke-width="1.4" stroke-linecap="round" />
+    <path d="M 86 61 Q 90 58.5 94 61" fill="none" stroke="#3d332e" stroke-width="1.4" stroke-linecap="round" />
+  </g>
+</svg>
