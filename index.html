@@ -309,7 +309,6 @@
       <div class="about-org-grid">
         <a href="#dept-btc" class="about-org-card dept-card dept-card--float-1" data-dept="dept-btc">
           <div class="dept-card__inner">
-            <span class="dept-card__rank">一</span>
             <div class="dept-card__art">
               <img src="Image/kokeshi-btc.svg" alt="Kokeshi Ban Tổ chức" class="dept-card__kokeshi" width="130" height="175" loading="lazy" />
             </div>
@@ -323,7 +322,6 @@
         </a>
         <a href="#dept-bcm" class="about-org-card dept-card dept-card--float-2" data-dept="dept-bcm">
           <div class="dept-card__inner">
-            <span class="dept-card__rank">二</span>
             <div class="dept-card__art">
               <img src="Image/kokeshi-bcm.svg" alt="Kokeshi Ban Chuyên môn" class="dept-card__kokeshi" width="130" height="175" loading="lazy" />
             </div>
@@ -337,7 +335,6 @@
         </a>
         <a href="#dept-btt" class="about-org-card dept-card dept-card--float-3" data-dept="dept-btt">
           <div class="dept-card__inner">
-            <span class="dept-card__rank">三</span>
             <div class="dept-card__art">
               <img src="Image/kokeshi-btt.svg" alt="Kokeshi Ban Thông tin" class="dept-card__kokeshi" width="130" height="175" loading="lazy" />
             </div>
@@ -351,7 +348,6 @@
         </a>
         <a href="#dept-bns" class="about-org-card dept-card dept-card--float-4" data-dept="dept-bns">
           <div class="dept-card__inner">
-            <span class="dept-card__rank">四</span>
             <div class="dept-card__art">
               <img src="Image/kokeshi-bns.svg" alt="Kokeshi Ban Nhân sự" class="dept-card__kokeshi" width="130" height="175" loading="lazy" />
             </div>
@@ -365,7 +361,6 @@
         </a>
         <a href="#dept-bdn" class="about-org-card dept-card dept-card--float-5" data-dept="dept-bdn">
           <div class="dept-card__inner">
-            <span class="dept-card__rank">五</span>
             <div class="dept-card__art">
               <img src="Image/kokeshi-bdn.svg" alt="Kokeshi Ban Đối ngoại" class="dept-card__kokeshi" width="130" height="175" loading="lazy" />
             </div>
@@ -729,47 +724,136 @@
   <!-- ============ TUYỂN THÀNH VIÊN ============ -->
   <section class="view join" id="join">
     <div class="section__head section__head--light">
-      <h2>Tuyển thành viên thế hệ 22</h2>
+      <div class="join__theme-badge-wrap">
+        <span class="join__theme-badge">こけし画記 · KOKESHI HỌA KÝ</span>
+      </div>
+      <h2 class="join__heading">Tuyển Thành Viên Thế Hệ 22</h2>
       <p class="section__lede">JPC đang tìm kiếm những gương mặt mới cho gia đình thế hệ 22. Không cần giỏi tiếng Nhật — chỉ cần bạn muốn học và muốn thuộc về một cộng đồng.</p>
       <div class="join__dept-more">
         <a href="#about-org" class="join__dept-link"><u>Xem thêm về các Ban</u></a>
       </div>
     </div>
 
-    <ol class="join__steps">
-      <li class="join__step">
-        <span class="join__step-no">Vòng 1</span>
-        <span class="join__step-date">01/10 – 20/10/2026</span>
-        <h3>Nộp đơn đăng ký</h3>
-        <p>Điền form đăng ký trực tuyến với thông tin cơ bản &amp; nguyện vọng chọn Ban.</p>
-      </li>
-      <li class="join__step">
-        <span class="join__step-no">Vòng 2</span>
-        <span class="join__step-date">23/10 – 25/10/2026</span>
-        <h3>Phỏng vấn nhóm</h3>
-        <p>Gặp gỡ, thảo luận nhóm để thể hiện cá tính, bản lĩnh và tinh thần đồng đội.</p>
-      </li>
-      <li class="join__step">
-        <span class="join__step-no">Vòng 3.1</span>
-        <span class="join__step-date">27/10 – 04/11/2026</span>
-        <h3>Teamwork</h3>
-        <p>Thực chiến cùng đồng đội đến từ các Ban qua đề bài được giao.</p>
-      </li>
-      <li class="join__step">
-        <span class="join__step-no">Vòng 3.2</span>
-        <span class="join__step-date">08/11 – 09/11/2026</span>
-        <h3>Phỏng vấn cá nhân</h3>
-        <p>Trò chuyện chuyên sâu cùng Trưởng - Phó Ban các ban chuyên trách.</p>
-      </li>
-      <li class="join__step join__step--result">
-        <span class="join__step-no">Kết quả</span>
-        <span class="join__step-date">12/11/2026</span>
-        <h3>Công bố kết quả</h3>
-        <p>Chào đón các gương mặt xuất sắc chính thức trở thành thế hệ Gen 22 của JPC - FTU!</p>
-      </li>
-    </ol>
+    <div class="join__container">
+      <!-- 4 Vòng chính ở 1 hàng ngang (Grid 4 cột) -->
+      <div class="join__rounds-grid" id="joinRoundsGrid">
+        <article class="join__step" data-round-id="round-1" tabindex="0" role="button" aria-label="Xem chi tiết Vòng 1: Khai Nhãn">
+          <div class="join__mascot-wrapper">
+            <div class="join__mascot-glow" aria-hidden="true"></div>
+            <div class="join__mascot-card">
+              <div class="join__mascot-face join__mascot-face--mono">
+                <img src="Image/Monochrome/Vòng 1 - Mono.png" alt="Vòng 1 - Mono" class="join__mascot-img" loading="lazy">
+              </div>
+              <div class="join__mascot-face join__mascot-face--color">
+                <img src="Image/Color/Vòng 1 - Color.png" alt="Vòng 1 - Color" class="join__mascot-img" loading="lazy">
+              </div>
+            </div>
+          </div>
+          <span class="join__step-no">Vòng 1</span>
+          <span class="join__step-date">01/10 – 20/10/2026</span>
+          <h3 class="join__step-title">Khai Nhãn</h3>
+          <p class="join__step-desc">Điền form đăng ký trực tuyến với thông tin cơ bản &amp; nguyện vọng chọn Ban.</p>
+          <div class="join__step-action" aria-hidden="true">
+            <span>Chi tiết vòng</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </div>
+        </article>
 
-    <a href="#" class="join__cta">Đăng ký ngay</a>
+        <article class="join__step" data-round-id="round-2" tabindex="0" role="button" aria-label="Xem chi tiết Vòng 2: Hòa Nhịp">
+          <div class="join__mascot-wrapper">
+            <div class="join__mascot-glow" aria-hidden="true"></div>
+            <div class="join__mascot-card">
+              <div class="join__mascot-face join__mascot-face--mono">
+                <img src="Image/Monochrome/Vòng 2 - Mono.png" alt="Vòng 2 - Mono" class="join__mascot-img" loading="lazy">
+              </div>
+              <div class="join__mascot-face join__mascot-face--color">
+                <img src="Image/Color/Vòng 2 - Color.png" alt="Vòng 2 - Color" class="join__mascot-img" loading="lazy">
+              </div>
+            </div>
+          </div>
+          <span class="join__step-no">Vòng 2</span>
+          <span class="join__step-date">23/10 – 25/10/2026</span>
+          <h3 class="join__step-title">Hòa Nhịp</h3>
+          <p class="join__step-desc">Gặp gỡ, thảo luận nhóm để thể hiện cá tính, bản lĩnh và tinh thần đồng đội.</p>
+          <div class="join__step-action" aria-hidden="true">
+            <span>Chi tiết vòng</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </div>
+        </article>
+
+        <article class="join__step" data-round-id="round-3-1" tabindex="0" role="button" aria-label="Xem chi tiết Vòng 3.1: Phá Phong">
+          <div class="join__mascot-wrapper">
+            <div class="join__mascot-glow" aria-hidden="true"></div>
+            <div class="join__mascot-card">
+              <div class="join__mascot-face join__mascot-face--mono">
+                <img src="Image/Monochrome/Vòng 3.1 - Mono.png" alt="Vòng 3.1 - Mono" class="join__mascot-img" loading="lazy">
+              </div>
+              <div class="join__mascot-face join__mascot-face--color">
+                <img src="Image/Color/Vòng 3.1 - Color.png" alt="Vòng 3.1 - Color" class="join__mascot-img" loading="lazy">
+              </div>
+            </div>
+          </div>
+          <span class="join__step-no">Vòng 3.1</span>
+          <span class="join__step-date">27/10 – 04/11/2026</span>
+          <h3 class="join__step-title">Phá Phong</h3>
+          <p class="join__step-desc">Thực chiến cùng đồng đội đến từ các Ban qua đề bài được giao.</p>
+          <div class="join__step-action" aria-hidden="true">
+            <span>Chi tiết vòng</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </div>
+        </article>
+
+        <article class="join__step" data-round-id="round-3-2" tabindex="0" role="button" aria-label="Xem chi tiết Vòng 3.2: Chân diện">
+          <div class="join__mascot-wrapper">
+            <div class="join__mascot-glow" aria-hidden="true"></div>
+            <div class="join__mascot-card">
+              <div class="join__mascot-face join__mascot-face--mono">
+                <img src="Image/Monochrome/Vòng 3.2 - Mono.png" alt="Vòng 3.2 - Mono" class="join__mascot-img" loading="lazy">
+              </div>
+              <div class="join__mascot-face join__mascot-face--color">
+                <img src="Image/Color/Vòng 3.2 - Color.png" alt="Vòng 3.2 - Color" class="join__mascot-img" loading="lazy">
+              </div>
+            </div>
+          </div>
+          <span class="join__step-no">Vòng 3.2</span>
+          <span class="join__step-date">08/11 – 09/11/2026</span>
+          <h3 class="join__step-title">Chân diện</h3>
+          <p class="join__step-desc">Trò chuyện chuyên sâu cùng Trưởng - Phó Ban các ban chuyên trách.</p>
+          <div class="join__step-action" aria-hidden="true">
+            <span>Chi tiết vòng</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </div>
+        </article>
+      </div>
+
+      <!-- Khung KẾT QUẢ tách xuống hàng dưới thành khối banner trải dài theo chiều ngang -->
+      <div class="join__result-wrap" id="joinResultContainer">
+        <article class="join__result-banner" id="joinResultBanner" data-round-id="round-result" tabindex="0" role="button" aria-label="Xem chi tiết Công bố kết quả">
+          <div class="join__result-banner-glow" aria-hidden="true"></div>
+          <div class="join__result-col join__result-col--badge">
+            <div class="join__result-pill">
+              <span class="join__result-pill-icon" aria-hidden="true">🎊</span>
+              <div class="join__result-pill-text">
+                <span class="join__result-tag">Kết quả</span>
+                <span class="join__result-date">12/11/2026</span>
+              </div>
+            </div>
+          </div>
+          <div class="join__result-col join__result-col--info">
+            <h3 class="join__result-title">Công Bố Kết Quả</h3>
+            <p class="join__result-desc">Chào đón các gương mặt xuất sắc chính thức trở thành thế hệ Gen 22 của JPC - FTU!</p>
+          </div>
+          <div class="join__result-col join__result-col--action">
+            <div class="join__result-action-btn">
+              <span>Xem chi tiết</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+
+    <a href="#" class="join__cta" id="joinCtaBtn">Đăng ký ngay</a>
   </section>
 
   <!-- ============ FOOTER / CONTACT ============ -->
@@ -859,6 +943,64 @@
     </div>
   </div>
 
+  <!-- ============ RECRUITMENT ROUND DETAIL MODAL (KẾ THỪA TỪ EVENT MODAL) ============ -->
+  <div class="event-modal join-modal" id="joinDetailModal" role="dialog" aria-modal="true" aria-labelledby="joinModalTitle" data-lenis-prevent>
+    <div class="event-modal-backdrop" id="joinModalBackdrop" aria-hidden="true"></div>
+    <div class="event-modal-dialog" data-lenis-prevent>
+      <!-- Animated Fluid / Ripple Background Layer (Chảy mực) -->
+      <div class="event-modal-bg" aria-hidden="true"></div>
+      <div class="event-modal-overlay" aria-hidden="true"></div>
+
+      <!-- Close Button ('X') -->
+      <button type="button" class="event-modal-close" id="joinModalCloseBtn" aria-label="Đóng cửa sổ chi tiết vòng thi">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <!-- Modal Body (2 Columns matching Màn hình nhỏ.png) -->
+      <div class="event-modal-body join-modal-body">
+        <!-- Left Column: Transparent Popup Mascot with Floating Animation & Soft Outer Glow -->
+        <div class="event-modal-col event-modal-col--left">
+          <div class="join-modal-thumb-wrap">
+            <div class="join-modal-glow" aria-hidden="true"></div>
+            <img src="" alt="Khung Popup Tuyển Gen" class="join-modal-thumb" id="joinModalThumb">
+          </div>
+          <span class="join-modal-step-badge" id="joinModalStepNo">Vòng 1</span>
+          <h3 class="event-modal-title join-modal-title" id="joinModalTitle">Khai Nhãn</h3>
+          <p class="event-modal-date" id="joinModalDate">01/10 – 20/10/2026</p>
+        </div>
+
+        <!-- Center Decorative Glowing Gradient 4-point Star Divider -->
+        <div class="event-modal-star-divider" aria-hidden="true">
+          <span class="event-modal-star-ray"></span>
+          <div class="event-modal-star">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 0L14.2 9.8L24 12L14.2 14.2L12 24L9.8 14.2L0 12L9.8 9.8L12 0Z" fill="url(#starGradientJoin)"/>
+              <defs>
+                <radialGradient id="starGradientJoin" cx="0.5" cy="0.5" r="0.5" fx="0.5" fy="0.5">
+                  <stop offset="0%" stop-color="#ffffff"/>
+                  <stop offset="40%" stop-color="#eecd7e"/>
+                  <stop offset="85%" stop-color="#cf9f3f"/>
+                  <stop offset="100%" stop-color="#a82338"/>
+                </radialGradient>
+              </defs>
+            </svg>
+          </div>
+          <span class="event-modal-star-ray"></span>
+        </div>
+
+        <!-- Right Column: Detailed Description with Custom Scrollbar -->
+        <div class="event-modal-col event-modal-col--right">
+          <div class="event-modal-desc join-modal-desc" id="joinModalDesc" data-lenis-prevent>
+            <!-- Dynamic Paragraphs -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ============ ADMIN PIN LOGIN MODAL ============ -->
   <div class="admin-login-modal" id="adminLoginModal" role="dialog" aria-modal="true" aria-labelledby="adminLoginMainTitle" data-lenis-prevent>
     <div class="admin-login-modal__backdrop" id="adminLoginBackdrop" aria-hidden="true"></div>
@@ -883,129 +1025,252 @@
       <div class="admin-portal__brand">
         <span class="admin-portal__logo-icon">⛩️</span>
         <div class="admin-portal__brand-text">
-          <h2 class="admin-portal__title">JPC Event CMS Studio</h2>
-          <span class="admin-portal__badge">Giao Diện Quản Trị Chuyên Biệt</span>
+          <h2 class="admin-portal__title">JPC CMS Studio</h2>
+          <span class="admin-portal__badge">Quản Trị Hệ Thống</span>
         </div>
       </div>
 
+      <!-- Navigation Tabs: Sự Kiện vs Tuyển Thành Viên -->
+      <nav class="admin-portal__nav-tabs" aria-label="Khu vực quản trị">
+        <button type="button" class="admin-nav-tab is-active" id="adminTabEvents" data-target="events">
+          <span class="admin-nav-tab__icon">📅</span>
+          <span>Sự Kiện</span>
+        </button>
+        <button type="button" class="admin-nav-tab" id="adminTabRecruitment" data-target="recruitment">
+          <span class="admin-nav-tab__icon">🎎</span>
+          <span>Tuyển Thành Viên (Kokeshi Họa Ký)</span>
+        </button>
+      </nav>
+
       <div class="admin-portal__actions">
-        <button type="button" class="admin-portal__btn admin-portal__btn--outline" id="adminBtnExportJSON" title="Sao lưu sự kiện thành file JSON">📥 Xuất JSON</button>
-        <button type="button" class="admin-portal__btn admin-portal__btn--outline" id="adminBtnImportJSON" title="Nhập sự kiện từ file JSON">📤 Nhập JSON</button>
+        <button type="button" class="admin-portal__btn admin-portal__btn--outline" id="adminBtnExportJSON" title="Sao lưu dữ liệu sự kiện & tuyển gen thành file JSON">📥 Xuất JSON</button>
+        <button type="button" class="admin-portal__btn admin-portal__btn--outline" id="adminBtnImportJSON" title="Nhập dữ liệu từ file JSON">📤 Nhập JSON</button>
         <input type="file" id="adminInputImportFile" accept=".json" style="display:none;">
-        <button type="button" class="admin-portal__btn admin-portal__btn--danger-outline" id="adminBtnResetDefaults" title="Khôi phục về 2 sự kiện mẫu ban đầu">↺ Khôi phục gốc</button>
+        <button type="button" class="admin-portal__btn admin-portal__btn--danger-outline" id="adminBtnResetDefaults" title="Khôi phục về dữ liệu mặc định">↺ Khôi phục gốc</button>
         <button type="button" class="admin-portal__btn admin-portal__btn--viewsite" id="adminBtnViewSite" title="Xem giao diện website bên ngoài">🌐 Xem Trang Chủ</button>
         <button type="button" class="admin-portal__btn admin-portal__btn--logout" id="adminBtnLogout" title="Đăng xuất khỏi CMS">🚪 Thoát Admin</button>
       </div>
     </header>
 
-    <!-- Main 2-Panel Workspace -->
+    <!-- Main Workspace -->
     <main class="admin-portal__body">
-      <!-- Left Panel: Event Master List -->
-      <section class="admin-portal__sidebar" data-lenis-prevent>
-        <div class="admin-portal__sidebar-header">
-          <div class="admin-portal__sidebar-meta">
-            <h3 class="admin-portal__sidebar-title">Danh Sách Sự Kiện</h3>
-            <span class="admin-portal__count" id="adminEventCount">2 sự kiện</span>
+      <!-- PANE 1: EVENT CMS -->
+      <div class="admin-portal__tab-pane is-active" id="adminTabPaneEvents">
+        <!-- Left Panel: Event Master List -->
+        <section class="admin-portal__sidebar" data-lenis-prevent>
+          <div class="admin-portal__sidebar-header">
+            <div class="admin-portal__sidebar-meta">
+              <h3 class="admin-portal__sidebar-title">Danh Sách Sự Kiện</h3>
+              <span class="admin-portal__count" id="adminEventCount">2 sự kiện</span>
+            </div>
+            <button type="button" class="admin-portal__btn-create" id="adminBtnAddNew">
+              <span class="admin-portal__btn-icon">＋</span> Thêm Sự Kiện Mới
+            </button>
           </div>
-          <button type="button" class="admin-portal__btn-create" id="adminBtnAddNew">
-            <span class="admin-portal__btn-icon">＋</span> Thêm Sự Kiện Mới
-          </button>
-        </div>
 
-        <div class="admin-portal__list-scroll" id="adminEventList" data-lenis-prevent>
-          <!-- Dynamic Event Cards injected via JS -->
-        </div>
-      </section>
-
-      <!-- Right Panel: Event Detail Editor Form -->
-      <section class="admin-portal__editor-area" data-lenis-prevent>
-        <div class="admin-portal__editor-header">
-          <div>
-            <span class="admin-portal__editor-tag" id="adminEditorTag">Chế độ chỉnh sửa</span>
-            <h3 class="admin-portal__editor-title" id="adminFormTitle">Chỉnh Sửa Sự Kiện</h3>
+          <div class="admin-portal__list-scroll" id="adminEventList" data-lenis-prevent>
+            <!-- Dynamic Event Cards injected via JS -->
           </div>
-          <div class="admin-portal__editor-quick">
-            <button type="button" class="admin-portal__btn admin-portal__btn--ghost" id="adminBtnCancelForm">✕ Hủy / Tạo mới</button>
-            <button type="button" class="admin-portal__btn admin-portal__btn--save-top" id="adminBtnSaveEventTop">💾 Lưu Sự Kiện</button>
+        </section>
+
+        <!-- Right Panel: Event Detail Editor Form -->
+        <section class="admin-portal__editor-area" data-lenis-prevent>
+          <div class="admin-portal__editor-header">
+            <div>
+              <span class="admin-portal__editor-tag" id="adminEditorTag">Chế độ chỉnh sửa</span>
+              <h3 class="admin-portal__editor-title" id="adminFormTitle">Chỉnh Sửa Sự Kiện</h3>
+            </div>
+            <div class="admin-portal__editor-quick">
+              <button type="button" class="admin-portal__btn admin-portal__btn--ghost" id="adminBtnCancelForm">✕ Hủy / Tạo mới</button>
+              <button type="button" class="admin-portal__btn admin-portal__btn--save-top" id="adminBtnSaveEventTop">💾 Lưu Sự Kiện</button>
+            </div>
           </div>
-        </div>
 
-        <div class="admin-portal__editor-scroll" data-lenis-prevent>
-          <form id="adminEventForm" class="admin-portal__form">
-            <div class="admin-portal__form-grid">
-              <!-- Event Title -->
-              <div class="admin-form-group admin-form-group--full">
-                <label for="formEventTitle">Tên sự kiện <span class="req">*</span></label>
-                <input type="text" id="formEventTitle" class="admin-input" placeholder="Ví dụ: 和の決戦 — QUYẾT CHIẾN NHẬT BẢN" required>
-              </div>
+          <div class="admin-portal__editor-scroll" data-lenis-prevent>
+            <form id="adminEventForm" class="admin-portal__form">
+              <div class="admin-portal__form-grid">
+                <!-- Event Title -->
+                <div class="admin-form-group admin-form-group--full">
+                  <label for="formEventTitle">Tên sự kiện <span class="req">*</span></label>
+                  <input type="text" id="formEventTitle" class="admin-input" placeholder="Ví dụ: 和の決戦 — QUYẾT CHIẾN NHẬT BẢN" required>
+                </div>
 
-              <!-- Event Date for sorting -->
-              <div class="admin-form-group">
-                <label for="formEventDate">Ngày tổ chức (Dùng để SẮP XẾP TỰ ĐỘNG) <span class="req">*</span></label>
-                <input type="date" id="formEventDate" class="admin-input" required>
-                <small class="admin-field-hint">Sự kiện có ngày mới hơn sẽ tự động hiển thị trên cùng.</small>
-              </div>
+                <!-- Event Date for sorting -->
+                <div class="admin-form-group">
+                  <label for="formEventDate">Ngày tổ chức (Dùng để SẮP XẾP TỰ ĐỘNG) <span class="req">*</span></label>
+                  <input type="date" id="formEventDate" class="admin-input" required>
+                  <small class="admin-field-hint">Sự kiện có ngày mới hơn sẽ tự động hiển thị trên cùng.</small>
+                </div>
 
-              <!-- Date Display Text -->
-              <div class="admin-form-group">
-                <label for="formEventDateDisplay">Văn bản ngày hiển thị (Tùy chọn)</label>
-                <input type="text" id="formEventDateDisplay" class="admin-input" placeholder="Ví dụ: 15/02 – 04/04/2026 hoặc 18/10/2026">
-                <small class="admin-field-hint">Nếu để trống, hệ thống tự định dạng ngày DD/MM/YYYY.</small>
-              </div>
+                <!-- Date Display Text -->
+                <div class="admin-form-group">
+                  <label for="formEventDateDisplay">Văn bản ngày hiển thị (Tùy chọn)</label>
+                  <input type="text" id="formEventDateDisplay" class="admin-input" placeholder="Ví dụ: 15/02 – 04/04/2026 hoặc 18/10/2026">
+                  <small class="admin-field-hint">Nếu để trống, hệ thống tự định dạng ngày DD/MM/YYYY.</small>
+                </div>
 
-              <!-- Timeframe Badge -->
-              <div class="admin-form-group admin-form-group--full">
-                <label for="formEventTimeframe">Mốc Timeframe trên thanh dọc (Tùy chọn)</label>
-                <input type="text" id="formEventTimeframe" class="admin-input" placeholder="Ví dụ: 04/2026 hoặc 10/2026">
-                <small class="admin-field-hint">Hiển thị trên trục thời gian dọc ở mép trái màn hình.</small>
-              </div>
+                <!-- Timeframe Badge -->
+                <div class="admin-form-group admin-form-group--full">
+                  <label for="formEventTimeframe">Mốc Timeframe trên thanh dọc (Tùy chọn)</label>
+                  <input type="text" id="formEventTimeframe" class="admin-input" placeholder="Ví dụ: 04/2026 hoặc 10/2026">
+                  <small class="admin-field-hint">Hiển thị trên trục thời gian dọc ở mép trái màn hình.</small>
+                </div>
 
-              <!-- Short Description -->
-              <div class="admin-form-group admin-form-group--full">
-                <label for="formEventShortDesc">Mô tả ngắn (Hiển thị ở trang chính dưới ảnh cover) <span class="req">*</span></label>
-                <textarea id="formEventShortDesc" class="admin-textarea" rows="2" placeholder="Tóm tắt ngắn gọn 1-2 câu về sự kiện... (Tối đa 2 dòng hiển thị trên card)" required data-lenis-prevent></textarea>
-              </div>
+                <!-- Short Description -->
+                <div class="admin-form-group admin-form-group--full">
+                  <label for="formEventShortDesc">Mô tả ngắn (Hiển thị ở trang chính dưới ảnh cover) <span class="req">*</span></label>
+                  <textarea id="formEventShortDesc" class="admin-textarea" rows="2" placeholder="Tóm tắt ngắn gọn 1-2 câu về sự kiện... (Tối đa 2 dòng hiển thị trên card)" required data-lenis-prevent></textarea>
+                </div>
 
-              <!-- Cover Image Upload -->
-              <div class="admin-form-group">
-                <label>Ảnh Cover / Banner (Khung trang chính — Không mất góc) <span class="req">*</span></label>
-                <div class="admin-file-upload-box">
-                  <input type="file" id="formCoverFile" accept="image/*" class="admin-file-input">
-                  <div class="admin-img-preview admin-img-preview--cover" id="formCoverPreview">
-                    <span class="admin-file-placeholder">Chưa chọn ảnh</span>
+                <!-- Cover Image Upload -->
+                <div class="admin-form-group">
+                  <label>Ảnh Cover / Banner (Khung trang chính — Không mất góc) <span class="req">*</span></label>
+                  <div class="admin-file-upload-box">
+                    <input type="file" id="formCoverFile" accept="image/*" class="admin-file-input">
+                    <div class="admin-img-preview admin-img-preview--cover" id="formCoverPreview">
+                      <span class="admin-file-placeholder">Chưa chọn ảnh</span>
+                    </div>
+                    <small class="admin-file-tip">Upload ảnh từ máy tính (Tỷ lệ ~2.56:1 hoặc 16:9, khung hiển thị trọn vẹn không xén góc).</small>
                   </div>
-                  <small class="admin-file-tip">Upload ảnh từ máy tính (Tỷ lệ ~2.56:1 hoặc 16:9, khung hiển thị trọn vẹn không xén góc).</small>
+                </div>
+
+                <!-- Thumbnail 1:1 Image Upload -->
+                <div class="admin-form-group">
+                  <label>Ảnh Thumbnail vuông 1:1 (Modal chi tiết) <span class="req">*</span></label>
+                  <div class="admin-file-upload-box">
+                    <input type="file" id="formThumbFile" accept="image/*" class="admin-file-input">
+                    <div class="admin-img-preview admin-img-preview--square" id="formThumbPreview">
+                      <span class="admin-file-placeholder">Chưa chọn ảnh</span>
+                    </div>
+                    <small class="admin-file-tip">Ảnh đại diện vuông chuẩn 1:1 cho popup chi tiết sự kiện.</small>
+                  </div>
+                </div>
+
+                <!-- Full Detailed Description -->
+                <div class="admin-form-group admin-form-group--full">
+                  <label for="formEventFullDesc">Thông tin chi tiết sự kiện (Khung cuộn của Modal) <span class="req">*</span></label>
+                  <textarea id="formEventFullDesc" class="admin-textarea" rows="7" placeholder="Nội dung chi tiết, thể lệ, thời gian, các vòng thi, quyền lợi tham gia... (Xuống dòng tự động tạo đoạn văn mới)" required data-lenis-prevent></textarea>
                 </div>
               </div>
 
-              <!-- Thumbnail 1:1 Image Upload -->
-              <div class="admin-form-group">
-                <label>Ảnh Thumbnail vuông 1:1 (Modal chi tiết) <span class="req">*</span></label>
-                <div class="admin-file-upload-box">
-                  <input type="file" id="formThumbFile" accept="image/*" class="admin-file-input">
-                  <div class="admin-img-preview admin-img-preview--square" id="formThumbPreview">
-                    <span class="admin-file-placeholder">Chưa chọn ảnh</span>
+              <!-- Action Bar -->
+              <div class="admin-portal__form-actions">
+                <button type="button" class="admin-portal__btn admin-portal__btn--ghost" id="adminBtnCancelForm2">✕ Hủy bỏ</button>
+                <button type="button" class="admin-portal__btn admin-portal__btn--danger" id="adminBtnDeleteEvent" style="display:none;">🗑️ Xóa Sự Kiện Này</button>
+                <button type="submit" class="admin-portal__btn admin-portal__btn--primary admin-portal__btn--lg" id="adminBtnSaveEvent">💾 Lưu Sự Kiện</button>
+              </div>
+            </form>
+          </div>
+        </section>
+      </div>
+
+      <!-- PANE 2: RECRUITMENT CMS (KOKESHI HỌA KÝ) -->
+      <div class="admin-portal__tab-pane" id="adminTabPaneRecruitment" style="display: none;">
+        <!-- Left Panel: Recruitment Rounds List -->
+        <section class="admin-portal__sidebar" data-lenis-prevent>
+          <div class="admin-portal__sidebar-header">
+            <div class="admin-portal__sidebar-meta">
+              <h3 class="admin-portal__sidebar-title">Vòng Tuyển Thành Viên</h3>
+              <span class="admin-portal__count">5 vòng</span>
+            </div>
+          </div>
+
+          <div class="admin-portal__list-scroll" id="adminRecruitList" data-lenis-prevent>
+            <!-- Injected via recruitment-manager.js -->
+          </div>
+        </section>
+
+        <!-- Right Panel: Recruitment Round Editor Form -->
+        <section class="admin-portal__editor-area" data-lenis-prevent>
+          <div class="admin-portal__editor-header">
+            <div>
+              <span class="admin-portal__editor-tag">Chỉnh sửa vòng thi tuyển Gen</span>
+              <h3 class="admin-portal__editor-title" id="adminRecruitFormTitle">Chỉnh Sửa: Vòng 1 — Khai Nhãn</h3>
+            </div>
+            <div class="admin-portal__editor-quick">
+              <button type="button" class="admin-portal__btn admin-portal__btn--save-top" id="adminBtnSaveRecruitTop">💾 Lưu Vòng Thi</button>
+            </div>
+          </div>
+
+          <div class="admin-portal__editor-scroll" id="adminRecruitEditorScroll" data-lenis-prevent>
+            <form id="adminRecruitForm" class="admin-portal__form">
+              <div class="admin-portal__form-grid">
+                <!-- Step Number / Label -->
+                <div class="admin-form-group">
+                  <label for="formRecruitStepNo">Tên / Số thứ tự vòng <span class="req">*</span></label>
+                  <input type="text" id="formRecruitStepNo" class="admin-input" placeholder="Ví dụ: Vòng 1, Vòng 2, Vòng 3.1, Vòng 3.2, Kết quả" required>
+                </div>
+
+                <!-- Official Round Name -->
+                <div class="admin-form-group">
+                  <label for="formRecruitTitle">Tên chính thức vòng thi <span class="req">*</span></label>
+                  <input type="text" id="formRecruitTitle" class="admin-input" placeholder="Ví dụ: Khai Nhãn, Hòa Nhịp, Phá Phong, Chân diện..." required>
+                </div>
+
+                <!-- Date Range -->
+                <div class="admin-form-group admin-form-group--full">
+                  <label for="formRecruitDate">Thời gian diễn ra <span class="req">*</span></label>
+                  <input type="text" id="formRecruitDate" class="admin-input" placeholder="Ví dụ: 01/10 – 20/10/2026 hoặc 12/11/2026" required>
+                </div>
+
+                <!-- Short Description -->
+                <div class="admin-form-group admin-form-group--full">
+                  <label for="formRecruitShortDesc">Đoạn text ngắn ở ngoài UI (Thẻ vòng thi) <span class="req">*</span></label>
+                  <textarea id="formRecruitShortDesc" class="admin-textarea" rows="2" placeholder="Tóm tắt ngắn gọn 1-2 câu hiển thị trực tiếp trên thẻ card ngoài trang chính..." required data-lenis-prevent></textarea>
+                </div>
+
+                <!-- Mascot Mono Upload -->
+                <div class="admin-form-group">
+                  <label>Mascot Bản Mono (Đen - Đỏ mặc định) <span class="req">*</span></label>
+                  <div class="admin-file-upload-box">
+                    <input type="file" id="formRecruitMonoFile" accept="image/*" class="admin-file-input">
+                    <div class="admin-img-preview admin-img-preview--contain" id="formRecruitMonoPreview">
+                      <span class="admin-file-placeholder">Chưa chọn ảnh</span>
+                    </div>
+                    <small class="admin-file-tip">Upload mascot bản Mono (Đen - Đỏ, file PNG trong suốt).</small>
                   </div>
-                  <small class="admin-file-tip">Ảnh đại diện vuông chuẩn 1:1 cho popup chi tiết sự kiện.</small>
+                </div>
+
+                <!-- Mascot Color Upload -->
+                <div class="admin-form-group">
+                  <label>Mascot Bản Color (Lật 3D Flip khi hover) <span class="req">*</span></label>
+                  <div class="admin-file-upload-box">
+                    <input type="file" id="formRecruitColorFile" accept="image/*" class="admin-file-input">
+                    <div class="admin-img-preview admin-img-preview--contain" id="formRecruitColorPreview">
+                      <span class="admin-file-placeholder">Chưa chọn ảnh</span>
+                    </div>
+                    <small class="admin-file-tip">Upload mascot bản Color (Bản màu sắc nét, file PNG trong suốt).</small>
+                  </div>
+                </div>
+
+                <!-- Popup Artwork Upload -->
+                <div class="admin-form-group admin-form-group--full">
+                  <label>Ảnh Khung Popup (Hiển thị lơ lửng trong Modal chi tiết) <span class="req">*</span></label>
+                  <div class="admin-file-upload-box">
+                    <input type="file" id="formRecruitPopupFile" accept="image/*" class="admin-file-input">
+                    <div class="admin-img-preview admin-img-preview--contain admin-img-preview--tall" id="formRecruitPopupPreview">
+                      <span class="admin-file-placeholder">Chưa chọn ảnh</span>
+                    </div>
+                    <small class="admin-file-tip">Upload ảnh khung Popup đại diện (File trong thư mục "Khung Popup - Tuyển Gen", PNG nền trong suốt).</small>
+                  </div>
+                </div>
+
+                <!-- Full Modal Description -->
+                <div class="admin-form-group admin-form-group--full">
+                  <label for="formRecruitFullDesc">Nội dung text dài hiển thị trong Modal chi tiết <span class="req">*</span></label>
+                  <textarea id="formRecruitFullDesc" class="admin-textarea" rows="8" placeholder="Thông tin chi tiết về vòng thi, ý nghĩa biểu tượng, thể lệ, các thử thách, lưu ý... (Xuống dòng tự động chia đoạn)" required data-lenis-prevent></textarea>
                 </div>
               </div>
 
-              <!-- Full Detailed Description -->
-              <div class="admin-form-group admin-form-group--full">
-                <label for="formEventFullDesc">Thông tin chi tiết sự kiện (Khung cuộn của Modal) <span class="req">*</span></label>
-                <textarea id="formEventFullDesc" class="admin-textarea" rows="7" placeholder="Nội dung chi tiết, thể lệ, thời gian, các vòng thi, quyền lợi tham gia... (Xuống dòng tự động tạo đoạn văn mới)" required data-lenis-prevent></textarea>
+              <!-- Form Actions -->
+              <div class="admin-portal__form-actions">
+                <button type="button" class="admin-portal__btn admin-portal__btn--danger-outline" id="adminBtnResetRound">↺ Khôi phục gốc vòng này</button>
+                <button type="submit" class="admin-portal__btn admin-portal__btn--primary admin-portal__btn--lg" id="adminBtnSaveRecruit">💾 Lưu Thay Đổi</button>
               </div>
-            </div>
-
-            <!-- Action Bar -->
-            <div class="admin-portal__form-actions">
-              <button type="button" class="admin-portal__btn admin-portal__btn--ghost" id="adminBtnCancelForm2">✕ Hủy bỏ</button>
-              <button type="button" class="admin-portal__btn admin-portal__btn--danger" id="adminBtnDeleteEvent" style="display:none;">🗑️ Xóa Sự Kiện Này</button>
-              <button type="submit" class="admin-portal__btn admin-portal__btn--primary admin-portal__btn--lg" id="adminBtnSaveEvent">💾 Lưu Sự Kiện</button>
-            </div>
-          </form>
-        </div>
-      </section>
+            </form>
+          </div>
+        </section>
+      </div>
     </main>
   </div>
 

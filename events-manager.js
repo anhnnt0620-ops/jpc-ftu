@@ -256,9 +256,6 @@ class EventsManager {
     window.lenis?.stop();
     document.body.classList.add('modal-scroll-lock');
 
-    // Free 100% GPU resources from 3D canvas for modal interaction
-    window.JPC3D?.pause?.();
-
     // Show modal
     modal.classList.remove('is-closing');
     modal.classList.add('is-open');
@@ -281,14 +278,16 @@ class EventsManager {
 
   checkAndRestoreScroll() {
     const detailModal = document.getElementById('eventDetailModal');
+    const joinModal = document.getElementById('joinDetailModal');
     const loginModal = document.getElementById('adminLoginModal');
     const adminPortal = document.getElementById('adminPortal');
 
     const isDetailOpen = detailModal && detailModal.classList.contains('is-open');
+    const isJoinOpen = joinModal && joinModal.classList.contains('is-open');
     const isLoginOpen = loginModal && loginModal.classList.contains('is-open');
     const isPortalOpen = adminPortal && !adminPortal.hidden;
 
-    if (!isDetailOpen && !isLoginOpen && !isPortalOpen) {
+    if (!isDetailOpen && !isJoinOpen && !isLoginOpen && !isPortalOpen) {
       document.body.classList.remove('modal-scroll-lock');
       window.lenis?.start();
       // Resume 3D background rendering once UI modal is fully dismissed
@@ -663,7 +662,7 @@ class EventsManager {
   }
 
   resetToDefaults() {
-    if (confirm('Khôi phục toàn bộ danh sách về 2 sự kiện mẫu mặc định? Các sự kiện tự tạo sẽ bị ghi đè!')) {
+    if (confirm('Khôi phục toàn bộ danh sách sự kiện về 2 sự kiện mẫu ban đầu? (Bạn có thể khôi phục các vòng tuyển Gen tại tab Tuyển Thành Viên)')) {
       this.events = JSON.parse(JSON.stringify(DEFAULT_EVENTS));
       this.sortEvents();
       this.saveEvents();
@@ -672,15 +671,21 @@ class EventsManager {
       if (this.events.length > 0) {
         this.selectEventForEdit(this.events[0].id);
       }
-      alert('Đã khôi phục dữ liệu mặc định thành công!');
+      alert('Đã khôi phục dữ liệu sự kiện mặc định thành công!');
     }
   }
 
   exportJSON() {
-    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(this.events, null, 2));
+    const backupData = {
+      version: '2.0',
+      exportedAt: new Date().toISOString(),
+      events: this.events,
+      recruitmentRounds: window.RecruitmentManager ? window.RecruitmentManager.rounds : []
+    };
+    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(backupData, null, 2));
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute('href', dataStr);
-    downloadAnchor.setAttribute('download', `jpc_events_backup_${new Date().toISOString().split('T')[0]}.json`);
+    downloadAnchor.setAttribute('download', `jpc_cms_backup_${new Date().toISOString().split('T')[0]}.json`);
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
@@ -692,8 +697,23 @@ class EventsManager {
     reader.onload = (e) => {
       try {
         const parsed = JSON.parse(e.target.result);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          this.events = parsed;
+        let importedCount = 0;
+
+        // 1. Check for recruitment rounds
+        if (parsed.recruitmentRounds && Array.isArray(parsed.recruitmentRounds)) {
+          if (window.RecruitmentManager) {
+            window.RecruitmentManager.rounds = parsed.recruitmentRounds;
+            window.RecruitmentManager.saveRounds();
+            window.RecruitmentManager.renderUI();
+            window.RecruitmentManager.renderAdminRoundsList();
+            importedCount++;
+          }
+        }
+
+        // 2. Check for events
+        const eventsArray = Array.isArray(parsed) ? parsed : (Array.isArray(parsed.events) ? parsed.events : null);
+        if (eventsArray && eventsArray.length > 0) {
+          this.events = eventsArray;
           this.sortEvents();
           this.saveEvents();
           this.renderTimeline();
@@ -701,9 +721,13 @@ class EventsManager {
           if (this.events.length > 0) {
             this.selectEventForEdit(this.events[0].id);
           }
-          alert(`Nhập thành công ${parsed.length} sự kiện!`);
+          importedCount++;
+        }
+
+        if (importedCount > 0) {
+          alert('Nhập dữ liệu JSON CMS thành công!');
         } else {
-          alert('File JSON không hợp lệ hoặc danh sách sự kiện rỗng!');
+          alert('File JSON không hợp lệ hoặc không chứa dữ liệu sự kiện / tuyển thành viên!');
         }
       } catch (err) {
         alert('Lỗi đọc file JSON: ' + err.message);
@@ -721,7 +745,10 @@ class EventsManager {
       document.getElementById('adminEventList'),
       document.querySelector('.admin-portal__editor-scroll'),
       document.getElementById('formEventShortDesc'),
-      document.getElementById('formEventFullDesc')
+      document.getElementById('formEventFullDesc'),
+      document.getElementById('adminRecruitList'),
+      document.getElementById('adminRecruitEditorScroll'),
+      document.getElementById('joinModalDesc')
     ];
     scrollContainers.forEach(el => {
       if (el && !el._hasWheelHandler) {
@@ -779,6 +806,33 @@ class EventsManager {
     const inputImportFile = document.getElementById('adminInputImportFile');
     const btnViewSite = document.getElementById('adminBtnViewSite');
     const btnLogout = document.getElementById('adminBtnLogout');
+
+    // Tab Switchers: Events vs Recruitment
+    const tabEvents = document.getElementById('adminTabEvents');
+    const tabRecruitment = document.getElementById('adminTabRecruitment');
+    const paneEvents = document.getElementById('adminTabPaneEvents');
+    const paneRecruitment = document.getElementById('adminTabPaneRecruitment');
+
+    if (tabEvents && tabRecruitment && paneEvents && paneRecruitment) {
+      tabEvents.addEventListener('click', () => {
+        tabEvents.classList.add('is-active');
+        tabRecruitment.classList.remove('is-active');
+        paneEvents.classList.add('is-active');
+        paneRecruitment.classList.remove('is-active');
+        paneEvents.style.display = '';
+        paneRecruitment.style.display = 'none';
+      });
+
+      tabRecruitment.addEventListener('click', () => {
+        tabRecruitment.classList.add('is-active');
+        tabEvents.classList.remove('is-active');
+        paneRecruitment.classList.add('is-active');
+        paneEvents.classList.remove('is-active');
+        paneEvents.style.display = 'none';
+        paneRecruitment.style.display = '';
+        window.RecruitmentManager?.setupAdminUI?.();
+      });
+    }
 
     if (btnAddNew) {
       btnAddNew.addEventListener('click', () => this.openCreateEventForm());
@@ -894,11 +948,14 @@ class EventsManager {
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         const detailModal = document.getElementById('eventDetailModal');
+        const joinModal = document.getElementById('joinDetailModal');
         const loginModal = document.getElementById('adminLoginModal');
         const adminPortal = document.getElementById('adminPortal');
 
         if (detailModal && detailModal.classList.contains('is-open')) {
           this.closeDetailModal();
+        } else if (joinModal && joinModal.classList.contains('is-open')) {
+          window.RecruitmentManager?.closeDetailModal?.();
         } else if (loginModal && loginModal.classList.contains('is-open')) {
           this.closeAdminLoginModal();
         } else if (adminPortal && !adminPortal.hidden) {
@@ -912,12 +969,17 @@ class EventsManager {
         this.triggerAdmin();
       }
 
-      // 3. Ctrl + S in Admin saves event
+      // 3. Ctrl + S in Admin saves active form (Event or Recruitment)
       if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S')) {
         const adminPortal = document.getElementById('adminPortal');
         if (adminPortal && !adminPortal.hidden) {
           e.preventDefault();
-          this.saveEventFromForm();
+          const paneRecruit = document.getElementById('adminTabPaneRecruitment');
+          if (paneRecruit && paneRecruit.classList.contains('is-active')) {
+            window.RecruitmentManager?.saveRoundFromForm?.();
+          } else {
+            this.saveEventFromForm();
+          }
         }
       }
     });

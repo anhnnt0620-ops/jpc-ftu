@@ -25,31 +25,17 @@
 @font-face {
   font-family: 'HK Gokukaikk';
   src: url('Font/epgyobld.ttf') format('truetype');
-  unicode-range: U+4F01;
-}
-
-@font-face {
-  font-family: 'HK Gokukaikk';
-  src: url('Font/hkgokukaikk.ttf') format('truetype');
-  font-weight: 400;
+  font-weight: 400 700;
   font-style: normal;
   font-display: swap;
-  unicode-range: U+0000-4F00, U+4F02-10FFFF;
 }
 
 @font-face {
   font-family: 'JPC Sho';
   src: url('Font/epgyobld.ttf') format('truetype');
-  unicode-range: U+4F01;
-}
-
-@font-face {
-  font-family: 'JPC Sho';
-  src: url('Font/hkgokukaikk.ttf') format('truetype');
-  font-weight: 400;
+  font-weight: 400 700;
   font-style: normal;
   font-display: swap;
-  unicode-range: U+0000-4F00, U+4F02-10FFFF;
 }
 
 @font-face {
@@ -449,6 +435,14 @@ body.cards-extracting .falling-cards {
     repeating-linear-gradient(135deg, rgba(255, 182, 193, 0.18) 0 1px, transparent 1px 4px),
     linear-gradient(160deg, #991e34, #2a040b 82%);
   box-shadow: 0 0 10px rgba(255, 105, 135, 0.4), 0 4px 12px rgba(0,0,0,0.5);
+}
+
+.mini-card--sakura {
+  border-color: rgba(255, 183, 197, 0.95);
+  background:
+    repeating-linear-gradient(135deg, rgba(255, 234, 167, 0.22) 0 1px, transparent 1px 4px),
+    linear-gradient(160deg, #d63031, #5c0f18 80%);
+  box-shadow: 0 0 14px rgba(255, 183, 197, 0.65), 0 4px 12px rgba(0,0,0,0.5);
 }
 
 @keyframes miniCardTumble {
@@ -879,7 +873,7 @@ a.nav__dropdown-item:hover .nav__dropdown-title,
 }
 
 .nav__sub-jp {
-  font-family: 'HK Gokukaikk', 'JPC Sho', sans-serif;
+  font-family: 'JPC Card', 'JPC Gyosho', 'HK Gokukaikk', 'JPC Sho', 'Noto Serif JP', serif;
   font-size: 0.82rem;
   color: var(--gold);
   opacity: 0.85;
@@ -1021,7 +1015,7 @@ a.nav__dropdown-item:hover .nav__dropdown-title,
 }
 
 .card__kanji {
-  font-family: 'HK Gokukaikk', 'JPC Sho', var(--font-title);
+  font-family: 'JPC Card', 'JPC Gyosho', 'HK Gokukaikk', 'JPC Sho', var(--font-title);
   font-size: 1.45rem;
   letter-spacing: 0.06em;
   color: var(--gold-bright);
@@ -1781,14 +1775,14 @@ section {
   transform: scale(0.15, 0.92) translateZ(0) !important;
 }
 
-/* Backdrop: Blur everything on screen except header (header has z-index: 100) */
+/* Backdrop: Luminous dark Japanese atmospheric vignette (lets background sakura & falling cards shine through) */
 .event-modal-backdrop {
   position: fixed;
   inset: 0;
   z-index: 1;
-  background: rgba(5, 1, 2, 0.85);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: radial-gradient(circle at 50% 45%, rgba(14, 3, 6, 0.48) 0%, rgba(6, 1, 3, 0.78) 100%);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   opacity: 1;
   transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: opacity;
@@ -1799,7 +1793,7 @@ section {
   opacity: 0;
 }
 
-/* Popup Modal Box (Bo góc, viền vàng kim, đổ bóng sâu, GPU Hardware Layer) */
+/* Popup Modal Box (Bo góc, viền Gradient phát sáng đa sắc, hào quang breathing đa tầng) */
 .event-modal-dialog {
   position: relative;
   z-index: 2;
@@ -1807,27 +1801,81 @@ section {
   max-width: 860px;
   max-height: 90vh;
   border-radius: 20px;
-  border: 2px solid var(--gold);
+  border: 2px solid transparent;
+  background: 
+    linear-gradient(#0e0204, #0e0204) padding-box,
+    linear-gradient(135deg, #ffd778 0%, #eecd7e 22%, #ff4757 48%, #b8263e 68%, #cf9f3f 85%, #ffd778 100%) border-box;
+  background-size: 100% 100%, 250% 250%;
   box-shadow: 
-    0 20px 50px rgba(0, 0, 0, 0.9), 
-    0 0 25px rgba(207, 159, 63, 0.35);
+    0 25px 75px rgba(0, 0, 0, 0.95), 
+    0 0 0 1px rgba(255, 234, 167, 0.65),
+    0 0 22px rgba(255, 215, 120, 0.80),
+    0 0 55px rgba(255, 71, 87, 0.55),
+    0 0 95px rgba(184, 38, 62, 0.45),
+    0 0 145px rgba(138, 28, 28, 0.35),
+    0 0 200px rgba(238, 205, 126, 0.20),
+    inset 0 0 20px rgba(238, 205, 126, 0.30);
   overflow: hidden;
-  background: #0e0204;
   transform-origin: center center;
   overscroll-behavior: contain !important;
-  will-change: transform, opacity, clip-path;
+  will-change: transform, opacity, clip-path, box-shadow;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
 
-/* Opening: Bung mở 2 bên từ trục giữa ra toàn màn hình */
+/* Opening: Bung mở 2 bên từ trục giữa ra toàn màn hình, kết hợp viền gradient chuyển màu & hào quang thở */
 .event-modal.is-open:not(.is-closing) .event-modal-dialog {
-  animation: modalBookSplitOpen 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: 
+    modalBookSplitOpen 0.38s cubic-bezier(0.16, 1, 0.3, 1) both,
+    modalGradientBorderFlow 8s ease infinite,
+    modalFrameAuraBreathe 5s ease-in-out infinite alternate 0.38s;
 }
 
 /* Closing: Khép 2 bên vào trục giữa rồi biến mất hoàn toàn */
 .event-modal.is-closing .event-modal-dialog {
   animation: modalBookSplitClose 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes modalGradientBorderFlow {
+  0%   { background-position: 0 0, 0% 50%; }
+  50%  { background-position: 0 0, 100% 50%; }
+  100% { background-position: 0 0, 0% 50%; }
+}
+
+@keyframes modalFrameAuraBreathe {
+  0% {
+    box-shadow: 
+      0 25px 75px rgba(0, 0, 0, 0.95), 
+      0 0 0 1px rgba(255, 234, 167, 0.65),
+      0 0 22px rgba(255, 215, 120, 0.75),
+      0 0 50px rgba(255, 71, 87, 0.50),
+      0 0 90px rgba(184, 38, 62, 0.40),
+      0 0 140px rgba(138, 28, 28, 0.30),
+      0 0 190px rgba(238, 205, 126, 0.18),
+      inset 0 0 18px rgba(238, 205, 126, 0.28);
+  }
+  50% {
+    box-shadow: 
+      0 28px 85px rgba(0, 0, 0, 0.98), 
+      0 0 0 1.5px rgba(255, 234, 167, 0.90),
+      0 0 35px rgba(255, 215, 120, 0.95),
+      0 0 70px rgba(255, 71, 87, 0.70),
+      0 0 120px rgba(184, 38, 62, 0.60),
+      0 0 175px rgba(138, 28, 28, 0.45),
+      0 0 230px rgba(255, 215, 120, 0.28),
+      inset 0 0 26px rgba(255, 215, 120, 0.40);
+  }
+  100% {
+    box-shadow: 
+      0 25px 75px rgba(0, 0, 0, 0.95), 
+      0 0 0 1px rgba(255, 183, 197, 0.75),
+      0 0 28px rgba(255, 183, 197, 0.85),
+      0 0 60px rgba(214, 48, 49, 0.55),
+      0 0 100px rgba(207, 159, 63, 0.45),
+      0 0 150px rgba(92, 18, 22, 0.35),
+      0 0 200px rgba(255, 183, 197, 0.20),
+      inset 0 0 20px rgba(255, 183, 197, 0.30);
+  }
 }
 
 @keyframes modalBookSplitOpen {
@@ -1838,18 +1886,18 @@ section {
   }
   35% {
     opacity: 0.7;
-    clip-path: polygon(36% 0, 64% 0, 64% 100%, 36% 100%);
+    clip-path: polygon(36% -100px, 64% -100px, 64% calc(100% + 100px), 36% calc(100% + 100px));
     transform: scale(0.55, 0.95) translateZ(0);
   }
   70% {
     opacity: 0.95;
-    clip-path: polygon(15% 0, 85% 0, 85% 100%, 15% 100%);
+    clip-path: polygon(15% -150px, 85% -150px, 85% calc(100% + 150px), 15% calc(100% + 150px));
     transform: scale(0.88, 0.98) translateZ(0);
   }
   100% {
     opacity: 1;
     transform: scale(1, 1) translateZ(0);
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    clip-path: polygon(-220px -220px, calc(100% + 220px) -220px, calc(100% + 220px) calc(100% + 220px), -220px calc(100% + 220px));
   }
 }
 
@@ -1857,16 +1905,16 @@ section {
   0% {
     opacity: 1;
     transform: scale(1, 1) translateZ(0);
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    clip-path: polygon(-220px -220px, calc(100% + 220px) -220px, calc(100% + 220px) calc(100% + 220px), -220px calc(100% + 220px));
   }
   30% {
     opacity: 0.95;
-    clip-path: polygon(15% 0, 85% 0, 85% 100%, 15% 100%);
+    clip-path: polygon(15% -150px, 85% -150px, 85% calc(100% + 150px), 15% calc(100% + 150px));
     transform: scale(0.88, 0.98) translateZ(0);
   }
   65% {
     opacity: 0.7;
-    clip-path: polygon(36% 0, 64% 0, 64% 100%, 36% 100%);
+    clip-path: polygon(36% -100px, 64% -100px, 64% calc(100% + 100px), 36% calc(100% + 100px));
     transform: scale(0.55, 0.95) translateZ(0);
   }
   100% {
@@ -2064,6 +2112,30 @@ section {
 body.modal-scroll-lock {
   overflow: hidden !important;
   overscroll-behavior: none !important;
+}
+
+/* Background elevation during modal:
+   Dim & blur the website content behind, while Three.js canvas (sakura petals) & falling cards float crisply in background */
+body.modal-scroll-lock .three-canvas {
+  z-index: 92 !important;
+  opacity: 0.95 !important;
+  visibility: visible !important;
+  pointer-events: none !important;
+}
+
+body.modal-scroll-lock .falling-cards {
+  z-index: 93 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: none !important;
+}
+
+body.modal-scroll-lock .nav,
+body.modal-scroll-lock main,
+body.modal-scroll-lock footer,
+body.modal-scroll-lock .bg-ambience {
+  filter: blur(8px) brightness(0.25) !important;
+  transition: filter 0.35s ease, brightness 0.35s ease;
 }
 
 .event-modal,
@@ -2937,44 +3009,176 @@ body.modal-scroll-lock {
   transform: translateY(-1px);
 }
 
-.join__steps {
-  list-style: none;
-  margin: 0 auto;
-  padding: 0;
-  max-width: var(--max);
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 1.1rem;
-  counter-reset: step;
+/* ==========================================================
+   TUYỂN THÀNH VIÊN — "KOKESHI HỌA KÝ" (こけし画記)
+   ========================================================== */
+
+.join__theme-badge-wrap {
+  margin-bottom: 0.85rem;
 }
 
+.join__theme-badge {
+  display: inline-block;
+  font-family: var(--font-title);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold-bright);
+  background: linear-gradient(135deg, rgba(207, 159, 63, 0.22) 0%, rgba(138, 28, 28, 0.35) 100%);
+  border: 1.5px solid rgba(238, 205, 126, 0.65);
+  box-shadow: 0 0 18px rgba(207, 159, 63, 0.35), inset 0 0 10px rgba(207, 159, 63, 0.15);
+  padding: 0.35rem 1.3rem;
+  border-radius: 999px;
+  text-shadow: 0 0 10px rgba(238, 205, 126, 0.6);
+  animation: themeBadgePulse 4s ease-in-out infinite alternate;
+}
+
+@keyframes themeBadgePulse {
+  0%   { box-shadow: 0 0 14px rgba(207, 159, 63, 0.3), inset 0 0 8px rgba(207, 159, 63, 0.1); }
+  100% { box-shadow: 0 0 24px rgba(238, 205, 126, 0.55), inset 0 0 14px rgba(207, 159, 63, 0.25); }
+}
+
+.join__heading {
+  font-family: var(--font-title);
+  font-size: clamp(1.9rem, 4vw, 2.7rem);
+  letter-spacing: 0.03em;
+  margin: 0 0 0.8rem;
+  color: var(--white-pure);
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.85);
+}
+
+.join__container {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* 4 Vòng chính ở 1 hàng ngang (Grid 4 cột) */
+.join__rounds-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 1.6rem;
+}
+
+/* Thẻ Vòng Thi */
 .join__step {
   position: relative;
-  padding: 1.8rem 1.1rem;
+  padding: 2rem 1.25rem 1.6rem;
   text-align: center;
-  border: 1px solid rgba(207,159,63,0.3);
-  border-radius: 10px;
-  background: linear-gradient(160deg, rgba(207,159,63,0.05), rgba(0,0,0,0.25));
+  border: 1px solid rgba(207, 159, 63, 0.35);
+  border-radius: 16px;
+  background: linear-gradient(160deg, rgba(207, 159, 63, 0.08) 0%, rgba(14, 2, 4, 0.88) 100%);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: flex;
   flex-direction: column;
   align-items: center;
-  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  cursor: pointer;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s ease, box-shadow 0.35s ease;
+  user-select: none;
+  overflow: hidden;
 }
 
 .join__step:hover {
-  transform: translateY(-4px);
-  border-color: rgba(238, 205, 126, 0.6);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  transform: translateY(-8px);
+  border-color: rgba(238, 205, 126, 0.85);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65), 0 0 28px rgba(207, 159, 63, 0.32);
 }
 
+/* ==========================================================
+   MASCOT 3D FLIP CARD & SOFT RADIANT GLOW (ITEM 2)
+   ========================================================== */
+.join__mascot-wrapper {
+  position: relative;
+  width: 145px;
+  height: 145px;
+  margin: 0 auto 1.3rem;
+  perspective: 1000px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Vầng sáng gradient nhẹ (Soft outer glow) tỏa ra xung quanh viền mascot */
+.join__mascot-glow {
+  position: absolute;
+  inset: 5%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(238, 205, 126, 0.35) 0%, rgba(168, 35, 56, 0.22) 50%, transparent 72%);
+  filter: blur(14px);
+  pointer-events: none;
+  transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease, background 0.5s ease;
+  will-change: transform, opacity;
+}
+
+.join__step:hover .join__mascot-glow {
+  transform: scale(1.35);
+  opacity: 1;
+  background: radial-gradient(circle, rgba(238, 205, 126, 0.65) 0%, rgba(207, 159, 63, 0.4) 50%, transparent 72%);
+  filter: blur(18px);
+}
+
+/* Thẻ lật 3D (3D Flip Card) */
+.join__mascot-card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: transform;
+}
+
+/* Hover: Lật 3D sang bản Color và phóng to hơn 1 tý */
+.join__step:hover .join__mascot-card {
+  transform: rotateY(180deg) scale(1.08);
+}
+
+.join__mascot-face {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Trạng thái Default: Hiển thị asset bản Monochrome (Đen - Đỏ) */
+.join__mascot-face--mono {
+  transform: rotateY(0deg);
+}
+
+/* Trạng thái Lật: Hiển thị asset bản Color */
+.join__mascot-face--color {
+  transform: rotateY(180deg);
+}
+
+.join__mascot-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 10px rgba(238, 205, 126, 0.45)) drop-shadow(0 4px 12px rgba(0, 0, 0, 0.6));
+  transition: filter 0.35s ease;
+  pointer-events: none;
+}
+
+.join__step:hover .join__mascot-img {
+  filter: drop-shadow(0 0 18px rgba(238, 205, 126, 0.85)) drop-shadow(0 6px 16px rgba(0, 0, 0, 0.7));
+}
+
+/* Card Content Info */
 .join__step-no {
   display: block;
   font-family: var(--font-title);
-  font-size: 1.15rem;
+  font-size: 1.18rem;
   font-weight: 700;
   color: var(--gold);
   margin-bottom: 0.35rem;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.04em;
 }
 
 .join__step-date {
@@ -2984,68 +3188,390 @@ body.modal-scroll-lock {
   color: var(--gold-bright);
   background: rgba(207, 159, 63, 0.15);
   border: 1px solid rgba(207, 159, 63, 0.35);
-  padding: 0.22rem 0.55rem;
+  padding: 0.22rem 0.65rem;
   border-radius: 999px;
   margin-bottom: 0.75rem;
   letter-spacing: 0.02em;
   white-space: nowrap;
 }
 
-.join__step h3 {
-  font-size: 1.05rem;
-  margin-bottom: 0.55rem;
+.join__step-title {
+  font-size: 1.25rem;
+  margin: 0 0 0.55rem;
   color: var(--white-pure);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.3;
+  font-family: var(--font-title);
 }
 
-.join__step p {
-  margin: 0;
+.join__step-desc {
+  margin: 0 0 1.1rem;
   font-size: 0.88rem;
-  line-height: 1.5;
-  color: rgba(244,236,216,0.78);
+  line-height: 1.55;
+  color: rgba(244, 236, 216, 0.82);
+  flex-grow: 1;
 }
 
-.join__step--result {
-  border-color: rgba(238, 205, 126, 0.55);
-  background: linear-gradient(160deg, rgba(207, 159, 63, 0.12), rgba(138, 28, 28, 0.2));
-  box-shadow: 0 0 16px rgba(207, 159, 63, 0.15);
-}
-
-.join__step--result .join__step-no {
+.join__step-action {
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  font-weight: 600;
   color: var(--gold-bright);
-  text-shadow: 0 0 8px rgba(238, 205, 126, 0.5);
+  opacity: 0.75;
+  transition: opacity 0.25s ease, transform 0.25s ease, color 0.25s ease;
 }
 
-@media (max-width: 1024px) {
-  .join__steps {
-    grid-template-columns: repeat(3, 1fr);
+.join__step:hover .join__step-action {
+  opacity: 1;
+  transform: translateX(3px);
+  color: #ffffff;
+}
+
+/* ==========================================================
+   KHỐI KẾT QUẢ — BANNER TRẢI DÀI THEO CHIỀU NGANG (ITEM 1)
+   ========================================================== */
+.join__result-wrap {
+  width: 100%;
+}
+
+.join__result-banner {
+  position: relative;
+  width: 100%;
+  border: 1.5px solid rgba(238, 205, 126, 0.55);
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(207, 159, 63, 0.15) 0%, rgba(138, 28, 28, 0.25) 50%, rgba(14, 2, 4, 0.92) 100%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 1.5rem 2.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  cursor: pointer;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55), 0 0 24px rgba(207, 159, 63, 0.2);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s ease, box-shadow 0.35s ease;
+  overflow: hidden;
+  user-select: none;
+}
+
+.join__result-banner:hover {
+  transform: translateY(-4px);
+  border-color: rgba(238, 205, 126, 0.9);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.65), 0 0 32px rgba(238, 205, 126, 0.38);
+}
+
+.join__result-banner-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 20% 50%, rgba(238, 205, 126, 0.18) 0%, transparent 60%);
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.join__result-banner:hover .join__result-banner-glow {
+  opacity: 1;
+}
+
+.join__result-col--badge {
+  flex-shrink: 0;
+}
+
+.join__result-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.65rem 1.25rem;
+  background: rgba(207, 159, 63, 0.18);
+  border: 1.5px solid rgba(238, 205, 126, 0.45);
+  border-radius: 999px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+.join__result-pill-icon {
+  font-size: 1.45rem;
+  line-height: 1;
+}
+
+.join__result-pill-text {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.join__result-tag {
+  font-family: var(--font-title);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--gold-bright);
+  letter-spacing: 0.05em;
+  line-height: 1.2;
+}
+
+.join__result-date {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(244, 236, 216, 0.85);
+  line-height: 1.2;
+}
+
+.join__result-col--info {
+  flex-grow: 1;
+  text-align: left;
+}
+
+.join__result-title {
+  font-family: var(--font-title);
+  font-size: 1.35rem;
+  margin: 0 0 0.35rem;
+  color: var(--white-pure);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.join__result-desc {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: rgba(244, 236, 216, 0.85);
+}
+
+.join__result-col--action {
+  flex-shrink: 0;
+}
+
+.join__result-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.35rem;
+  border-radius: 999px;
+  background: rgba(207, 159, 63, 0.18);
+  border: 1.5px solid rgba(238, 205, 126, 0.4);
+  color: var(--gold-bright);
+  font-size: 0.88rem;
+  font-weight: 600;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+
+.join__result-banner:hover .join__result-action-btn {
+  background: var(--gold-bright);
+  color: #0c0204;
+  border-color: #ffffff;
+  box-shadow: 0 0 16px rgba(238, 205, 126, 0.6);
+  transform: translateX(3px);
+}
+
+/* Responsive Layout */
+@media (max-width: 1080px) {
+  .join__rounds-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.2rem;
   }
 }
 
-@media (max-width: 720px) {
-  .join__steps {
+@media (max-width: 768px) {
+  .join__result-banner {
+    flex-direction: column;
+    text-align: center;
+    gap: 1.2rem;
+    padding: 1.6rem 1.4rem;
+  }
+  .join__result-col--info {
+    text-align: center;
+  }
+}
+
+@media (max-width: 600px) {
+  .join__rounds-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
+  .join__step {
+    padding: 1.6rem 1.1rem;
+  }
+  .join__mascot-wrapper {
+    width: 125px;
+    height: 125px;
+  }
+}
+
+/* ==========================================================
+   POPUP MODAL CHI TIẾT TUYỂN THÀNH VIÊN (ITEM 3)
+   ========================================================== */
+.join-modal-thumb-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 270px;
+  height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  overflow: visible;
+  margin-bottom: 0.6rem;
+}
+
+.join-modal-glow {
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(238, 205, 126, 0.45) 0%, rgba(168, 35, 56, 0.28) 50%, transparent 72%);
+  filter: blur(24px);
+  pointer-events: none;
+  animation: joinModalGlowPulse 4s ease-in-out infinite alternate;
+  will-change: transform, opacity;
+}
+
+.join-modal-thumb {
+  position: relative;
+  z-index: 2;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 16px rgba(238, 205, 126, 0.65)) drop-shadow(0 8px 24px rgba(0, 0, 0, 0.7));
+  animation: joinModalMascotFloat 4s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+/* Hiệu ứng lơ lửng lên xuống tại chỗ cho mascot trong modal */
+@keyframes joinModalMascotFloat {
+  0%   { transform: translateY(0px) rotate(0deg); }
+  50%  { transform: translateY(-12px) rotate(1.2deg); }
+  100% { transform: translateY(2px) rotate(-1deg); }
+}
+
+@keyframes joinModalGlowPulse {
+  0%   { transform: scale(0.9); opacity: 0.65; }
+  50%  { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0.75; }
+}
+
+.join-modal-step-badge {
+  display: inline-block;
+  font-family: var(--font-title);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--gold-bright);
+  background: rgba(207, 159, 63, 0.18);
+  border: 1px solid rgba(207, 159, 63, 0.4);
+  padding: 0.2rem 0.8rem;
+  border-radius: 999px;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.4rem;
+}
+
+/* ==========================================================
+   ADMIN STUDIO TABS & RECRUITMENT CMS (ITEM 3)
+   ========================================================== */
+.admin-portal__nav-tabs {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-left: 2rem;
+}
+
+.admin-nav-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.52rem 1.15rem;
+  border-radius: 8px;
+  border: 1px solid rgba(207, 159, 63, 0.3);
+  background: rgba(20, 3, 6, 0.6);
+  color: rgba(244, 236, 216, 0.75);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.admin-nav-tab:hover {
+  background: rgba(207, 159, 63, 0.15);
+  border-color: rgba(238, 205, 126, 0.6);
+  color: #ffffff;
+}
+
+.admin-nav-tab.is-active {
+  background: linear-gradient(135deg, rgba(207, 159, 63, 0.3) 0%, rgba(138, 28, 28, 0.4) 100%);
+  border-color: var(--gold-bright);
+  color: #ffffff;
+  box-shadow: 0 0 14px rgba(207, 159, 63, 0.3);
+}
+
+.admin-portal__tab-pane {
+  display: contents;
+}
+
+.admin-portal__tab-pane:not(.is-active) {
+  display: none !important;
+}
+
+.admin-card-item--recruit .admin-card-item__thumb img {
+  object-fit: contain;
+  padding: 6px;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.admin-card-item__badge-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.4rem;
+}
+
+.admin-round-pill {
+  font-family: var(--font-title);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--gold-bright);
+  background: rgba(207, 159, 63, 0.2);
+  padding: 0.15rem 0.55rem;
+  border-radius: 4px;
+  border: 1px solid rgba(207, 159, 63, 0.35);
+}
+
+.admin-round-date {
+  font-size: 0.76rem;
+  color: rgba(244, 236, 216, 0.75);
+}
+
+.admin-img-preview--contain img {
+  object-fit: contain;
+  background: rgba(0, 0, 0, 0.55);
+  padding: 8px;
+}
+
+.admin-img-preview--tall {
+  height: 200px !important;
 }
 
 .join__cta {
   display: block;
   width: fit-content;
-  margin: 3rem auto 0;
-  padding: 0.95rem 2.6rem;
+  margin: 2.8rem auto 0;
+  padding: 0.95rem 2.8rem;
   border-radius: 999px;
   font-family: var(--font-title);
   letter-spacing: 0.03em;
-  font-size: 1rem;
+  font-size: 1.05rem;
+  font-weight: 700;
   color: var(--black);
   background: linear-gradient(180deg, var(--gold-bright), var(--gold));
-  box-shadow: 0 10px 24px rgba(0,0,0,0.35);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .join__cta:hover {
   transform: translateY(-2px);
-  box-shadow: 0 14px 28px rgba(0,0,0,0.4);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.4);
 }
 
 /* Contact / Footer */
@@ -3178,7 +3704,7 @@ body.modal-scroll-lock {
 .dept__jp-title {
   position: relative;
   z-index: 1;
-  font-family: 'HK Gokukaikk', 'JPC Sho', sans-serif;
+  font-family: 'JPC Card', 'JPC Gyosho', 'HK Gokukaikk', 'JPC Sho', 'Noto Serif JP', serif;
   font-size: clamp(1.4rem, 2.8vw, 2.05rem);
   letter-spacing: 0.18em;
   color: var(--gold-bright);
@@ -3211,7 +3737,7 @@ body.modal-scroll-lock {
 }
 
 .dept__slogan-jp {
-  font-family: 'HK Gokukaikk', serif;
+  font-family: 'JPC Card', 'JPC Gyosho', 'HK Gokukaikk', 'JPC Sho', 'Noto Serif JP', serif;
   font-size: 1.2rem;
   color: var(--gold-bright);
   letter-spacing: 0.08em;
@@ -3259,7 +3785,7 @@ body.modal-scroll-lock {
 }
 
 .dept__card-rank {
-  font-family: 'HK Gokukaikk', 'Noto Serif JP', 'Yu Mincho', 'Hiragino Mincho ProN', 'MS Mincho', serif;
+  font-family: 'JPC Card', 'JPC Gyosho', 'HK Gokukaikk', 'JPC Sho', 'Noto Serif JP', serif;
   font-size: 2.2rem;
   color: var(--gold-bright);
   display: block;
@@ -3461,18 +3987,9 @@ body.modal-scroll-lock {
   z-index: 1;
 }
 
-/* Rank Corner Badge (一, 二, 三, 四, 五) */
+/* Rank Corner Badge (一, 二, 三, 四, 五 - Ẩn theo yêu cầu người dùng) */
 .dept-card__rank {
-  position: absolute;
-  top: -2px;
-  left: 2px;
-  font-family: 'JPC Gyosho', 'JPC Card', serif;
-  font-size: 1.15rem;
-  color: #fbbf24;
-  opacity: 0.85;
-  text-shadow: 0 0 8px rgba(251, 191, 36, 0.5);
-  z-index: 2;
-  pointer-events: none;
+  display: none !important;
 }
 
 /* Kokeshi Illustration Art Area */
@@ -3507,7 +4024,7 @@ body.modal-scroll-lock {
 }
 
 .dept-card__jp {
-  font-family: 'HK Gokukaikk', 'JPC Sho', sans-serif;
+  font-family: 'JPC Card', 'JPC Gyosho', 'HK Gokukaikk', 'JPC Sho', 'Noto Serif JP', serif;
   font-size: 1.18rem;
   color: var(--gold-bright);
   letter-spacing: 0.08em;
@@ -3610,8 +4127,9 @@ body.modal-scroll-lock {
   .pillars {
     grid-template-columns: repeat(2, 1fr);
   }
-  .join__steps {
-    grid-template-columns: repeat(3, 1fr);
+  .join__steps,
+  .join__rounds-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
   .dept__grid {
     grid-template-columns: repeat(2, 1fr);
@@ -4176,8 +4694,9 @@ body.modal-scroll-lock {
     margin-top: 1.8rem;
   }
 
-  /* Join Steps */
-  .join__steps {
+  /* Join Steps & Rounds Grid */
+  .join__steps,
+  .join__rounds-grid {
     grid-template-columns: 1fr;
     gap: 0.9rem;
   }
@@ -4386,6 +4905,7 @@ body.modal-scroll-lock {
 
   .pillars,
   .join__steps,
+  .join__rounds-grid,
   .dept__grid {
     grid-template-columns: 1fr;
     gap: 0.85rem;
@@ -4749,6 +5269,22 @@ body.modal-scroll-lock {
 
 .music-player__title-clone {
   display: none;
+}
+
+/* Bảo đảm tuyệt đối không bao giờ hiển thị bản clone nếu clone rỗng hoặc track không ở trạng thái scrolling */
+.music-player__title-clone:empty,
+.music-player__title-track:not(.is-scrolling) .music-player__title-clone {
+  display: none !important;
+}
+
+.music-player__title-track:not(.is-scrolling) {
+  transform: none !important;
+  animation: none !important;
+}
+
+.music-player__title-track:not(.is-scrolling) .music-player__title::after {
+  display: none !important;
+  content: "" !important;
 }
 
 /* Trượt thành 1 vòng nối đuôi nhau liên tục (Infinite Seamless Loop Marquee) */
@@ -5229,9 +5765,9 @@ body.ban-transition-active .falling-cards {
 }
 
 .ban-vortex-card__jp {
-  font-family: 'HK Gokukaikk', 'JPC Sho', sans-serif;
-  font-size: 1.05rem;
-  font-weight: 400;
+  font-family: 'JPC Card', 'JPC Gyosho', 'HK Gokukaikk', 'JPC Sho', 'Noto Serif JP', serif;
+  font-size: 1.12rem;
+  font-weight: 700;
   color: #fef08a;
   letter-spacing: 0.08em;
   line-height: 1.1;
@@ -5292,12 +5828,15 @@ body.ban-transition-active .falling-cards {
 }
 
 .ban-vortex-card.is-selected .ban-vortex-card__jp {
-  font-family: 'HK Gokukaikk', 'JPC Sho', sans-serif;
+  font-family: 'JPC Card', 'JPC Gyosho', 'HK Gokukaikk', 'JPC Sho', 'Noto Serif JP', serif;
+  font-size: 1.18rem;
+  font-weight: 700;
   color: #fef08a;
   text-shadow: 0 0 18px rgba(254, 240, 138, 1);
 }
 
 .ban-vortex-card.is-selected .ban-vortex-card__name {
+  font-family: var(--font-title);
   color: #ffffff;
   text-shadow: 0 0 14px rgba(254, 240, 138, 0.95), 0 0 24px rgba(204, 20, 54, 0.8);
 }

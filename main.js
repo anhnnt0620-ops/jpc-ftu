@@ -150,8 +150,8 @@ function init3DCardHoverPhysics() {
     });
   });
 
-  // Attach celebratory confetti to CTA buttons
-  const ctaButtons = document.querySelectorAll('.join__cta, .hero__badge, a[href="#join"]');
+  // Attach celebratory confetti to CTA buttons (exclude navigation menu links like "Tuyển thành viên")
+  const ctaButtons = document.querySelectorAll('.join__cta');
   ctaButtons.forEach((btn) => {
     btn.addEventListener('click', (e) => {
       const rect = btn.getBoundingClientRect();
@@ -188,3 +188,4 @@ if (typeof window !== 'undefined') {
 }
 import './script.js';
 import './events-manager.js';
+import './recruitment-manager.js';

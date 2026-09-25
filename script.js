@@ -623,40 +623,47 @@ function initFallingCards() {
 
   if (!container || prefersReducedMotion) return;
 
+  container.innerHTML = '';
   const isMobile = window.innerWidth <= 768;
-  // Lightweight count on mobile (8 cards) vs desktop (16 cards) to eliminate frame drops
-  const count = isMobile ? 8 : 16;
-  const halfCount = count / 2;
+  const count = isMobile ? 14 : 28;
   const fragment = document.createDocumentFragment();
 
   for (let i = 0; i < count; i++) {
     const card = document.createElement('div');
     card.className = 'mini-card';
     card.style.pointerEvents = 'none';
-    const isLeft = i < halfCount;
-    const sideIndex = isLeft ? i : i - halfCount;
 
-    const spreadFactor = ((sideIndex * 7 + (isLeft ? 2 : 5)) % halfCount) / Math.max(1, halfCount - 1);
-    const leftPercent = isLeft
-      ? (isMobile ? 0.5 + spreadFactor * 9.5 : 0.8 + spreadFactor * 14.7)
-      : (isMobile ? 89.5 + spreadFactor * 9.5 : 84.5 + spreadFactor * 14.7);
+    // Distribute: Left lane (40%), Right lane (40%), Center ambient lane (20%)
+    const laneType = i % 5;
+    let leftPercent;
 
-    const duration = 7.5 + ((sideIndex * 3 + (isLeft ? 0 : 2)) % 7) * 1.15;
-    const delay = -(((sideIndex + (isLeft ? 0 : 0.45)) / halfCount) * duration + (i % 4) * 0.7);
+    if (laneType === 0 || laneType === 1) {
+      leftPercent = 1.5 + (i * 7.3) % 23.5;
+    } else if (laneType === 2 || laneType === 3) {
+      leftPercent = 75.0 + (i * 7.3) % 23.5;
+    } else {
+      leftPercent = 25.0 + (i * 11.7) % 50.0;
+    }
+
+    const duration = 8.0 + ((i * 3.7) % 7) * 1.2;
+    const delay = -((i / count) * duration + (i % 3) * 0.8);
 
     const sizeTier = i % 3;
+    const isCenter = (laneType === 4);
     const width = isMobile
-      ? (sizeTier === 0 ? 11 : sizeTier === 1 ? 14 : 17)
-      : (sizeTier === 0 ? 14 + (i % 3) : sizeTier === 1 ? 18 + (i % 4) : 23 + (i % 4));
+      ? (sizeTier === 0 ? 12 : sizeTier === 1 ? 15 : 18)
+      : (isCenter ? (sizeTier === 0 ? 14 : 17) : (sizeTier === 0 ? 16 : sizeTier === 1 ? 21 : 26));
     const height = Math.round(width * 1.4);
 
-    const opacity = sizeTier === 0 ? 0.30 : sizeTier === 1 ? 0.45 : 0.60;
+    const opacity = isCenter
+      ? (sizeTier === 0 ? 0.38 : 0.52)
+      : (sizeTier === 0 ? 0.58 : sizeTier === 1 ? 0.72 : 0.90);
 
     const rzStart = -45 + ((i * 37) % 90);
     const rzEnd = rzStart + (i % 2 === 0 ? 1 : -1) * (180 + ((i * 29) % 150));
     const rx = 180 + ((i * 41) % 240);
     const ry = 160 + ((i * 31) % 220);
-    const drift = (i % 2 === 0 ? 1 : -1) * (isMobile ? 6 + (i % 4) * 2 : 10 + (i % 5) * 4);
+    const drift = (i % 2 === 0 ? 1 : -1) * (isMobile ? 8 + (i % 4) * 3 : 14 + (i % 5) * 5);
 
     card.style.left = `${leftPercent.toFixed(1)}%`;
     card.style.setProperty('--mc-w', `${width}px`);
@@ -673,6 +680,8 @@ function initFallingCards() {
     if (i % 4 === 0) {
       card.classList.add('mini-card--gold');
     } else if (i % 3 === 0) {
+      card.classList.add('mini-card--sakura');
+    } else if (i % 5 === 0) {
       card.classList.add('mini-card--deep');
     }
 
@@ -1142,8 +1151,6 @@ function updateTitleMarquee() {
   const clone = document.getElementById('musicPlayerTitleClone');
   if (!wrap || !title) return;
 
-  const isMobile = window.innerWidth <= 768 || window.matchMedia('(max-width: 768px)').matches;
-
   // 1. Reset state for accurate unconstrained measurement
   if (wrap) wrap.classList.remove('has-marquee');
   if (track) {
@@ -1153,15 +1160,17 @@ function updateTitleMarquee() {
   }
   if (clone) clone.textContent = '';
 
-  // Force reflow
+  // Force reflow for precise geometry reading
   void title.offsetWidth;
 
-  const wrapWidth = wrap.clientWidth;
-  const titleWidth = title.offsetWidth || title.scrollWidth;
+  const wrapRect = wrap.getBoundingClientRect();
+  const titleRect = title.getBoundingClientRect();
+  const wrapWidth = wrapRect.width || wrap.clientWidth || 0;
+  const titleWidth = titleRect.width || title.scrollWidth || 0;
 
-  // Trên điện thoại: LUÔN CHO TÊN BÀI HÁT MOVE LIÊN TỤC theo phong cách mini walkman / player
-  // Trên desktop: chạy marquee khi tiêu đề vượt quá độ rộng khung
-  const shouldScroll = isMobile ? true : (wrapWidth > 0 && titleWidth > wrapWidth + 2);
+  // Chỉ kích hoạt marquee khi tiêu đề bài hát THỰC SỰ dài hơn chiều rộng khung hiển thị (áp dụng chuẩn trên mọi thiết bị: Mobile, Tablet, Desktop)
+  // Các bài hát ngắn (như Gunjou, Idol, Inazuma, Blue Dream, Fake,...) sẽ hiển thị tĩnh 1 lần gọn gàng, tuyệt đối không bị lặp tên bài
+  const shouldScroll = wrapWidth > 0 && titleWidth > (wrapWidth + 2);
 
   if (shouldScroll && title.textContent && title.textContent.trim().length > 0) {
     if (clone) clone.textContent = title.textContent;
@@ -1177,6 +1186,15 @@ function updateTitleMarquee() {
       requestAnimationFrame(() => {
         track.classList.add('is-scrolling');
       });
+    }
+  } else {
+    // Đảm bảo dọn dẹp sạch sẽ khi tên bài vừa vặn trong khung
+    if (clone) clone.textContent = '';
+    if (wrap) wrap.classList.remove('has-marquee');
+    if (track) {
+      track.classList.remove('is-scrolling');
+      track.style.removeProperty('--marquee-duration');
+      track.style.transform = '';
     }
   }
 }

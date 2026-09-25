@@ -216,6 +216,8 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
     if (pendingIntroCall) {
       startIntroTimeline(pendingIntroCall.onSnap, pendingIntroCall.onComplete);
       pendingIntroCall = null;
+    } else {
+      startAmbientCardRain();
     }
 
     console.info('[JPC 3D] Authentic Bio-Kinematic Hand & UnrealBloom 3D Engine ready.');
@@ -405,6 +407,27 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
       c.mesh.material.opacity = 0.95;
       c.mesh.visible = true;
       c.active = true;
+    }
+  }
+
+  function startAmbientCardRain() {
+    if (!cardRainGroup) return;
+    cardRainGroup.visible = true;
+    isCardRainLooping = true;
+    for (let i = 0; i < cardRainData.length; i++) {
+      const c = cardRainData[i];
+      if (!c.active) {
+        c.mesh.position.set(
+          (Math.random() - 0.5) * 18,
+          -7 + Math.random() * 16,
+          2 + (Math.random() - 0.5) * 6
+        );
+        c.mesh.rotation.set(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2);
+        c.mesh.material.opacity = 0.90;
+        c.mesh.visible = true;
+        c.active = true;
+        c.vy = -(0.018 + Math.random() * 0.024);
+      }
     }
   }
 
@@ -1698,6 +1721,7 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
           onIntroCompleteCallback();
           onIntroCompleteCallback = null;
         }
+        startAmbientCardRain();
       }
     }
 
@@ -1749,8 +1773,8 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
           c.active = false;
           c.mesh.visible = false;
           if (isCardRainLooping) {
-            c.mesh.position.set(c.initX, c.initY + Math.random() * 2, c.initZ);
-            c.mesh.material.opacity = 0.95;
+            c.mesh.position.set((Math.random() - 0.5) * 18, 8 + Math.random() * 4, 2 + (Math.random() - 0.5) * 6);
+            c.mesh.material.opacity = 0.90;
             c.mesh.visible = true;
             c.active = true;
           }
@@ -1900,6 +1924,9 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
       triggerCardRain: function () {
         triggerCardRain();
       },
+      startAmbientCardRain: function () {
+        startAmbientCardRain();
+      },
 
       /**
        * Instant skip to settled ambient state
@@ -1908,10 +1935,10 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
         isIntroPlaying = false;
         if (humanHandGroup) humanHandGroup.visible = false;
         if (vortexGroup) vortexGroup.visible = false;
-        if (cardRainGroup) cardRainGroup.visible = false;
         if (sovereignRingMesh && sovereignRingMesh.material) sovereignRingMesh.material.opacity = 0;
         if (anamorphicFlareMesh && anamorphicFlareMesh.material) anamorphicFlareMesh.material.opacity = 0;
         if (sovereignEmbersGroup) sovereignEmbersGroup.visible = false;
+        startAmbientCardRain();
       },
 
       /**
@@ -2020,8 +2047,8 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
        * Transition 3D scene elements when changing web SPA views
        */
       transitionView: function (viewId) {
-        const isHome = viewId === 'home' || !viewId;
-        const targetOpacity = isHome ? 0.85 : 0.25;
+        // Keep 3D canvas (sakura petals, golden stardust, ambient card rain) clear & vibrant across all main views!
+        const targetOpacity = (viewId === 'contact') ? 0.40 : 0.85;
 
         if (typeof gsap !== 'undefined' && canvas) {
           gsap.to(canvas, {
@@ -2030,6 +2057,7 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
             ease: 'power2.out'
           });
         }
+        startAmbientCardRain();
       },
 
       /**

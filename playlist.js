@@ -1,10 +1,10 @@
-// JPC FTU Playlist - 80 Ambient BGM Tracks (Exact Playlist file naming)
+// JPC FTU Playlist - 121 Ambient & Anime BGM Tracks (Exact Playlist file naming)
 const JPC_PLAYLIST = [
   {
     title: "Inazuma",
     fullTitle: "Inazuma",
     src: "Playlist/Inazuma.m4a",
-    gain: 1.0
+    gain: 1
   },
   {
     title: "Against the Invisible Net",
@@ -13,9 +13,9 @@ const JPC_PLAYLIST = [
     gain: 0.72
   },
   {
-    title: "Aishite Aishite Ashite",
-    fullTitle: "Aishite Aishite Ashite",
-    src: "Playlist/Aishite Aishite Ashite.m4a",
+    title: "Aishite Aishite Aishite",
+    fullTitle: "Aishite Aishite Aishite",
+    src: "Playlist/Aishite Aishite Aishite.m4a",
     gain: 0.52
   },
   {
@@ -265,12 +265,6 @@ const JPC_PLAYLIST = [
     gain: 0.53
   },
   {
-    title: "Monster",
-    fullTitle: "Monster",
-    src: "Playlist/Monster.m4a",
-    gain: 0.46
-  },
-  {
     title: "Moshimo Inochi Ga Egake Tara",
     fullTitle: "Moshimo Inochi Ga Egake Tara",
     src: "Playlist/Moshimo Inochi Ga Egake Tara.m4a",
@@ -479,6 +473,258 @@ const JPC_PLAYLIST = [
     fullTitle: "Zankyosanka",
     src: "Playlist/Zankyosanka.m4a",
     gain: 0.56
+  },
+  {
+    title: "Akari ga Yatte Kita Zo",
+    fullTitle: "Akari ga Yatte Kita Zo",
+    src: "Playlist/Akari ga Yatte Kita Zo.m4a",
+    gain: 0.52
+  },
+  {
+    title: "Bassline Yatteru w",
+    fullTitle: "Bassline Yatteru w",
+    src: "Playlist/Bassline Yatteru w.m4a",
+    gain: 0.5
+  },
+  {
+    title: "Betelgeuse",
+    fullTitle: "Betelgeuse (ベテルギウス)",
+    src: "Playlist/Betelgeuse.m4a",
+    gain: 0.5
+  },
+  {
+    title: "Black Princess",
+    fullTitle: "Black Princess",
+    src: "Playlist/Black Princess.m4a",
+    gain: 0.9
+  },
+  {
+    title: "BRING IT ON",
+    fullTitle: "BRING IT ON (劣等上等)",
+    src: "Playlist/BRING IT ON.m4a",
+    gain: 0.45
+  },
+  {
+    title: "DROPS",
+    fullTitle: "DROPS",
+    src: "Playlist/DROPS.m4a",
+    gain: 0.54
+  },
+  {
+    title: "Dry Flower",
+    fullTitle: "Dry Flower (ドライフラワー)",
+    src: "Playlist/Dry Flower.m4a",
+    gain: 0.52
+  },
+  {
+    title: "Fake",
+    fullTitle: "Fake",
+    src: "Playlist/Fake.m4a",
+    gain: 0.52
+  },
+  {
+    title: "From Zero",
+    fullTitle: "From Zero",
+    src: "Playlist/From Zero.m4a",
+    gain: 0.55
+  },
+  {
+    title: "Gloomy Flash",
+    fullTitle: "Gloomy Flash",
+    src: "Playlist/Gloomy Flash.m4a",
+    gain: 0.7
+  },
+  {
+    title: "Houkai Sekai no Utahime",
+    fullTitle: "Houkai Sekai no Utahime (崩壊世界の歌姫)",
+    src: "Playlist/Houkai Sekai no Utahime.m4a",
+    gain: 0.6
+  },
+  {
+    title: "Hysteric Night Girl",
+    fullTitle: "Hysteric Night Girl",
+    src: "Playlist/Hysteric Night Girl.m4a",
+    gain: 0.48
+  },
+  {
+    title: "Instant Love",
+    fullTitle: "Instant Love",
+    src: "Playlist/Instant Love.m4a",
+    gain: 0.52
+  },
+  {
+    title: "Intersection",
+    fullTitle: "Intersection",
+    src: "Playlist/Intersection.m4a",
+    gain: 0.55
+  },
+  {
+    title: "Kairikou",
+    fullTitle: "Kairikou",
+    src: "Playlist/Kairikou.m4a",
+    gain: 0.52
+  },
+  {
+    title: "Lagtrain",
+    fullTitle: "Lagtrain (ラグトレイン)",
+    src: "Playlist/Lagtrain.m4a",
+    gain: 0.48
+  },
+  {
+    title: "Leo",
+    fullTitle: "Leo (レオ)",
+    src: "Playlist/Leo.m4a",
+    gain: 0.5
+  },
+  {
+    title: "Letter to the Black World",
+    fullTitle: "Letter to the Black World",
+    src: "Playlist/Letter to the Black World.m4a",
+    gain: 0.7
+  },
+  {
+    title: "Lost Umbrella",
+    fullTitle: "Lost Umbrella (ロストアンブレラ)",
+    src: "Playlist/Lost Umbrella.m4a",
+    gain: 0.48
+  },
+  {
+    title: "M@GICALCURE! LOVE 3 SHOT!",
+    fullTitle: "M@GICALCURE! LOVE 3 SHOT!",
+    src: "Playlist/M@GICALCURE! LOVE 3 SHOT!.m4a",
+    gain: 0.46
+  },
+  {
+    title: "Machine Love",
+    fullTitle: "Machine Love",
+    src: "Playlist/Machine Love.m4a",
+    gain: 0.52
+  },
+  {
+    title: "Memoirs",
+    fullTitle: "Memoirs",
+    src: "Playlist/Memoirs.m4a",
+    gain: 0.8
+  },
+  {
+    title: "Metaphor",
+    fullTitle: "Metaphor",
+    src: "Playlist/Metaphor.m4a",
+    gain: 0.55
+  },
+  {
+    title: "MoeChakkaFire",
+    fullTitle: "MoeChakkaFire (萌えチャッカファイア)",
+    src: "Playlist/MoeChakkaFire.m4a",
+    gain: 0.48
+  },
+  {
+    title: "NEXT COLOR PLANET",
+    fullTitle: "NEXT COLOR PLANET",
+    src: "Playlist/NEXT COLOR PLANET.m4a",
+    gain: 0.48
+  },
+  {
+    title: "pinKing",
+    fullTitle: "pinKing",
+    src: "Playlist/pinKing.m4a",
+    gain: 0.52
+  },
+  {
+    title: "Polaris",
+    fullTitle: "Polaris (ポラリス)",
+    src: "Playlist/Polaris.m4a",
+    gain: 0.46
+  },
+  {
+    title: "PONPONPON",
+    fullTitle: "PONPONPON",
+    src: "Playlist/PONPONPON.m4a",
+    gain: 0.48
+  },
+  {
+    title: "ReDreaming Angel",
+    fullTitle: "ReDreaming Angel",
+    src: "Playlist/ReDreaming Angel.m4a",
+    gain: 0.65
+  },
+  {
+    title: "Ring of Fortune",
+    fullTitle: "Ring of Fortune",
+    src: "Playlist/Ring of Fortune.m4a",
+    gain: 0.55
+  },
+  {
+    title: "Shelter",
+    fullTitle: "Shelter",
+    src: "Playlist/Shelter.m4a",
+    gain: 0.48
+  },
+  {
+    title: "Shippaisaku Shoujo",
+    fullTitle: "Shippaisaku Shoujo (失敗作少女)",
+    src: "Playlist/Shippaisaku Shoujo.m4a",
+    gain: 0.46
+  },
+  {
+    title: "Someone Special",
+    fullTitle: "Someone Special",
+    src: "Playlist/Someone Special.m4a",
+    gain: 0.65
+  },
+  {
+    title: "starlights",
+    fullTitle: "starlights",
+    src: "Playlist/starlights.m4a",
+    gain: 0.6
+  },
+  {
+    title: "Stellar Stellar",
+    fullTitle: "Stellar Stellar",
+    src: "Playlist/Stellar Stellar.m4a",
+    gain: 0.46
+  },
+  {
+    title: "Sunset Tea Cup",
+    fullTitle: "Sunset Tea Cup",
+    src: "Playlist/Sunset Tea Cup.m4a",
+    gain: 0.8
+  },
+  {
+    title: "Tag",
+    fullTitle: "Tag (かくれんぼ)",
+    src: "Playlist/Tag.m4a",
+    gain: 0.5
+  },
+  {
+    title: "Take Me Away",
+    fullTitle: "Take Me Away",
+    src: "Playlist/Take Me Away.m4a",
+    gain: 0.55
+  },
+  {
+    title: "Tear Rain",
+    fullTitle: "Tear Rain",
+    src: "Playlist/Tear Rain.m4a",
+    gain: 0.6
+  },
+  {
+    title: "Tiny Little Adiantum",
+    fullTitle: "Tiny Little Adiantum",
+    src: "Playlist/Tiny Little Adiantum.m4a",
+    gain: 0.55
+  },
+  {
+    title: "White Canvas",
+    fullTitle: "White Canvas",
+    src: "Playlist/White Canvas.m4a",
+    gain: 0.65
+  },
+  {
+    title: "YoiYoi Kokon",
+    fullTitle: "YoiYoi Kokon (宵々古今)",
+    src: "Playlist/YoiYoi Kokon.m4a",
+    gain: 0.48
   }
 ];
 
