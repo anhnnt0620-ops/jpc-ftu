@@ -16,6 +16,28 @@
   <link rel="preload" as="image" href="Image/Khung Popup - Tuyển Gen/Vòng 3.2 - Popup.png?v=20260925_rev3">
   <!-- Modern 3D & Animation Bundle (Three.js, GSAP, Lenis, Confetti via Node.js / Vite) -->
   <script type="module" src="./main.js"></script>
+  <!-- Safety Watchdog: Guarantees the loading screen never gets stuck in black under any network or WebGL condition -->
+  <script>
+    (function () {
+      function dismissLoader() {
+        if (document.body && document.body.classList.contains('is-loading')) {
+          document.body.classList.remove('is-loading');
+          var loader = document.getElementById('appLoader');
+          if (loader) {
+            loader.style.opacity = '0';
+            loader.style.pointerEvents = 'none';
+            setTimeout(function () {
+              if (loader && loader.parentNode) loader.parentNode.removeChild(loader);
+            }, 600);
+          }
+        }
+      }
+      setTimeout(dismissLoader, 2500);
+      window.addEventListener('load', function () {
+        setTimeout(dismissLoader, 1500);
+      });
+    })();
+  </script>
 </head>
 <body class="is-loading play-intro">
 

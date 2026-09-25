@@ -33,6 +33,9 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
 
   if (typeof THREE === 'undefined') {
     console.warn('[JPC 3D] Three.js library not detected.');
+    if (typeof document !== 'undefined' && document.body) {
+      document.body.classList.remove('is-loading');
+    }
     return;
   }
 
@@ -184,6 +187,9 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
       });
     } catch (e) {
       console.warn('[JPC 3D] WebGL not supported:', e);
+      if (typeof document !== 'undefined' && document.body) {
+        document.body.classList.remove('is-loading');
+      }
       return;
     }
 
@@ -1333,6 +1339,11 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
 
     if (!renderer || !humanHandGroup) {
       pendingIntroCall = { onSnap, onComplete };
+      setTimeout(() => {
+        if (typeof document !== 'undefined' && document.body && document.body.classList.contains('is-loading')) {
+          document.body.classList.remove('is-loading');
+        }
+      }, 1000);
       return;
     }
 

@@ -10,6 +10,14 @@ function copyStaticAssets() {
       const folders = ['Image', 'Playlist', 'Font', 'model'];
       const outDir = path.resolve(process.cwd(), 'dist');
       
+      // Ensure .nojekyll is always created in dist to prevent Jekyll processing
+      try {
+        fs.writeFileSync(path.resolve(outDir, '.nojekyll'), '');
+        console.log('[Vite Build] Created dist/.nojekyll');
+      } catch (err) {
+        console.warn(`[Vite Build] Note: could not create dist/.nojekyll (${err.message})`);
+      }
+
       folders.forEach((folder) => {
         const src = path.resolve(process.cwd(), folder);
         const dest = path.resolve(outDir, folder);
