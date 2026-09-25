@@ -98,6 +98,46 @@ function initNavToggle() {
         }
       });
     }
+
+    // Direct click handler on "Về JPC" link: immediately navigates to "Giới thiệu chung về JPC" (#about)
+    aboutParent.addEventListener('click', (e) => {
+      // If clicking specifically on the small arrow icon, allow arrowBtn handler to toggle dropdown
+      if (e.target && (e.target.classList.contains('nav__arrow') || e.target.closest('.nav__arrow'))) {
+        return;
+      }
+
+      e.preventDefault();
+
+      // Immediately dismiss dropdown and mobile hamburger menu
+      aboutDropdown.classList.remove('is-open');
+      aboutDropdown.classList.add('is-force-closed');
+      setTimeout(() => aboutDropdown.classList.remove('is-force-closed'), 400);
+
+      if (branchOrg) branchOrg.classList.remove('is-open');
+
+      if (navMenu && navToggle) {
+        navMenu.classList.remove('is-open');
+        document.body.classList.remove('menu-open');
+        navToggle.setAttribute('aria-expanded', 'false');
+      }
+
+      if (document.activeElement) document.activeElement.blur();
+      aboutParent.blur();
+
+      // Navigate immediately to Giới thiệu chung về JPC (#about)
+      if (typeof window.showView === 'function') {
+        window.showView('about', true);
+      } else {
+        window.location.hash = '#about';
+      }
+
+      window.scrollTo(0, 0);
+      if (window.lenis) {
+        window.lenis.scrollTo(0, { immediate: true });
+      }
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    });
   }
 
   // Mobile & Touch accordion behavior for Cơ cấu tổ chức arrow button (toggles 5 Ban sub-accordion)
@@ -244,9 +284,17 @@ function initViewNavigation() {
     } else if (isContact && contact) {
       contact.scrollIntoView({ behavior: 'smooth', block: 'start' });
     } else {
-      window.scrollTo({ top: 0, behavior: 'auto' });
+      window.scrollTo(0, 0);
+      if (window.lenis) {
+        window.lenis.scrollTo(0, { immediate: true });
+      }
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
     }
   };
+
+  // Expose showView globally so navigation handlers can trigger direct view switches
+  window.showView = showView;
 
   const DEPT_IDS = ['dept-btc', 'dept-bcm', 'dept-btt', 'dept-bns', 'dept-bdn'];
   let isBanTransitionRunning = false;
@@ -526,7 +574,10 @@ function initViewNavigation() {
   // Robust document-level click delegation for all internal links & department navigation
   document.addEventListener('click', (event) => {
     const link = event.target.closest('a[href^="#"]');
-    const targetId = link.getAttribute('href').slice(1);
+    if (!link) return;
+    const href = link.getAttribute('href');
+    if (!href || !href.startsWith('#')) return;
+    const targetId = href.slice(1);
     if (!targetId) return;
 
     event.preventDefault();
@@ -545,7 +596,11 @@ function initViewNavigation() {
 
       const aboutDropdown = document.getElementById('navAboutDropdown');
       const branchOrg = document.getElementById('navBranchOrg');
-      if (aboutDropdown) aboutDropdown.classList.remove('is-open');
+      if (aboutDropdown) {
+        aboutDropdown.classList.remove('is-open');
+        aboutDropdown.classList.add('is-force-closed');
+        setTimeout(() => aboutDropdown.classList.remove('is-force-closed'), 400);
+      }
       if (branchOrg) branchOrg.classList.remove('is-open');
     };
 
