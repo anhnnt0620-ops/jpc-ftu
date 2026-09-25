@@ -9,10 +9,18 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;900&family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Noto+Serif+JP:wght@600;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <!-- Preload 4 Popup Representative Mascots -->
+  <link rel="preload" as="image" href="Image/Khung Popup - Tuyển Gen/Vòng 1 - Popup.png?v=20260925_rev3">
+  <link rel="preload" as="image" href="Image/Khung Popup - Tuyển Gen/Vòng 2 - Popup.png?v=20260925_rev3">
+  <link rel="preload" as="image" href="Image/Khung Popup - Tuyển Gen/Vòng 3.1 - Popup.png?v=20260925_rev3">
+  <link rel="preload" as="image" href="Image/Khung Popup - Tuyển Gen/Vòng 3.2 - Popup.png?v=20260925_rev3">
   <!-- Modern 3D & Animation Bundle (Three.js, GSAP, Lenis, Confetti via Node.js / Vite) -->
   <script type="module" src="./main.js"></script>
 </head>
-<body>
+<body class="is-loading play-intro">
+
+  <!-- Initial Blank Loading Screen (Màn hình trơn trống trước khi intro bắt đầu) -->
+  <div class="app-loader" id="appLoader" aria-hidden="true"></div>
 
   <!-- 3D WebGL Graphics Canvas -->
   <canvas id="threeCanvas" class="three-canvas" aria-hidden="true"></canvas>
@@ -255,10 +263,7 @@
     <div class="hero__content">
       <p class="hero__eyebrow">CLB Tiếng Nhật Trường Đại học Ngoại Thương</p>
       <h1 class="hero__title">
-        <span class="hero__title-text" id="heroTitleText">
-          <span class="hero__title-line1">Chào mừng bạn đến với</span><br>
-          <span class="hero__title-line2">thế giới của JPC</span>
-        </span>
+        <span class="hero__title-text" id="heroTitleText"></span>
         <span class="hero__title-cursor is-hidden" id="heroTitleCursor" aria-hidden="true"></span>
       </h1>
       <a href="#about" class="hero__cta">
@@ -828,7 +833,7 @@
 
       <!-- Khung KẾT QUẢ tách xuống hàng dưới thành khối banner trải dài theo chiều ngang -->
       <div class="join__result-wrap" id="joinResultContainer">
-        <article class="join__result-banner" id="joinResultBanner" data-round-id="round-result" tabindex="0" role="button" aria-label="Xem chi tiết Công bố kết quả">
+        <article class="join__result-banner" id="joinResultBanner">
           <div class="join__result-banner-glow" aria-hidden="true"></div>
           <div class="join__result-col join__result-col--badge">
             <div class="join__result-pill">
@@ -842,12 +847,6 @@
           <div class="join__result-col join__result-col--info">
             <h3 class="join__result-title">Công Bố Kết Quả</h3>
             <p class="join__result-desc">Chào đón các gương mặt xuất sắc chính thức trở thành thế hệ Gen 22 của JPC - FTU!</p>
-          </div>
-          <div class="join__result-col join__result-col--action">
-            <div class="join__result-action-btn">
-              <span>Xem chi tiết</span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-            </div>
           </div>
         </article>
       </div>
@@ -965,7 +964,7 @@
         <div class="event-modal-col event-modal-col--left">
           <div class="join-modal-thumb-wrap">
             <div class="join-modal-glow" aria-hidden="true"></div>
-            <img src="" alt="Khung Popup Tuyển Gen" class="join-modal-thumb" id="joinModalThumb">
+            <img src="Image/Khung Popup - Tuyển Gen/Vòng 1 - Popup.png?v=20260925_rev3" alt="Khung Popup Tuyển Gen" class="join-modal-thumb" id="joinModalThumb" width="136" height="178" loading="eager" decoding="async">
           </div>
           <span class="join-modal-step-badge" id="joinModalStepNo">Vòng 1</span>
           <h3 class="event-modal-title join-modal-title" id="joinModalTitle">Khai Nhãn</h3>
@@ -1053,7 +1052,7 @@
     </header>
 
     <!-- Main Workspace -->
-    <main class="admin-portal__body">
+    <div class="admin-portal__body">
       <!-- PANE 1: EVENT CMS -->
       <div class="admin-portal__tab-pane is-active" id="adminTabPaneEvents">
         <!-- Left Panel: Event Master List -->
@@ -1271,7 +1270,7 @@
           </div>
         </section>
       </div>
-    </main>
+    </div>
   </div>
 
   <!-- ============ BAN PAGE TRANSITION OVERLAY ============ -->

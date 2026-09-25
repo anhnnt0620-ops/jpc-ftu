@@ -43,7 +43,7 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
     accentRed: 0xff1e46,
     goldLight: 0xf6d382,
     particleCount: window.innerWidth <= 768 ? 55 : 105,
-    bloomStrength: 0.55,
+    bloomStrength: 0.52,
     bloomRadius: 0.40,
     bloomThreshold: 0.32
   };
@@ -187,7 +187,8 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
       return;
     }
 
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+    const maxPR = (window.innerWidth <= 768) ? 1.15 : 1.5;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, maxPR));
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.15;
@@ -404,6 +405,7 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
       const c = cardRainData[i];
       c.mesh.position.set(c.initX, c.initY, c.initZ);
       c.mesh.rotation.set(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2);
+      c.baseOpacity = 0.95;
       c.mesh.material.opacity = 0.95;
       c.mesh.visible = true;
       c.active = true;
@@ -423,10 +425,11 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
           2 + (Math.random() - 0.5) * 6
         );
         c.mesh.rotation.set(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2);
-        c.mesh.material.opacity = 0.90;
+        c.baseOpacity = 0.88;
+        c.mesh.material.opacity = 0.88;
         c.mesh.visible = true;
         c.active = true;
-        c.vy = -(0.018 + Math.random() * 0.024);
+        c.vy = -(0.016 + Math.random() * 0.022);
       }
     }
   }
@@ -655,6 +658,7 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
     humanHandGroup.position.set(0.12, -0.32, 3.8);
     humanHandGroup.rotation.set(-0.16, 0.38, -0.10);
     humanHandGroup.scale.set(1.30, 1.30, 1.30);
+    humanHandGroup.visible = false;
 
     const {
       animeGloveMaterial,
@@ -1332,6 +1336,11 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
       return;
     }
 
+    // Dismiss plain loading screen: 3D scene is ready and intro is starting!
+    if (typeof document !== 'undefined' && document.body) {
+      document.body.classList.remove('is-loading');
+    }
+
     isIntroPlaying = true;
     introStartTime = clock.getElapsedTime();
     hasSnapped = false;
@@ -1765,8 +1774,9 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
         c.mesh.rotation.z += c.rotSpeedZ;
 
         if (c.mesh.position.y < -1) {
+          const maxOp = c.baseOpacity || 0.88;
           const fade = Math.max(0, (c.mesh.position.y - (-8)) / 7);
-          c.mesh.material.opacity = Math.min(0.95, fade * 0.95);
+          c.mesh.material.opacity = Math.min(maxOp, fade * maxOp);
         }
 
         if (c.mesh.position.y < -8) {
@@ -1774,7 +1784,8 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
           c.mesh.visible = false;
           if (isCardRainLooping) {
             c.mesh.position.set((Math.random() - 0.5) * 18, 8 + Math.random() * 4, 2 + (Math.random() - 0.5) * 6);
-            c.mesh.material.opacity = 0.90;
+            c.baseOpacity = 0.88;
+            c.mesh.material.opacity = 0.88;
             c.mesh.visible = true;
             c.active = true;
           }
@@ -1880,7 +1891,8 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
     camera.updateProjectionMatrix();
 
     renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+    const maxPR = (width <= 768) ? 1.15 : 1.5;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, maxPR));
 
     if (composer) {
       composer.setSize(width, height);
@@ -1997,23 +2009,24 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
        * Trigger a lively 3D Pulse with Bloom Flare
        */
       pulse: function (intensity = 1.25) {
-        if (typeof gsap !== 'undefined') {
-          if (goldLight) {
-            gsap.to(goldLight, {
-              intensity: 3.8,
-              duration: 0.18,
-              yoyo: true,
-              repeat: 1
-            });
-          }
-          if (bloomPass) {
-            gsap.to(bloomPass, {
-              strength: 1.4,
-              duration: 0.18,
-              yoyo: true,
-              repeat: 1
-            });
-          }
+        if (typeof gsap === 'undefined') return;
+        const isMobile = window.innerWidth <= 768;
+        if (goldLight) {
+          gsap.to(goldLight, {
+            intensity: isMobile ? 2.4 : 3.8,
+            duration: 0.18,
+            yoyo: true,
+            repeat: 1
+          });
+        }
+        // On mobile, skip heavy multi-pass BloomPass shader tween to prevent GPU frame stall
+        if (bloomPass && !isMobile) {
+          gsap.to(bloomPass, {
+            strength: 1.4,
+            duration: 0.18,
+            yoyo: true,
+            repeat: 1
+          });
         }
       },
 
@@ -2047,8 +2060,8 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
        * Transition 3D scene elements when changing web SPA views
        */
       transitionView: function (viewId) {
-        // Keep 3D canvas (sakura petals, golden stardust, ambient card rain) clear & vibrant across all main views!
-        const targetOpacity = (viewId === 'contact') ? 0.40 : 0.85;
+        // Keep 3D canvas and falling cards clearly alive & visible across all views!
+        const targetOpacity = (viewId === 'contact') ? 0.45 : 0.85;
 
         if (typeof gsap !== 'undefined' && canvas) {
           gsap.to(canvas, {

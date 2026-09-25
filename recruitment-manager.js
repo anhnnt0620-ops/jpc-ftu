@@ -13,7 +13,7 @@
  *    - Backup JSON export & restore defaults
  */
 
-export const RECRUIT_STORAGE_KEY = 'jpc_recruitment_rounds_v2';
+export const RECRUIT_STORAGE_KEY = 'jpc_recruitment_rounds_v3';
 
 export const DEFAULT_ROUNDS = [
   {
@@ -24,7 +24,7 @@ export const DEFAULT_ROUNDS = [
     shortDesc: 'Điền form đăng ký trực tuyến với thông tin cơ bản & nguyện vọng chọn Ban.',
     monoUrl: 'Image/Monochrome/Vòng 1 - Mono.png',
     colorUrl: 'Image/Color/Vòng 1 - Color.png',
-    popupUrl: 'Image/Khung Popup - Tuyển Gen/Vòng 1 - Popup.png',
+    popupUrl: 'Image/Khung Popup - Tuyển Gen/Vòng 1 - Popup.png?v=20260925_rev3',
     fullDesc: `"Vòng 1: Khai Nhãn" (開眼 - Khai mở tầm nhìn và ước vọng) chính là bước khởi đầu trên hành trình bước chân vào thế giới của JPC FTU thế hệ Gen 22 — "Kokeshi Họa Ký".
 
 Trong văn hóa truyền thống Nhật Bản, búp bê Daruma khi mới được tạo ra chưa hề có mắt. Người sở hữu sẽ tự tay vẽ con mắt thứ nhất để gửi gắm một tâm nguyện lớn lao, và chỉ khi mục tiêu đã hoàn thành thì con mắt thứ hai mới được điểm sắc trọn vẹn. "Khai Nhãn" chính là thời khắc bạn chấm nét bút đầu tiên lên con búp bê Daruma của chính mình: xác định mục tiêu, bộc lộ khát khao và chọn cho mình bến đỗ tại JPC FTU.
@@ -44,7 +44,7 @@ Nội dung & Hình thức tham gia:
     shortDesc: 'Gặp gỡ, thảo luận nhóm để thể hiện cá tính, bản lĩnh và tinh thần đồng đội.',
     monoUrl: 'Image/Monochrome/Vòng 2 - Mono.png',
     colorUrl: 'Image/Color/Vòng 2 - Color.png',
-    popupUrl: 'Image/Khung Popup - Tuyển Gen/Vòng 2 - Popup.png',
+    popupUrl: 'Image/Khung Popup - Tuyển Gen/Vòng 2 - Popup.png?v=20260925_rev3',
     fullDesc: `"Vòng 2: Hòa Nhịp" (和 - Sự hòa hợp và nhịp đập đồng điệu), mang hình tượng Zashiki-warashi (ざしきわらし) — thần linh mang lại may mắn, tiếng cười và sự ấm áp sum vầy trong những ngôi nhà truyền thống Nhật Bản.
 
 Sau khi vượt qua Vòng Khai Nhãn, bạn sẽ bước vào buổi gặp gỡ trực tiếp cùng các ứng viên khác. Tại đây, sự hòa hợp và tinh thần tương trợ lẫn nhau chính là chìa khóa mở cánh cửa tiếp theo.
@@ -64,7 +64,7 @@ Nội dung & Hoạt động chính:
     shortDesc: 'Thực chiến cùng đồng đội đến từ các Ban qua đề bài được giao.',
     monoUrl: 'Image/Monochrome/Vòng 3.1 - Mono.png',
     colorUrl: 'Image/Color/Vòng 3.1 - Color.png',
-    popupUrl: 'Image/Khung Popup - Tuyển Gen/Vòng 3.1 - Popup.png',
+    popupUrl: 'Image/Khung Popup - Tuyển Gen/Vòng 3.1 - Popup.png?v=20260925_rev3',
     fullDesc: `"Vòng 3.1: Phá Phong" (破風 - Cưỡi gió phá sóng, bứt phá giới hạn), đại diện bởi linh vật Tengu (てんぐ) quyền năng với đôi cánh sải rộng giữa tầng không bão táp, biểu trưng cho sự quả cảm, tốc độ và năng lực thực chiến phi thường.
 
 Đây là chặng thử thách Teamwork kéo dài nhất của kỳ tuyển Gen 22. Bạn sẽ được phân vào một đội ngũ liên ban — mô phỏng chính xác mô hình vận hành dự án thực tế tại JPC FTU.
@@ -84,7 +84,7 @@ Hãy giương cao cánh buồm, cùng đồng đội phá tan cơn gió ngược
     shortDesc: 'Trò chuyện chuyên sâu cùng Trưởng - Phó Ban các ban chuyên trách.',
     monoUrl: 'Image/Monochrome/Vòng 3.2 - Mono.png',
     colorUrl: 'Image/Color/Vòng 3.2 - Color.png',
-    popupUrl: 'Image/Khung Popup - Tuyển Gen/Vòng 3.2 - Popup.png',
+    popupUrl: 'Image/Khung Popup - Tuyển Gen/Vòng 3.2 - Popup.png?v=20260925_rev3',
     fullDesc: `"Vòng 3.2: Chân diện" (真面 - Bộ mặt chân thật, cuộc đối thoại từ trái tim), gắn liền với hình tượng mặt nạ Kitsune (きつね - Hồ Ly Thần) bí ẩn và tinh anh của đền thần Inari. Chiếc mặt nạ được gỡ xuống cũng là lúc bạn đối diện chân thực nhất với chính mình.
 
 Đây là vòng phỏng vấn cá nhân 1-1 chuyên sâu cuối cùng trước khi cánh cổng Gen 22 chính thức khép lại.
@@ -104,7 +104,7 @@ Hãy giữ vững tâm thế tự tin và là chính mình một cách chân th�
     shortDesc: 'Chào đón các gương mặt xuất sắc chính thức trở thành thế hệ Gen 22 của JPC - FTU!',
     monoUrl: 'Image/Monochrome/Vòng 1 - Mono.png',
     colorUrl: 'Image/Color/Vòng 1 - Color.png',
-    popupUrl: 'Image/Khung Popup - Tuyển Gen/Vòng 1 - Popup.png',
+    popupUrl: 'Image/Khung Popup - Tuyển Gen/Vòng 1 - Popup.png?v=20260925_rev3',
     fullDesc: `"KOKESHI HỌA KÝ — HOÀN THÀNH BỨC TRANH GEN 22"
 
 Sau những chặng đường thử thách đầy cam go nhưng ngập tràn cảm xúc từ Khai Nhãn, Hòa Nhịp cho đến Phá Phong và Chân diện, kỳ tuyển thành viên Gen 22 của CLB Tiếng Nhật FTU đã chính thức về đích!
@@ -127,20 +127,32 @@ export class RecruitmentManager {
 
   init() {
     this.loadRounds();
+    this.preloadImages();
     this.renderUI();
     this.bindDOM();
   }
 
   /* ==========================================================
-     1. DATA STORAGE
+     1. DATA STORAGE & PRELOADING
      ========================================================== */
   loadRounds() {
     try {
-      const stored = localStorage.getItem(RECRUIT_STORAGE_KEY);
+      let stored = localStorage.getItem(RECRUIT_STORAGE_KEY);
+      if (!stored) {
+        stored = localStorage.getItem('jpc_recruitment_rounds_v2');
+      }
       if (stored) {
         const parsed = JSON.parse(stored);
         if (Array.isArray(parsed) && parsed.length >= 4) {
           this.rounds = parsed;
+          // Synchronize default popup URLs if they use default files (so fresh image updates take effect)
+          this.rounds.forEach((round) => {
+            const def = DEFAULT_ROUNDS.find((d) => d.id === round.id);
+            if (def && (!round.popupUrl || round.popupUrl.includes('Khung Popup - Tuyển Gen'))) {
+              round.popupUrl = def.popupUrl;
+            }
+          });
+          this.saveRounds();
           return;
         }
       }
@@ -149,6 +161,19 @@ export class RecruitmentManager {
     }
     this.rounds = JSON.parse(JSON.stringify(DEFAULT_ROUNDS));
     this.saveRounds();
+  }
+
+  preloadImages() {
+    if (typeof window === 'undefined') return;
+    this.rounds.forEach((round) => {
+      [round.popupUrl, round.monoUrl, round.colorUrl].forEach((url) => {
+        if (url && typeof url === 'string') {
+          const img = new Image();
+          img.decoding = 'async';
+          img.src = url;
+        }
+      });
+    });
   }
 
   saveRounds() {
@@ -233,7 +258,7 @@ export class RecruitmentManager {
     const resultRound = this.rounds.find(r => r.id === 'round-result') || DEFAULT_ROUNDS[4];
 
     resultContainer.innerHTML = `
-      <article class="join__result-banner" id="joinResultBanner" data-round-id="${resultRound.id}" tabindex="0" role="button" aria-label="Xem chi tiết Công bố kết quả">
+      <article class="join__result-banner" id="joinResultBanner">
         <div class="join__result-banner-glow" aria-hidden="true"></div>
         <div class="join__result-col join__result-col--badge">
           <div class="join__result-pill">
@@ -249,32 +274,8 @@ export class RecruitmentManager {
           <h3 class="join__result-title">${this.escapeHTML(resultRound.title)}</h3>
           <p class="join__result-desc">${this.escapeHTML(resultRound.shortDesc)}</p>
         </div>
-
-        <div class="join__result-col join__result-col--action">
-          <div class="join__result-action-btn">
-            <span>Xem chi tiết</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-              <polyline points="12 5 19 12 12 19"></polyline>
-            </svg>
-          </div>
-        </div>
       </article>
     `;
-
-    const banner = document.getElementById('joinResultBanner');
-    if (banner) {
-      const openHandler = () => {
-        this.openDetailModal(resultRound.id);
-      };
-      banner.addEventListener('click', openHandler);
-      banner.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          openHandler();
-        }
-      });
-    }
   }
 
   /* ==========================================================
@@ -295,7 +296,11 @@ export class RecruitmentManager {
     const descEl = document.getElementById('joinModalDesc');
 
     if (thumbEl) {
-      thumbEl.src = round.popupUrl || round.colorUrl || round.monoUrl;
+      const targetSrc = round.popupUrl || round.colorUrl || round.monoUrl;
+      thumbEl.decoding = 'async';
+      if (thumbEl.src !== targetSrc) {
+        thumbEl.src = targetSrc;
+      }
       thumbEl.alt = `${round.stepNo} - ${round.title}`;
     }
     if (stepNoEl) stepNoEl.textContent = round.stepNo;
