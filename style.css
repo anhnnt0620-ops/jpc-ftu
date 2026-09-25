@@ -12,6 +12,7 @@
   font-weight: 700;
   font-style: normal;
   font-display: swap;
+  unicode-range: U+2000-206F, U+2190-21FF, U+2200-22FF, U+25A0-25FF, U+2600-26FF, U+3000-303F, U+3040-309F, U+30A0-30FF, U+4E00-9FFF, U+F900-FAFF, U+FF00-FFEF;
 }
 
 @font-face {
@@ -28,6 +29,7 @@
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
+  unicode-range: U+2000-206F, U+2190-21FF, U+2200-22FF, U+25A0-25FF, U+2600-26FF, U+3000-303F, U+3040-309F, U+30A0-30FF, U+4E00-9FFF, U+F900-FAFF, U+FF00-FFEF;
 }
 
 @font-face {
@@ -1511,12 +1513,17 @@ section {
 }
 
 .section__tag {
-  font-family: 'HK Gokukaikk', var(--font-body);
+  font-family: 'HK Gokukaikk', var(--font-title), var(--font-body);
   letter-spacing: 0.12em;
   font-size: 0.9rem;
   color: var(--gold);
   margin-bottom: 0.5rem;
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
+}
+
+.section__tag .tag-latin {
+  font-family: var(--font-title);
+  letter-spacing: 0.14em;
 }
 
 .section__lede {
@@ -3156,6 +3163,14 @@ body.modal-scroll-lock .admin-portal * {
   border-radius: 999px;
   text-shadow: 0 0 10px rgba(238, 205, 126, 0.6);
   animation: themeBadgePulse 4s ease-in-out infinite alternate;
+}
+
+.join__theme-badge .badge-jp {
+  font-family: 'HK Gokukaikk', 'Noto Serif JP', serif;
+}
+
+.join__theme-badge .badge-latin {
+  font-family: var(--font-title);
 }
 
 @keyframes themeBadgePulse {

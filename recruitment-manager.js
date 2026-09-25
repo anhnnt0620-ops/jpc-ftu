@@ -325,6 +325,17 @@ export class RecruitmentManager {
     modal.classList.remove('is-closing');
     modal.classList.add('is-open');
 
+    // Refresh & reset description scroll position to top once modal is visible in the DOM
+    const resetScroll = () => {
+      if (descEl) descEl.scrollTop = 0;
+    };
+    resetScroll();
+    requestAnimationFrame(() => {
+      resetScroll();
+      requestAnimationFrame(resetScroll);
+    });
+    setTimeout(resetScroll, 60);
+
     // Focus close button
     const closeBtn = document.getElementById('joinModalCloseBtn');
     if (closeBtn) closeBtn.focus();
@@ -334,9 +345,14 @@ export class RecruitmentManager {
     const modal = document.getElementById('joinDetailModal');
     if (!modal || !modal.classList.contains('is-open') || modal.classList.contains('is-closing')) return;
 
+    // Pre-reset scroll before close animation completes
+    const descEl = document.getElementById('joinModalDesc');
+    if (descEl) descEl.scrollTop = 0;
+
     modal.classList.add('is-closing');
     setTimeout(() => {
       modal.classList.remove('is-open', 'is-closing');
+      if (descEl) descEl.scrollTop = 0;
       this.checkAndRestoreScroll();
     }, 350);
   }
