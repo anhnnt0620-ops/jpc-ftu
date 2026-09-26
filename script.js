@@ -924,9 +924,7 @@ function initHeroIntroTimeline() {
   const handleIntroComplete = () => {
     if (hasSkipped) return;
     settleAndStartTyping();
-    if (!isMusicPlaying || (bgAudio && bgAudio.paused)) {
-      startMusicPlayback();
-    }
+    startAutoPlay();
   };
 
   // Connect directly with Three.js 3D Finger-Snap Intro Engine
@@ -1000,9 +998,7 @@ function initHeroIntroTimeline() {
         }, 1600);
         // All animations (cards settling & typewriter) have fully finished! Start music automatically!
         notifyIntroComplete();
-        if (!isMusicPlaying || (bgAudio && bgAudio.paused)) {
-          startMusicPlayback();
-        }
+        startAutoPlay();
       }
     };
 
@@ -1032,9 +1028,7 @@ function initHeroIntroTimeline() {
       titleCursorEl.classList.add('is-hidden');
     }
 
-    if (typeof startMusicPlayback === 'function') {
-      startMusicPlayback();
-    }
+    startAutoPlay();
   }
 
   // Any tap or click on the hero banner primes audio & user gesture without canceling 3D intro!
@@ -1043,13 +1037,20 @@ function initHeroIntroTimeline() {
       if (e.target.closest('a, button, input, textarea, #musicPlayer')) return;
       hasUserInteracted = true;
       unlockAudioContext();
-      if (!isMusicPlaying || (bgAudio && bgAudio.paused)) {
-        startMusicPlayback();
+      if (bgAudio) {
+        bgAudio.muted = false;
+        try {
+          const playlist = getPlaylist();
+          const currentTrack = playlist[currentTrackIndex] || playlist[0];
+          bgAudio.volume = getTrackTargetVolume(currentTrack);
+        } catch (_) {}
       }
+      startMusicPlayback();
     };
-    hero.addEventListener('click', onHeroInteract);
-    hero.addEventListener('pointerdown', onHeroInteract);
+    hero.addEventListener('click', onHeroInteract, { capture: true });
+    hero.addEventListener('touchend', onHeroInteract, { capture: true });
     hero.addEventListener('touchstart', onHeroInteract, { passive: true });
+    hero.addEventListener('pointerdown', onHeroInteract, { capture: true });
   }
 
   // Pressing Escape skips intro if user explicitly wishes to skip
@@ -1093,7 +1094,7 @@ function isMobileDevice() {
 // Mỗi bài hát được chuẩn hóa gain (EBU R128 / RMS) dựa trên bản nhạc không lời Inazuma & Genshin OST
 // giúp các bài hát thương mại (J-Pop / Anime) có âm lượng hoàn toàn đồng dạng với các bản không lời.
 function getBgmBaseVolume() {
-  return isMobileDevice() ? 0.10 : 0.20;
+  return isMobileDevice() ? 0.75 : 0.50;
 }
 
 let volumeFadeTimer = null;
@@ -1102,7 +1103,7 @@ function getTrackTargetVolume(track) {
   const currentTrack = track || (getPlaylist()[currentTrackIndex]);
   const trackGain = (currentTrack && typeof currentTrack.gain === 'number') ? currentTrack.gain : 1.0;
   const baseVol = getBgmBaseVolume();
-  return Math.max(0.01, Math.min(1.0, baseVol * trackGain));
+  return Math.max(0.05, Math.min(1.0, baseVol * trackGain));
 }
 
 function applyBgmVolume(smooth = false, track = null) {
@@ -1122,11 +1123,11 @@ function applyBgmVolume(smooth = false, track = null) {
     return;
   }
 
-  // Smooth gentle fade-in ramp (200ms) on desktop starting strictly from 0 to prevent DAC pop or click
-  const startVol = 0.0;
-  try { bgAudio.volume = 0.0; } catch (_) {}
+  // Smooth gentle fade-in ramp (200ms) on desktop from current volume
+  const startVol = (typeof bgAudio.volume === 'number' && bgAudio.volume > 0) ? bgAudio.volume : 0.05;
+  try { bgAudio.volume = startVol; } catch (_) {}
   const duration = 200;
-  const steps = 10;
+  const steps = 8;
   const stepTime = duration / steps;
   const volInc = (targetVol - startVol) / steps;
   let currentStep = 0;
@@ -1138,8 +1139,8 @@ function applyBgmVolume(smooth = false, track = null) {
       return;
     }
     try {
-      const nextVol = Math.min(targetVol, bgAudio.volume + volInc);
-      bgAudio.volume = Math.max(0, Math.min(1, nextVol));
+      const nextVol = bgAudio.volume + volInc;
+      bgAudio.volume = Math.max(0.01, Math.min(1, nextVol));
       if (currentStep >= steps || bgAudio.volume >= targetVol) {
         bgAudio.volume = targetVol;
         clearInterval(volumeFadeTimer);
@@ -1430,9 +1431,7 @@ function initMusicPlayerUI() {
   // Auto-play when hero intro completes
   window.addEventListener('heroIntroComplete', () => {
     isIntroAnimationFinished = true;
-    if (!isMusicPlaying || (bgAudio && bgAudio.paused)) {
-      startMusicPlayback();
-    }
+    startAutoPlay();
     updateTitleMarquee();
   });
 
@@ -1442,12 +1441,11 @@ function initMusicPlayerUI() {
 
 const unlockEvents = [
   'touchstart',
+  'touchend',
   'click',
   'pointerdown',
   'mousedown',
-  'touchend',
-  'keydown',
-  'wheel'
+  'keydown'
 ];
 
 function unlockAudioContext() {
@@ -1469,6 +1467,15 @@ function handleGlobalUserGesture(e) {
   hasUserInteracted = true;
   unlockAudioContext();
 
+  if (bgAudio) {
+    bgAudio.muted = false;
+    try {
+      const playlist = getPlaylist();
+      const track = playlist[currentTrackIndex] || playlist[0];
+      bgAudio.volume = getTrackTargetVolume(track);
+    } catch (_) {}
+  }
+
   // Synchronously prime the background audio element on user gesture
   if (bgAudio && (!bgAudio.src || bgAudio.src === '')) {
     const playlist = getPlaylist();
@@ -1479,8 +1486,8 @@ function handleGlobalUserGesture(e) {
     }
   }
 
-  // Trigger music whenever autoplay is pending or audio is paused
-  if (pendingAutoPlay || !isMusicPlaying || (bgAudio && bgAudio.paused)) {
+  // Trigger music whenever autoplay is pending or audio is paused/muted
+  if (pendingAutoPlay || !isMusicPlaying || (bgAudio && (bgAudio.paused || bgAudio.muted))) {
     startMusicPlayback();
   }
 }
@@ -1501,9 +1508,7 @@ function removeGlobalUnlockListeners() {
 
 function startAutoPlay() {
   pendingAutoPlay = true;
-  if (!isMusicPlaying || (bgAudio && bgAudio.paused)) {
-    startMusicPlayback();
-  }
+  startMusicPlayback();
 }
 
 function startMusicPlayback() {
@@ -1512,6 +1517,10 @@ function startMusicPlayback() {
   updateTitleMarquee();
 
   const playerEl = document.getElementById('musicPlayer');
+  isMusicPlaying = true;
+  if (playerEl) {
+    playerEl.classList.add('is-playing');
+  }
 
   // Ensure current track is properly loaded if audio was in error state or empty
   const playlist = getPlaylist();
@@ -1543,29 +1552,24 @@ function startMusicPlayback() {
         removeGlobalUnlockListeners();
       })
       .catch((err) => {
-        isMusicPlaying = false;
-        if (playerEl) {
-          playerEl.classList.remove('is-playing');
-        }
         if (!err || err.name === 'AbortError') return;
 
         if (err.name === 'NotAllowedError') {
           // Browser autoplay restriction waiting for first user gesture
           pendingAutoPlay = true;
+          isMusicPlaying = false;
+          if (playerEl) {
+            playerEl.classList.remove('is-playing');
+          }
           if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
 
-          const triggerOnFirstGesture = () => {
-            ['pointerdown', 'mousedown', 'touchstart', 'click', 'keydown', 'wheel'].forEach((ev) => {
-              window.removeEventListener(ev, triggerOnFirstGesture, { capture: true });
-              document.removeEventListener(ev, triggerOnFirstGesture, { capture: true });
-            });
-            unlockAudioContext();
-            startMusicPlayback();
-          };
-          ['pointerdown', 'mousedown', 'touchstart', 'click', 'keydown', 'wheel'].forEach((ev) => {
-            window.addEventListener(ev, triggerOnFirstGesture, { capture: true, once: true });
-            document.addEventListener(ev, triggerOnFirstGesture, { capture: true, once: true });
-          });
+          // Try muted playback so the audio stream begins decoding in background without blocking
+          try {
+            bgAudio.muted = true;
+            bgAudio.play().then(() => {
+              if (playerEl) playerEl.classList.add('is-playing');
+            }).catch(() => {});
+          } catch (_) {}
         } else {
           // Genuine media error: safely try next track with retry cap
           console.warn('[JPC Audio] Playback error on start:', err.name, err.message);
