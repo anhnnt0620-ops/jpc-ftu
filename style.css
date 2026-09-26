@@ -7,18 +7,17 @@
    FONTS
    ========================================================== */
 @font-face {
-  font-family: 'JPC Card';
+  font-family: 'HK Gokukaikk';
   src: url('Font/hkgokukaikk.ttf') format('truetype');
-  font-weight: 700;
+  font-weight: 400;
   font-style: normal;
   font-display: swap;
-  unicode-range: U+2000-206F, U+2190-21FF, U+2200-22FF, U+25A0-25FF, U+2600-26FF, U+3000-303F, U+3040-309F, U+30A0-30FF, U+4E00-9FFF, U+F900-FAFF, U+FF00-FFEF;
 }
 
 @font-face {
-  font-family: 'JPC Gyosho';
-  src: url('Font/epgyosho.ttf') format('truetype');
-  font-weight: 400 700;
+  font-family: 'HK Gokukaikk';
+  src: url('Font/hkgokukaikk.ttf') format('truetype');
+  font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
@@ -29,7 +28,38 @@
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
-  unicode-range: U+2000-206F, U+2190-21FF, U+2200-22FF, U+25A0-25FF, U+2600-26FF, U+3000-303F, U+3040-309F, U+30A0-30FF, U+4E00-9FFF, U+F900-FAFF, U+FF00-FFEF;
+}
+
+@font-face {
+  font-family: 'JPC Card';
+  src: url('Font/hkgokukaikk.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JPC Card';
+  src: url('Font/hkgokukaikk.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JPC Card';
+  src: url('Font/hkgokukaikk.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JPC Gyosho';
+  src: url('Font/epgyosho.ttf') format('truetype');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
@@ -683,10 +713,15 @@ h1, h2, h3 {
   color: var(--gold-bright);
 }
 
+.nav__item--dropdown.is-force-closed .nav__arrow {
+  transform: rotate(0deg) !important;
+  color: var(--gold) !important;
+}
+
 /* Primary Dropdown Container: Compact single vertical menu, không bung ngang, không tràn màn hình */
 .nav__dropdown {
   position: absolute;
-  top: calc(100% - 6px);
+  top: calc(100% + 8px);
   left: 0;
   width: 270px;
   max-width: calc(100vw - 32px);
@@ -708,10 +743,10 @@ h1, h2, h3 {
 .nav__dropdown::before {
   content: "";
   position: absolute;
-  top: -16px;
+  top: -20px;
   left: 0;
   right: 0;
-  height: 16px;
+  height: 20px;
 }
 
 .nav__item--dropdown:hover .nav__dropdown,
@@ -892,7 +927,7 @@ a.nav__dropdown-item:hover .nav__dropdown-title,
 }
 
 /* Desktop: Hover vào mục "Cơ cấu tổ chức" là dropdown list 5 Ban hiển thị ngay lập tức (không cần click mũi tên) */
-@media (min-width: 721px) {
+@media (min-width: 861px) {
   .nav__dropdown-branch:hover .nav__subdropdown,
   .nav__dropdown-branch:focus-within .nav__subdropdown,
   .nav__dropdown-branch.is-open .nav__subdropdown {
@@ -1923,7 +1958,7 @@ section {
   z-index: 2;
   width: 92%;
   max-width: 860px;
-  min-height: 500px;
+  min-height: 400px;
   max-height: 90vh;
   border-radius: 20px;
   border: 2px solid transparent;
@@ -3013,6 +3048,19 @@ body.modal-scroll-lock .admin-portal * {
    RESPONSIVE OPTIMIZATIONS (TABLET & MOBILE)
    ========================================================== */
 @media (max-width: 900px) {
+  .event-modal-dialog {
+    min-height: auto !important;
+    max-height: 88svh !important;
+    overflow-y: auto !important;
+  }
+
+  .event-modal-close {
+    width: 44px;
+    height: 44px;
+    top: 12px;
+    right: 12px;
+  }
+
   .event-modal-body {
     grid-template-columns: 1fr;
     gap: 1.8rem;
@@ -3766,6 +3814,12 @@ body.modal-scroll-lock .admin-portal * {
 }
 
 @media (max-width: 900px) {
+  .join-modal .event-modal-dialog {
+    min-height: auto !important;
+    max-height: 88svh !important;
+    overflow-y: auto !important;
+  }
+
   .join-modal .event-modal-body {
     flex-direction: column;
     gap: 1.5rem;
@@ -4081,6 +4135,146 @@ body.modal-scroll-lock .admin-portal * {
   margin: 0 auto;
 }
 
+/* ==========================================================
+   DEPARTMENT SUB-COMMITTEES (TIỂU BAN TRỰC THUỘC)
+   ========================================================== */
+.dept__subunits {
+  position: relative;
+  z-index: 2;
+  margin: 2.2rem auto 0;
+  max-width: 800px;
+  width: 100%;
+}
+
+.dept__subunits-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.35rem;
+}
+
+.dept__subunits-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(207, 159, 63, 0.42), transparent);
+}
+
+.dept__subunits-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: var(--font-card);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold-bright);
+  padding: 0.32rem 1.15rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(207, 159, 63, 0.12) 0%, rgba(138, 30, 48, 0.16) 100%);
+  border: 1px solid rgba(207, 159, 63, 0.35);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 234, 167, 0.15);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.85);
+}
+
+.dept__subunits-gem {
+  font-size: 0.65rem;
+  color: var(--gold);
+  opacity: 0.9;
+}
+
+.dept__subunits-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.35rem;
+  text-align: center;
+}
+
+.dept__subunit-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1.45rem 1.6rem;
+  border-radius: 12px;
+  background: linear-gradient(145deg, rgba(32, 12, 16, 0.85) 0%, rgba(14, 5, 8, 0.92) 100%);
+  border: 1.2px solid rgba(207, 159, 63, 0.38);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 234, 167, 0.12);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  overflow: hidden;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dept__subunit-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(238, 205, 126, 0.75);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.75), 0 0 22px rgba(207, 159, 63, 0.22);
+}
+
+.dept__subunit-glow {
+  position: absolute;
+  top: -40%;
+  left: -20%;
+  width: 140%;
+  height: 180%;
+  background: radial-gradient(circle at 50% 30%, rgba(207, 159, 63, 0.14) 0%, transparent 65%);
+  pointer-events: none;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.dept__subunit-card:hover .dept__subunit-glow {
+  opacity: 1;
+}
+
+.dept__subunit-title {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-title), 'Montserrat', sans-serif;
+  font-size: 1.16rem;
+  font-weight: 700;
+  color: var(--white-pure);
+  text-transform: uppercase;
+  margin: 0 0 0.55rem;
+  letter-spacing: 0.05em;
+  line-height: 1.3;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+}
+
+.dept__subunit-desc {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.90);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.85);
+  max-width: 330px;
+}
+
+@media (max-width: 680px) {
+  .dept__subunits {
+    margin-top: 1.8rem;
+  }
+
+  .dept__subunits-grid {
+    grid-template-columns: 1fr;
+    gap: 0.95rem;
+  }
+
+  .dept__subunit-card {
+    padding: 1.25rem 1.3rem;
+  }
+
+  .dept__subunit-title {
+    font-size: 1.08rem;
+  }
+}
+
 /* 3 Core Activity Cards */
 .dept__grid {
   display: grid;
@@ -4328,12 +4522,39 @@ body.modal-scroll-lock .admin-portal * {
   background: radial-gradient(circle at center, rgba(238, 205, 126, 0.16) 0%, transparent 68%);
 }
 
+/* Vầng sáng gradient nhẹ (Soft radiant glow) xung quanh kokeshi tương tự highlight mascot Tuyển thành viên */
+.dept-card__art::before {
+  content: '';
+  position: absolute;
+  inset: 16px 18px 4px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(238, 205, 126, 0.32) 0%, rgba(168, 35, 56, 0.20) 50%, transparent 72%);
+  filter: blur(14px);
+  pointer-events: none;
+  transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease, background 0.5s ease;
+  will-change: transform, opacity;
+  z-index: 0;
+}
+
+.dept-card:hover .dept-card__art::before {
+  transform: scale(1.25);
+  opacity: 1;
+  background: radial-gradient(circle, rgba(238, 205, 126, 0.60) 0%, rgba(207, 159, 63, 0.36) 50%, transparent 72%);
+  filter: blur(18px);
+}
+
 .dept-card__kokeshi {
   width: auto;
-  height: 148px;
-  max-width: 112px;
+  height: 145px;
+  max-width: 145px;
   object-fit: contain;
-  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.45));
+  position: relative;
+  z-index: 1;
+  transform: translateY(6px);
+  /* Lớp viền gradient phát sáng nhẹ ôm quanh viền kokeshi chống chìm vào nền tối */
+  filter: drop-shadow(0 0 10px rgba(238, 205, 126, 0.48)) 
+          drop-shadow(0 0 20px rgba(207, 159, 63, 0.26)) 
+          drop-shadow(0 6px 14px rgba(0, 0, 0, 0.55));
   transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.4s ease;
 }
 
@@ -4349,7 +4570,7 @@ body.modal-scroll-lock .admin-portal * {
 
 .dept-card__jp {
   font-family: 'HK Gokukaikk', 'Noto Serif JP', serif;
-  font-size: 1.18rem;
+  font-size: 1.10rem;
   color: var(--gold-bright);
   letter-spacing: 0.08em;
   margin-bottom: 0.25rem;
@@ -4359,7 +4580,7 @@ body.modal-scroll-lock .admin-portal * {
 
 .dept-card__title {
   font-family: var(--font-title);
-  font-size: 1.02rem;
+  font-size: 0.98rem;
   font-weight: 700;
   color: var(--white-pure);
   margin: 0 0 0.45rem;
@@ -4427,7 +4648,9 @@ body.modal-scroll-lock .admin-portal * {
 
 .dept-card:hover .dept-card__kokeshi {
   transform: scale(1.08) translateY(-4px);
-  filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.65)) drop-shadow(0 0 15px rgba(254, 240, 138, 0.5));
+  filter: drop-shadow(0 0 18px rgba(254, 240, 138, 0.85)) 
+          drop-shadow(0 0 30px rgba(238, 205, 126, 0.50)) 
+          drop-shadow(0 10px 18px rgba(0, 0, 0, 0.65));
 }
 
 .dept-card:hover .dept-card__jp {
@@ -4466,10 +4689,56 @@ body.modal-scroll-lock .admin-portal * {
     display: block;
     font-size: 0.68rem;
   }
+  /* Prevent iOS auto-zoom on input focus */
+  .admin-input,
+  .admin-textarea,
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
 }
 
-/* Tablet (481px - 768px): Card scaling & Ambient optimization */
-@media (min-width: 481px) and (max-width: 768px) {
+@media (min-width: 681px) and (max-width: 860px) {
+  /* Center 3rd item nicely in 2-column tablet layout */
+  .pillars {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .pillars .pillar:nth-child(3) {
+    grid-column: 1 / -1 !important;
+    max-width: 460px !important;
+    width: 100% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+  .dept__grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .dept__grid .dept__card:nth-child(3) {
+    grid-column: 1 / -1 !important;
+    max-width: 480px !important;
+    width: 100% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+  /* Tablet (681px - 860px): Balanced 3+2 layout for 5 Japanese Ban cards */
+  .about-org-grid {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 1.15rem !important;
+    max-width: 840px !important;
+    margin: 1.8rem auto 0 !important;
+  }
+  .about-org-grid .dept-card {
+    flex: 0 1 calc(33.333% - 1.15rem) !important;
+    min-width: 200px !important;
+    max-width: 250px !important;
+  }
+}
+
+/* Tablet (481px - 860px): Card scaling & Ambient optimization */
+@media (min-width: 481px) and (max-width: 860px) {
   .hero__cards {
     height: 165px;
     max-width: 500px;
@@ -4545,8 +4814,8 @@ body.modal-scroll-lock .admin-portal * {
   }
 }
 
-/* Mobile Screens (<= 720px) */
-@media (max-width: 720px) {
+/* Mobile & Tablet Navigation Screens (<= 860px) */
+@media (max-width: 860px) {
   :root {
     --nav-h: 54px;
   }
@@ -5249,13 +5518,18 @@ body.modal-scroll-lock .admin-portal * {
   }
 
   .about-org-grid {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     gap: 1rem;
-    max-width: 320px;
+    width: 100%;
+    max-width: 350px;
     margin-left: auto;
     margin-right: auto;
   }
   .dept-card {
+    width: 100%;
+    max-width: 340px;
     padding: 1rem 0.85rem;
   }
 
@@ -5692,8 +5966,8 @@ body.modal-scroll-lock .admin-portal * {
   height: 14px;
 }
 
-/* Responsive for Mobile */
-@media (max-width: 720px) {
+/* Responsive for Tablet & Mobile */
+@media (max-width: 900px) {
   .music-player {
     top: auto !important;
     bottom: calc(14px + env(safe-area-inset-bottom, 0px)) !important;
@@ -5729,6 +6003,14 @@ body.modal-scroll-lock .admin-portal * {
   .music-player__shuffle-icon {
     width: 14px;
     height: 14px;
+  }
+  /* WCAG Accessible touch target (44x44px hitbox) */
+  .music-player__cd-btn::after,
+  .music-player__btn--shuffle::after {
+    content: "";
+    position: absolute;
+    inset: -7px;
+    border-radius: 50%;
   }
 }
 
@@ -5977,6 +6259,15 @@ body.ban-transition-active .falling-cards {
   }
 }
 
+@media (max-width: 420px) {
+  :root {
+    --vortex-radius: 104px;
+    --vortex-radius-selected: 122px;
+    --vortex-card-w: 74px;
+    --vortex-card-h: 112px;
+  }
+}
+
 .ban-transition__ring {
   position: absolute;
   left: 50%;
@@ -6067,6 +6358,20 @@ body.ban-transition-active .falling-cards {
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+  transform: translateY(10px);
+}
+
+.ban-vortex-card__art::before {
+  content: '';
+  position: absolute;
+  width: 75px;
+  height: 75px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(238, 205, 126, 0.32) 0%, rgba(168, 35, 56, 0.18) 50%, transparent 72%);
+  filter: blur(10px);
+  pointer-events: none;
+  z-index: 0;
 }
 
 .ban-vortex-card__art img {
@@ -6074,7 +6379,12 @@ body.ban-transition-active .falling-cards {
   height: 90%;
   max-width: 90%;
   object-fit: contain;
-  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.55));
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 0 8px rgba(238, 205, 126, 0.45)) 
+          drop-shadow(0 0 16px rgba(207, 159, 63, 0.25)) 
+          drop-shadow(0 4px 10px rgba(0, 0, 0, 0.55));
+  transition: filter 0.3s ease;
 }
 
 .ban-vortex-card__info {
@@ -6090,7 +6400,7 @@ body.ban-transition-active .falling-cards {
 
 .ban-vortex-card__jp {
   font-family: 'HK Gokukaikk', 'Noto Serif JP', serif;
-  font-size: 1.12rem;
+  font-size: 0.96rem;
   font-weight: 700;
   color: #fef08a;
   letter-spacing: 0.08em;
@@ -6100,7 +6410,7 @@ body.ban-transition-active .falling-cards {
 
 .ban-vortex-card__name {
   font-family: var(--font-title);
-  font-size: 0.74rem;
+  font-size: 0.65rem;
   font-weight: 700;
   color: #fff;
   white-space: nowrap;
@@ -6109,11 +6419,26 @@ body.ban-transition-active .falling-cards {
 }
 
 @media (max-width: 768px) {
+  .ban-vortex-card__art {
+    transform: translateY(6px);
+  }
   .ban-vortex-card__jp {
-    font-size: 0.88rem;
+    font-size: 0.76rem;
   }
   .ban-vortex-card__name {
-    font-size: 0.63rem;
+    font-size: 0.54rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .ban-vortex-card__art {
+    transform: translateY(4px);
+  }
+  .ban-vortex-card__jp {
+    font-size: 0.68rem;
+  }
+  .ban-vortex-card__name {
+    font-size: 0.50rem;
   }
 }
 

@@ -109,6 +109,11 @@ window.fireJapaneseConfetti = fireJapaneseConfetti;
  * 3. 3D Magnetic Card Hover Physics
  */
 function init3DCardHoverPhysics() {
+  // Only bind 3D magnetic tilt on devices with mouse/trackpad (prevents touch scroll stutter on phones & iPads)
+  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    return;
+  }
+
   const cards = document.querySelectorAll('.about__card, .dept__card, .journey__step, .join__card, .timeline__item, .dept-card');
 
   cards.forEach((card) => {

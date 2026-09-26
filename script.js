@@ -85,15 +85,18 @@ function initNavToggle() {
     const arrowBtn = aboutParent.querySelector('.nav__arrow');
     if (arrowBtn) {
       arrowBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        const isOpen = aboutDropdown.classList.toggle('is-open');
-        aboutParent.setAttribute('aria-expanded', String(isOpen));
-        if (!isOpen && branchOrg) {
-          branchOrg.classList.remove('is-open');
-          if (branchArrowBtn) {
-            branchArrowBtn.setAttribute('aria-expanded', 'false');
-            branchArrowBtn.blur();
+        // Chỉ trên mobile menu mới toggle accordion khi bấm mũi tên
+        if (window.innerWidth <= 860 || document.body.classList.contains('menu-open')) {
+          e.preventDefault();
+          e.stopPropagation();
+          const isOpen = aboutDropdown.classList.toggle('is-open');
+          aboutParent.setAttribute('aria-expanded', String(isOpen));
+          if (!isOpen && branchOrg) {
+            branchOrg.classList.remove('is-open');
+            if (branchArrowBtn) {
+              branchArrowBtn.setAttribute('aria-expanded', 'false');
+              branchArrowBtn.blur();
+            }
           }
         }
       });
@@ -101,17 +104,24 @@ function initNavToggle() {
 
     // Direct click handler on "Về JPC" link: immediately navigates to "Giới thiệu chung về JPC" (#about)
     aboutParent.addEventListener('click', (e) => {
-      // If clicking specifically on the small arrow icon, allow arrowBtn handler to toggle dropdown
-      if (e.target && (e.target.classList.contains('nav__arrow') || e.target.closest('.nav__arrow'))) {
+      // Trên mobile, nếu bấm chính xác vào mũi tên thì để handler arrowBtn xử lý toggle accordion
+      if ((window.innerWidth <= 860 || document.body.classList.contains('menu-open')) && e.target && (e.target.classList.contains('nav__arrow') || e.target.closest('.nav__arrow'))) {
         return;
       }
 
       e.preventDefault();
+      e.stopPropagation();
 
       // Immediately dismiss dropdown and mobile hamburger menu
       aboutDropdown.classList.remove('is-open');
       aboutDropdown.classList.add('is-force-closed');
-      setTimeout(() => aboutDropdown.classList.remove('is-force-closed'), 400);
+
+      const resetForceClosed = () => {
+        aboutDropdown.classList.remove('is-force-closed');
+        aboutDropdown.removeEventListener('mouseleave', resetForceClosed);
+      };
+      aboutDropdown.addEventListener('mouseleave', resetForceClosed);
+      setTimeout(resetForceClosed, 2500);
 
       if (branchOrg) branchOrg.classList.remove('is-open');
 
@@ -183,7 +193,7 @@ function initNavToggle() {
 
   if (branchOrg && branchArrowBtn) {
     branchOrg.addEventListener('mouseenter', () => {
-      if (window.innerWidth > 720) {
+      if (window.innerWidth > 860) {
         branchArrowBtn.setAttribute('aria-expanded', 'true');
       }
     });
@@ -599,7 +609,12 @@ function initViewNavigation() {
       if (aboutDropdown) {
         aboutDropdown.classList.remove('is-open');
         aboutDropdown.classList.add('is-force-closed');
-        setTimeout(() => aboutDropdown.classList.remove('is-force-closed'), 400);
+        const resetFC = () => {
+          aboutDropdown.classList.remove('is-force-closed');
+          aboutDropdown.removeEventListener('mouseleave', resetFC);
+        };
+        aboutDropdown.addEventListener('mouseleave', resetFC);
+        setTimeout(resetFC, 2500);
       }
       if (branchOrg) branchOrg.classList.remove('is-open');
     };
@@ -646,7 +661,7 @@ function initGoldNeedles() {
 
   if (!needleField || prefersReducedMotion) return;
 
-  const isMobile = window.innerWidth <= 768;
+  const isMobile = isMobileDevice();
   const count = isMobile ? 8 : 12;
   const fragment = document.createDocumentFragment();
   for (let i = 0; i < count; i++) {
@@ -676,7 +691,7 @@ function initFallingCards() {
   if (!container || prefersReducedMotion) return;
 
   container.innerHTML = '';
-  const isMobile = window.innerWidth <= 768;
+  const isMobile = isMobileDevice();
   const count = isMobile ? 14 : 28;
   const fragment = document.createDocumentFragment();
 
@@ -1066,7 +1081,10 @@ let lastCdClickTime = 0;
 let isTrackSwitching = false;
 
 function isMobileDevice() {
-  return window.innerWidth <= 768 || /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+  const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 1);
+  const isIpadOS = (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const isMobileUA = /Android|iPhone|iPad|iPod|Mobile|Silk|Tablet/i.test(navigator.userAgent);
+  return window.innerWidth <= 1024 || isTouch || isIpadOS || isMobileUA;
 }
 
 // BGM Volume Calibration & Loudness Normalization
@@ -1420,6 +1438,7 @@ function initMusicPlayerUI() {
 }
 
 const unlockEvents = [
+  'touchstart',
   'click',
   'pointerdown',
   'touchend',
