@@ -223,8 +223,6 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
     if (pendingIntroCall) {
       startIntroTimeline(pendingIntroCall.onSnap, pendingIntroCall.onComplete);
       pendingIntroCall = null;
-    } else {
-      startAmbientCardRain();
     }
 
     console.info('[JPC 3D] Authentic Bio-Kinematic Hand & UnrealBloom 3D Engine ready.');
@@ -371,8 +369,10 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
       map: cardTexture,
       side: THREE.DoubleSide,
       transparent: true,
-      roughness: 0.35,
-      metalness: 0.25,
+      roughness: 0.20,
+      metalness: 0.50,
+      emissive: 0x5a0c18,
+      emissiveIntensity: 0.28,
       opacity: 0.95
     });
 
@@ -385,15 +385,15 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
       cardRainData.push({
         mesh,
         initX: (Math.random() - 0.5) * 16,
-        initY: 6 + Math.random() * 8,
+        initY: 6 + Math.random() * 7,
         initZ: 2 + (Math.random() - 0.5) * 6,
-        vy: -(0.07 + Math.random() * 0.08),
-        vx: (Math.random() - 0.5) * 0.035,
-        vz: (Math.random() - 0.5) * 0.02,
-        rotSpeedX: (Math.random() - 0.5) * 0.08,
-        rotSpeedY: (Math.random() - 0.5) * 0.09,
-        rotSpeedZ: (Math.random() - 0.5) * 0.06,
-        flutterSpeed: 2.2 + Math.random() * 3.0,
+        vy: -(0.055 + Math.random() * 0.040),
+        vx: (Math.random() - 0.5) * 0.025,
+        vz: (Math.random() - 0.5) * 0.018,
+        rotSpeedX: (Math.random() - 0.5) * 0.065,
+        rotSpeedY: (Math.random() - 0.5) * 0.075,
+        rotSpeedZ: (Math.random() - 0.5) * 0.045,
+        flutterSpeed: 1.8 + Math.random() * 2.2,
         flutterPhase: Math.random() * Math.PI * 2,
         active: false
       });
@@ -419,25 +419,8 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
   }
 
   function startAmbientCardRain() {
-    if (!cardRainGroup) return;
-    cardRainGroup.visible = true;
-    isCardRainLooping = true;
-    for (let i = 0; i < cardRainData.length; i++) {
-      const c = cardRainData[i];
-      if (!c.active) {
-        c.mesh.position.set(
-          (Math.random() - 0.5) * 18,
-          -7 + Math.random() * 16,
-          2 + (Math.random() - 0.5) * 6
-        );
-        c.mesh.rotation.set(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2);
-        c.baseOpacity = 0.88;
-        c.mesh.material.opacity = 0.88;
-        c.mesh.visible = true;
-        c.active = true;
-        c.vy = -(0.016 + Math.random() * 0.022);
-      }
-    }
+    // Disabled per user request: 3D card rain only falls once after hero snap at home
+    isCardRainLooping = false;
   }
 
   /**
@@ -1741,7 +1724,6 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
           onIntroCompleteCallback();
           onIntroCompleteCallback = null;
         }
-        startAmbientCardRain();
       }
     }
 
@@ -1784,25 +1766,25 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
         c.mesh.rotation.y += c.rotSpeedY;
         c.mesh.rotation.z += c.rotSpeedZ;
 
-        if (c.mesh.position.y < -1) {
-          const maxOp = c.baseOpacity || 0.88;
-          const fade = Math.max(0, (c.mesh.position.y - (-8)) / 7);
+        // Dynamic specular shimmer & light glint ("ánh xạ" phản chiếu lấp lánh khi lá bài xoay đón hướng sáng)
+        if (c.mesh.material) {
+          const shimmer = Math.abs(Math.sin(elapsedTime * 2.2 + c.flutterPhase));
+          c.mesh.material.emissiveIntensity = 0.20 + shimmer * 0.35;
+        }
+
+        // Smooth natural fade near the bottom threshold
+        if (c.mesh.position.y < -3) {
+          const maxOp = c.baseOpacity || 0.95;
+          const fade = Math.max(0, (c.mesh.position.y - (-8)) / 5);
           c.mesh.material.opacity = Math.min(maxOp, fade * maxOp);
         }
 
         if (c.mesh.position.y < -8) {
           c.active = false;
           c.mesh.visible = false;
-          if (isCardRainLooping) {
-            c.mesh.position.set((Math.random() - 0.5) * 18, 8 + Math.random() * 4, 2 + (Math.random() - 0.5) * 6);
-            c.baseOpacity = 0.88;
-            c.mesh.material.opacity = 0.88;
-            c.mesh.visible = true;
-            c.active = true;
-          }
         }
       }
-      if (!anyActive && !isIntroPlaying && !isCardRainLooping) {
+      if (!anyActive && !isIntroPlaying) {
         cardRainGroup.visible = false;
       }
     }
@@ -1938,17 +1920,25 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
        * Card rain controls for page transitions
        */
       startCardRainLoop: function () {
-        isCardRainLooping = true;
-        triggerCardRain();
+        // Disabled per user request: cards only fall once at home snap
+        isCardRainLooping = false;
       },
       stopCardRainLoop: function () {
         isCardRainLooping = false;
+        if (cardRainGroup) {
+          cardRainGroup.visible = false;
+          for (let i = 0; i < cardRainData.length; i++) {
+            cardRainData[i].active = false;
+            cardRainData[i].mesh.visible = false;
+          }
+        }
       },
+
       triggerCardRain: function () {
         triggerCardRain();
       },
       startAmbientCardRain: function () {
-        startAmbientCardRain();
+        isCardRainLooping = false;
       },
 
       /**
@@ -1961,7 +1951,7 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
         if (sovereignRingMesh && sovereignRingMesh.material) sovereignRingMesh.material.opacity = 0;
         if (anamorphicFlareMesh && anamorphicFlareMesh.material) anamorphicFlareMesh.material.opacity = 0;
         if (sovereignEmbersGroup) sovereignEmbersGroup.visible = false;
-        startAmbientCardRain();
+        isCardRainLooping = false;
       },
 
       /**
@@ -2071,7 +2061,6 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
        * Transition 3D scene elements when changing web SPA views
        */
       transitionView: function (viewId) {
-        // Keep 3D canvas and falling cards clearly alive & visible across all views!
         const targetOpacity = (viewId === 'contact') ? 0.45 : 0.85;
 
         if (typeof gsap !== 'undefined' && canvas) {
@@ -2081,7 +2070,19 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
             ease: 'power2.out'
           });
         }
-        startAmbientCardRain();
+
+        // Khi chuyển từ Home sang các trang nội dung khác (Ban, Sự kiện, Tuyển dụng...),
+        // ẩn ngay toàn bộ lá bài 3D để giữ khu vực nội dung trung tâm luôn sạch và thoáng đãng!
+        if (viewId && viewId !== 'home') {
+          isCardRainLooping = false;
+          if (cardRainGroup) {
+            cardRainGroup.visible = false;
+            for (let i = 0; i < cardRainData.length; i++) {
+              cardRainData[i].active = false;
+              cardRainData[i].mesh.visible = false;
+            }
+          }
+        }
       },
 
       /**

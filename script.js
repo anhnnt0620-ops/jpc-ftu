@@ -323,8 +323,10 @@ function initViewNavigation() {
       currentBanTimeline.kill();
       isBanTransitionRunning = false;
     }
-    isBanTransitionRunning = true;
     if (banSafetyTimer) clearTimeout(banSafetyTimer);
+    if (window.JPC3D && typeof window.JPC3D.stopCardRainLoop === 'function') {
+      window.JPC3D.stopCardRainLoop();
+    }
 
     const overlay = document.getElementById('banTransitionOverlay');
     const ring = document.getElementById('banTransitionRing');
@@ -366,10 +368,6 @@ function initViewNavigation() {
 
     console.info(`[JPC Ban Transition] Starting transition to: ${targetDeptId} (stop rotation: ${finalRotation}deg)`);
 
-    // Giữ nguyên hiệu ứng cánh hoa và mưa bài 3D liên tục ở nền trong suốt quá trình xoay bài
-    if (window.JPC3D && typeof window.JPC3D.startCardRainLoop === 'function') {
-      window.JPC3D.startCardRainLoop();
-    }
 
     // Activate overlay and reset card states
     overlay.classList.add('is-active');
@@ -384,32 +382,37 @@ function initViewNavigation() {
     const gsapRef = window.gsap || (typeof gsap !== 'undefined' ? gsap : null);
 
     if (gsapRef) {
-      // Initialize GSAP values
-      gsapRef.set(ring, { rotation: 0 });
-      gsapRef.set(aura, { scale: 0, opacity: 0 });
-      if (pulseRipple) gsapRef.set(pulseRipple, { scale: 0.1, opacity: 0 });
-      gsapRef.set('#banTransitionStage', { opacity: 1 });
-      gsapRef.set('#banTransitionRipples', { opacity: 1 });
-      gsapRef.set(overlay, { opacity: 1 });
+      // Initialize GSAP values for NEW transition
+      gsapRef.set(overlay, { opacity: 1, display: 'flex' });
+      gsapRef.set('#banTransitionStage', { opacity: 1, display: 'flex' });
+      gsapRef.set('#banTransitionRipples', { opacity: 1, display: 'flex' });
       gsapRef.set(vortexCards, { opacity: 1 });
+      vortexCards.forEach((c) => {
+        c.classList.remove('is-selected', 'is-dimmed', 'is-dash-out');
+        c.style.removeProperty('opacity');
+        c.style.removeProperty('transform');
+      });
+      gsapRef.set(ring, { rotation: 0 });
+      gsapRef.set(aura, { scale: 0.2, opacity: 0 });
+      if (pulseRipple) gsapRef.set(pulseRipple, { scale: 0.1, opacity: 0 });
 
       const tl = gsapRef.timeline({
         onComplete: () => {
           clearTimeout(banSafetyTimer);
           overlay.classList.remove('is-active');
-          document.body.classList.remove('ban-transition-active');
           overlay.setAttribute('aria-hidden', 'true');
+          document.body.classList.remove('ban-transition-active');
+          // Giữ overlay và 5 lá bài hoàn toàn ẩn để không bao giờ bị hiện lại
+          gsapRef.set(overlay, { opacity: 0, display: 'none' });
+          gsapRef.set('#banTransitionStage', { opacity: 0, display: 'none' });
+          gsapRef.set(aura, { scale: 0.2, opacity: 0 });
+          if (pulseRipple) gsapRef.set(pulseRipple, { scale: 0.1, opacity: 0 });
           vortexCards.forEach((c) => {
             c.classList.remove('is-selected', 'is-dimmed', 'is-dash-out');
             c.style.removeProperty('opacity');
             c.style.removeProperty('transform');
           });
           gsapRef.set(ring, { rotation: 0 });
-          gsapRef.set(aura, { scale: 0, opacity: 0 });
-          if (pulseRipple) gsapRef.set(pulseRipple, { scale: 0.1, opacity: 0 });
-          gsapRef.set('#banTransitionStage', { opacity: 1 });
-          gsapRef.set('#banTransitionRipples', { opacity: 1 });
-          gsapRef.set(overlay, { opacity: 1 });
           if (window.JPC3D && typeof window.JPC3D.stopCardRainLoop === 'function') {
             window.JPC3D.stopCardRainLoop();
           }
@@ -471,10 +474,10 @@ function initViewNavigation() {
         ease: 'power2.out'
       }, 3.5);
 
-      // 2. Gợn sóng chỉ chiếu đến đoạn lan ra toàn màn hình và hết (dissipates hoàn toàn tại viền màn hình)
+      // 2. Gợn sóng cuối từ lá bài Ban được pick lan tỏa sang UI Ban mượt mà (Tối ưu GPU 60fps không giật lag)
       tl.fromTo(aura,
-        { scale: 0.2, opacity: 0.95 },
-        { scale: 42, opacity: 0, duration: 0.85, ease: 'power2.out', immediateRender: false },
+        { scale: 0.25, opacity: 0.95 },
+        { scale: 7.2, opacity: 0, duration: 0.72, ease: 'power2.out', immediateRender: false },
         3.5
       );
 
@@ -502,12 +505,14 @@ function initViewNavigation() {
         document.body.scrollTop = 0;
         // Bắt đầu làm rõ dần UI riêng của Ban (gỡ bỏ làm mờ & tối)
         document.body.classList.remove('ban-transition-active');
+        // Ẩn ngay stage chứa 5 lá bài để không bao giờ bị hiện lại
+        gsapRef.set('#banTransitionStage', { opacity: 0, display: 'none' });
       }, 3.75);
 
       // 5. Overlay làm mờ biến mất mượt mà để lộ hoàn toàn UI sắc nét của Ban
       tl.to(overlay, {
         opacity: 0,
-        duration: 0.55,
+        duration: 0.45,
         ease: 'power2.out'
       }, 3.8);
 
@@ -544,8 +549,8 @@ function initViewNavigation() {
             }
           });
 
-          aura.style.transition = 'transform 0.75s ease-out, opacity 0.75s ease-out';
-          aura.style.transform = 'scale(42)';
+          aura.style.transition = 'transform 0.72s ease-out, opacity 0.72s ease-out';
+          aura.style.transform = 'scale(7.2)';
           aura.style.opacity = '0';
 
           setTimeout(() => {
@@ -555,13 +560,16 @@ function initViewNavigation() {
             document.documentElement.scrollTop = 0;
             document.body.scrollTop = 0;
             document.body.classList.remove('ban-transition-active');
+            const stageEl = document.getElementById('banTransitionStage');
+            if (stageEl) stageEl.style.display = 'none';
 
-            overlay.style.transition = 'opacity 0.5s ease-out';
+            overlay.style.transition = 'opacity 0.45s ease-out';
             overlay.style.opacity = '0';
 
             setTimeout(() => {
               clearTimeout(banSafetyTimer);
               overlay.classList.remove('is-active');
+              overlay.style.display = 'none';
               overlay.style.removeProperty('opacity');
               if (centerRipples) centerRipples.style.removeProperty('opacity');
               vortexCards.forEach((c) => {
@@ -570,7 +578,7 @@ function initViewNavigation() {
               });
               isBanTransitionRunning = false;
               if (typeof onFinish === 'function') onFinish();
-            }, 550);
+            }, 450);
           }, 250);
         }, 1700);
       }, 1800);
@@ -682,7 +690,7 @@ function initGoldNeedles() {
 }
 
 /* ==========================================================
-   4. MINI FALLING CARDS (LIGHTWEIGHT RESPONSIVE POOL - 2 SIDES)
+   4. MINI FALLING CARDS (LIGHTWEIGHT RESPONSIVE POOL - 2 SIDES ONLY)
    ========================================================== */
 function initFallingCards() {
   const container = document.getElementById('fallingCards');
@@ -692,7 +700,8 @@ function initFallingCards() {
 
   container.innerHTML = '';
   const isMobile = isMobileDevice();
-  const count = isMobile ? 14 : 28;
+  // Count: 10 mini cards on mobile (5 left, 5 right), 18 on desktop (9 left, 9 right)
+  const count = isMobile ? 10 : 18;
   const fragment = document.createDocumentFragment();
 
   for (let i = 0; i < count; i++) {
@@ -700,37 +709,43 @@ function initFallingCards() {
     card.className = 'mini-card';
     card.style.pointerEvents = 'none';
 
-    // Distribute: Left lane (40%), Right lane (40%), Center ambient lane (20%)
-    const laneType = i % 5;
+    // Strictly 2 sides: Even = Left margin, Odd = Right margin
+    // Zero cards in the middle 72% area (14% - 86%) to keep all main content completely clear
+    const isLeft = (i % 2 === 0);
+    const sideIndex = Math.floor(i / 2);
     let leftPercent;
 
-    if (laneType === 0 || laneType === 1) {
-      leftPercent = 1.5 + (i * 7.3) % 23.5;
-    } else if (laneType === 2 || laneType === 3) {
-      leftPercent = 75.0 + (i * 7.3) % 23.5;
+    if (isLeft) {
+      // Left margin: 1.0% to 13.0%
+      leftPercent = isMobile
+        ? 1.0 + ((sideIndex * 3.1) % 9.5)
+        : 1.2 + ((sideIndex * 3.4) % 11.8);
     } else {
-      leftPercent = 25.0 + (i * 11.7) % 50.0;
+      // Right margin: 87.0% to 99.0%
+      leftPercent = isMobile
+        ? 88.5 + ((sideIndex * 3.1) % 9.5)
+        : 87.0 + ((sideIndex * 3.4) % 11.8);
     }
 
-    const duration = 8.0 + ((i * 3.7) % 7) * 1.2;
-    const delay = -((i / count) * duration + (i % 3) * 0.8);
+    const duration = 8.5 + ((i * 3.7) % 7) * 1.3;
+    const delay = -((i / count) * duration + (i % 3) * 0.9);
 
     const sizeTier = i % 3;
-    const isCenter = (laneType === 4);
     const width = isMobile
-      ? (sizeTier === 0 ? 12 : sizeTier === 1 ? 15 : 18)
-      : (isCenter ? (sizeTier === 0 ? 14 : 17) : (sizeTier === 0 ? 16 : sizeTier === 1 ? 21 : 26));
+      ? (sizeTier === 0 ? 11 : sizeTier === 1 ? 13 : 15)
+      : (sizeTier === 0 ? 14 : sizeTier === 1 ? 18 : 22);
     const height = Math.round(width * 1.4);
 
-    const opacity = isCenter
-      ? (sizeTier === 0 ? 0.38 : 0.52)
-      : (sizeTier === 0 ? 0.58 : sizeTier === 1 ? 0.72 : 0.88);
+    const opacity = sizeTier === 0 ? 0.48 : sizeTier === 1 ? 0.62 : 0.72;
 
     const rzStart = -45 + ((i * 37) % 90);
-    const rzEnd = rzStart + (i % 2 === 0 ? 1 : -1) * (180 + ((i * 29) % 150));
+    const rzEnd = rzStart + (isLeft ? 1 : -1) * (180 + ((i * 29) % 150));
     const rx = 180 + ((i * 41) % 240);
     const ry = 160 + ((i * 31) % 220);
-    const drift = (i % 2 === 0 ? 1 : -1) * (isMobile ? 8 + (i % 4) * 3 : 14 + (i % 5) * 5);
+    // Subtle horizontal drift: gently stay within the side margin, never drift inward
+    const drift = isLeft
+      ? (isMobile ? -2 + (i % 3) * 2 : -4 + (i % 4) * 3)
+      : (isMobile ? 2 - (i % 3) * 2 : 4 - (i % 4) * 3);
 
     card.style.left = `${leftPercent.toFixed(1)}%`;
     card.style.setProperty('--mc-w', `${width}px`);

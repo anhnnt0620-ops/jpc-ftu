@@ -406,13 +406,13 @@ body > section, body > footer {
 }
 
 /* Content View Subtle Scrim:
-   Giữ hiệu ứng cánh hoa đào và lá bài rơi luôn sắc nét, chuyển động sinh động trên nền */
+   Giúp nội dung chính luôn nổi bật, sắc nét, không bị nền làm chói hay mờ mắt */
 .view:not(.hero)::before {
   content: "";
   position: fixed;
   inset: 0;
   z-index: -1;
-  background: rgba(10, 3, 5, 0.12);
+  background: rgba(10, 3, 5, 0.22);
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.4s ease;
@@ -6251,27 +6251,36 @@ body.modal-scroll-lock .admin-portal * {
   pointer-events: none;
   visibility: hidden;
   overflow: hidden;
+  background: rgba(8, 2, 4, 0.82);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.ban-transition:not(.is-active) {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 .ban-transition.is-active {
+  display: flex !important;
   opacity: 1;
   pointer-events: auto;
   visibility: visible;
 }
 
-/* Background UI dim & blur during Ban Transition:
-   The home/main UI content (sections, text, cards) behind is covered & blurred ~100%,
-   while the 3D falling cards and sakura petals on three-canvas remain crisp & visible in the background! */
+/* Background UI dim during Ban Transition:
+   Tối ưu GPU: sử dụng backdrop-filter của overlay thay vì blur 28px trên từng DOM node */
 body.ban-transition-active .nav,
 body.ban-transition-active main,
 body.ban-transition-active footer,
 body.ban-transition-active .bg-ambience,
 body.ban-transition-active .gold-needles {
-  filter: blur(28px) brightness(0.10) !important;
   opacity: 0.15 !important;
   pointer-events: none !important;
   user-select: none !important;
-  transition: filter 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
+  transition: opacity 0.35s ease;
 }
 
 /* Three.js canvas & falling cards: sit ABOVE the blurred main UI, but BEHIND the .ban-transition overlay */
@@ -6382,29 +6391,27 @@ body.ban-transition-active .falling-cards {
   transform: scale(0.1);
 }
 
-/* Radiant Concentric Water Ripple Aura Wave centered at screen */
+/* Radiant Concentric Water Ripple Aura Wave centered at screen (Tối ưu GPU 60fps không giật lag) */
 .ban-transition__aura {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 260px;
-  height: 260px;
-  margin-left: -130px;
-  margin-top: -130px;
+  width: 440px;
+  height: 440px;
+  margin-left: -220px;
+  margin-top: -220px;
   border-radius: 50%;
   pointer-events: none;
   opacity: 0;
-  transform: scale(0);
+  transform: scale(0.2) translateZ(0);
   background-image: url("Image/water-ripple.svg");
-  background-size: cover;
+  background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
-  box-shadow:
-    0 0 70px rgba(204, 20, 54, 0.95),
-    0 0 140px rgba(153, 27, 27, 0.8),
-    inset 0 0 60px rgba(255, 255, 255, 0.7);
   z-index: 25;
   will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 /* Stage & Center Vortex Ring */
@@ -6676,25 +6683,28 @@ body.ban-transition-active .falling-cards {
 /* Phase 3 Dash-out: Card shoots forward towards the camera and off screen in a radiant flash */
 @keyframes cardDashOut {
   0% {
-    transform: rotate(var(--card-angle, 0deg)) translateY(calc(-1 * var(--vortex-radius-selected))) scale(1.32);
+    transform: rotate(var(--card-angle, 0deg)) translateY(calc(-1 * var(--vortex-radius-selected))) scale(1.32) translateZ(0);
     opacity: 1;
-    filter: brightness(1.18);
+    filter: brightness(1.15);
   }
-  20% {
+  25% {
     opacity: 1;
-    filter: brightness(1.6) drop-shadow(0 0 35px rgba(254, 240, 138, 0.95)) drop-shadow(0 0 60px rgba(204, 20, 54, 0.8));
+    filter: brightness(1.4) drop-shadow(0 0 16px rgba(254, 240, 138, 0.85));
   }
   100% {
-    transform: rotate(var(--card-angle, 0deg)) translateY(calc(-1 * var(--vortex-radius-selected) - 320px)) scale(3.9);
+    transform: rotate(var(--card-angle, 0deg)) translateY(calc(-1 * var(--vortex-radius-selected) - 280px)) scale(3.2) translateZ(0);
     opacity: 0;
-    filter: brightness(2.4) drop-shadow(0 0 90px rgba(254, 240, 138, 1));
+    filter: brightness(1.8) drop-shadow(0 0 24px rgba(254, 240, 138, 0.95));
   }
 }
 
 .ban-vortex-card.is-dash-out {
-  animation: cardDashOut 0.55s cubic-bezier(0.16, 0.8, 0.25, 1) forwards !important;
+  animation: cardDashOut 0.5s cubic-bezier(0.16, 0.8, 0.25, 1) forwards !important;
   pointer-events: none !important;
   z-index: 120 !important;
+  will-change: transform, opacity, filter;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 
