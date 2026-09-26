@@ -2290,12 +2290,16 @@ body.modal-scroll-lock .falling-cards {
   pointer-events: none !important;
 }
 
-body.modal-scroll-lock .nav,
 body.modal-scroll-lock main,
 body.modal-scroll-lock footer,
 body.modal-scroll-lock .bg-ambience {
   filter: blur(8px) brightness(0.25) !important;
   transition: filter 0.35s ease, brightness 0.35s ease;
+}
+
+body.modal-scroll-lock .nav {
+  filter: none !important;
+  opacity: 1 !important;
 }
 
 /* Ensure Admin Studio is 100% sharp, bright, perfectly legible and never affected by modal blur */
@@ -3052,7 +3056,7 @@ body.modal-scroll-lock .admin-portal * {
     width: 94% !important;
     max-width: 480px !important;
     min-height: auto !important;
-    max-height: 88svh !important;
+    max-height: 72svh !important;
     overflow: hidden !important;
     display: flex !important;
     flex-direction: column !important;
@@ -3071,11 +3075,11 @@ body.modal-scroll-lock .admin-portal * {
     flex-direction: column !important;
     align-items: stretch !important;
     grid-template-columns: none !important;
-    gap: 1rem !important;
-    padding: 1.5rem 1.3rem 1.6rem !important;
+    gap: 0.85rem !important;
+    padding: 1.35rem 1.6rem 1.5rem !important;
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch;
-    max-height: calc(88svh - 20px) !important;
+    max-height: calc(72svh - 15px) !important;
   }
 
   .event-modal-col--left {
@@ -3129,9 +3133,9 @@ body.modal-scroll-lock .admin-portal * {
   .event-modal-desc {
     max-height: none !important;
     overflow-y: visible !important;
-    padding-right: 0 !important;
+    padding: 0.25rem 0.65rem 0.5rem 0.45rem !important;
     font-size: 0.86rem !important;
-    line-height: 1.65 !important;
+    line-height: 1.68 !important;
   }
 
   /* Admin Studio Responsive */
@@ -3867,7 +3871,7 @@ body.modal-scroll-lock .admin-portal * {
 @media (max-width: 900px) {
   .join-modal .event-modal-dialog {
     min-height: auto !important;
-    max-height: 88svh !important;
+    max-height: 72svh !important;
     overflow: hidden !important;
     width: 94% !important;
     max-width: 480px !important;
@@ -3875,10 +3879,10 @@ body.modal-scroll-lock .admin-portal * {
 
   .join-modal .event-modal-body {
     flex-direction: column;
-    gap: 1.2rem;
-    padding: 1.8rem 1.4rem;
+    gap: 1rem;
+    padding: 1.5rem 1.6rem;
     min-height: auto;
-    max-height: 88svh !important;
+    max-height: 72svh !important;
     overflow-y: auto;
   }
 
@@ -3889,7 +3893,8 @@ body.modal-scroll-lock .admin-portal * {
 
   .join-modal-desc {
     height: auto;
-    max-height: calc(88svh - 220px);
+    max-height: calc(72svh - 190px);
+    padding: 0.2rem 0.65rem 0.5rem 0.45rem !important;
   }
 
   .join-modal .event-modal-star-divider {
@@ -3903,16 +3908,16 @@ body.modal-scroll-lock .admin-portal * {
   .join-modal .event-modal-dialog {
     width: 94% !important;
     max-width: 440px !important;
-    max-height: 88svh !important;
+    max-height: 72svh !important;
     overflow: hidden !important;
   }
 
   .join-modal .event-modal-body {
     display: flex !important;
     flex-direction: column !important;
-    padding: 1.15rem 1.15rem 1.35rem !important;
-    gap: 0.45rem !important;
-    max-height: 88svh !important;
+    padding: 1.25rem 1.5rem 1.35rem !important;
+    gap: 0.4rem !important;
+    max-height: 72svh !important;
     overflow: hidden !important;
   }
 
@@ -4004,13 +4009,13 @@ body.modal-scroll-lock .admin-portal * {
 
   .join-modal-desc {
     height: auto !important;
-    max-height: calc(88svh - 175px) !important;
-    min-height: 220px !important;
+    max-height: calc(72svh - 145px) !important;
+    min-height: 180px !important;
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch;
-    padding-right: 0.75rem !important;
+    padding: 0.25rem 0.85rem 0.55rem 0.45rem !important;
     font-size: 0.86rem !important;
-    line-height: 1.65 !important;
+    line-height: 1.68 !important;
   }
 }
 

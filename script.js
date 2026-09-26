@@ -864,8 +864,6 @@ function initHeroIntroTimeline() {
   let completionTimer = null;
 
   function notifyIntroComplete() {
-    if (introCompleteNotified) return;
-    introCompleteNotified = true;
     isIntroAnimationFinished = true;
     window.dispatchEvent(new CustomEvent('heroIntroComplete'));
   }
@@ -926,7 +924,7 @@ function initHeroIntroTimeline() {
   const handleIntroComplete = () => {
     if (hasSkipped) return;
     settleAndStartTyping();
-    if (!isMusicPlaying) {
+    if (!isMusicPlaying || (bgAudio && bgAudio.paused)) {
       startMusicPlayback();
     }
   };
@@ -1002,6 +1000,9 @@ function initHeroIntroTimeline() {
         }, 1600);
         // All animations (cards settling & typewriter) have fully finished! Start music automatically!
         notifyIntroComplete();
+        if (!isMusicPlaying || (bgAudio && bgAudio.paused)) {
+          startMusicPlayback();
+        }
       }
     };
 
@@ -1042,11 +1043,12 @@ function initHeroIntroTimeline() {
       if (e.target.closest('a, button, input, textarea, #musicPlayer')) return;
       hasUserInteracted = true;
       unlockAudioContext();
-      if (!isMusicPlaying) {
+      if (!isMusicPlaying || (bgAudio && bgAudio.paused)) {
         startMusicPlayback();
       }
     };
     hero.addEventListener('click', onHeroInteract);
+    hero.addEventListener('pointerdown', onHeroInteract);
     hero.addEventListener('touchstart', onHeroInteract, { passive: true });
   }
 
@@ -1428,7 +1430,9 @@ function initMusicPlayerUI() {
   // Auto-play when hero intro completes
   window.addEventListener('heroIntroComplete', () => {
     isIntroAnimationFinished = true;
-    startAutoPlay();
+    if (!isMusicPlaying || (bgAudio && bgAudio.paused)) {
+      startMusicPlayback();
+    }
     updateTitleMarquee();
   });
 
@@ -1440,8 +1444,10 @@ const unlockEvents = [
   'touchstart',
   'click',
   'pointerdown',
+  'mousedown',
   'touchend',
-  'keydown'
+  'keydown',
+  'wheel'
 ];
 
 function unlockAudioContext() {
@@ -1463,7 +1469,7 @@ function handleGlobalUserGesture(e) {
   hasUserInteracted = true;
   unlockAudioContext();
 
-  // Synchronously prime the background audio element on mobile user gesture
+  // Synchronously prime the background audio element on user gesture
   if (bgAudio && (!bgAudio.src || bgAudio.src === '')) {
     const playlist = getPlaylist();
     const track = playlist[currentTrackIndex] || playlist[0];
@@ -1473,8 +1479,8 @@ function handleGlobalUserGesture(e) {
     }
   }
 
-  // Trigger music whenever autoplay is pending
-  if (pendingAutoPlay && !isMusicPlaying) {
+  // Trigger music whenever autoplay is pending or audio is paused
+  if (pendingAutoPlay || !isMusicPlaying || (bgAudio && bgAudio.paused)) {
     startMusicPlayback();
   }
 }
@@ -1495,7 +1501,7 @@ function removeGlobalUnlockListeners() {
 
 function startAutoPlay() {
   pendingAutoPlay = true;
-  if (!isMusicPlaying) {
+  if (!isMusicPlaying || (bgAudio && bgAudio.paused)) {
     startMusicPlayback();
   }
 }
@@ -1506,61 +1512,60 @@ function startMusicPlayback() {
   updateTitleMarquee();
 
   const playerEl = document.getElementById('musicPlayer');
-  isMusicPlaying = true;
-  if (playerEl) {
-    playerEl.classList.add('is-playing');
-  }
-
-  if (window.JPC3D && typeof window.JPC3D.pulse === 'function') {
-    window.JPC3D.pulse(isMobileDevice() ? 1.05 : 1.3);
-  }
 
   // Ensure current track is properly loaded if audio was in error state or empty
   const playlist = getPlaylist();
-  const currentTrack = playlist[currentTrackIndex];
-  if (currentTrack && (bgAudio.error || !bgAudio.src || bgAudio.networkState === HTMLMediaElement.NETWORK_NO_SOURCE)) {
+  const currentTrack = playlist[currentTrackIndex] || playlist[0];
+  if (currentTrack && (!bgAudio.src || bgAudio.src === '' || bgAudio.error || bgAudio.networkState === HTMLMediaElement.NETWORK_NO_SOURCE)) {
     bgAudio.src = encodeURI(currentTrack.src);
     bgAudio.load();
   }
 
   bgAudio.muted = false;
-  applyBgmVolume(true, currentTrack);
+  try {
+    bgAudio.volume = getTrackTargetVolume(currentTrack);
+  } catch (_) {}
 
   const playPromise = bgAudio.play();
   if (playPromise !== undefined) {
     playPromise
       .then(() => {
+        isMusicPlaying = true;
         pendingAutoPlay = false;
         consecutiveAudioErrors = 0;
         if (playerEl) {
           playerEl.classList.add('is-playing');
         }
+        if (window.JPC3D && typeof window.JPC3D.pulse === 'function') {
+          window.JPC3D.pulse(isMobileDevice() ? 1.05 : 1.3);
+        }
         updateMediaSession(currentTrack);
         removeGlobalUnlockListeners();
       })
       .catch((err) => {
-        // Normal interruption (e.g. track change or pause) -> Ignore!
+        isMusicPlaying = false;
+        if (playerEl) {
+          playerEl.classList.remove('is-playing');
+        }
         if (!err || err.name === 'AbortError') return;
 
         if (err.name === 'NotAllowedError') {
           // Browser autoplay restriction waiting for first user gesture
           pendingAutoPlay = true;
-          isMusicPlaying = false;
-          if (playerEl) {
-            playerEl.classList.remove('is-playing');
-          }
           if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
 
-          const triggerOnFirstTouch = () => {
-            window.removeEventListener('pointerdown', triggerOnFirstTouch, { capture: true });
-            window.removeEventListener('touchstart', triggerOnFirstTouch, { capture: true });
-            window.removeEventListener('click', triggerOnFirstTouch, { capture: true });
+          const triggerOnFirstGesture = () => {
+            ['pointerdown', 'mousedown', 'touchstart', 'click', 'keydown', 'wheel'].forEach((ev) => {
+              window.removeEventListener(ev, triggerOnFirstGesture, { capture: true });
+              document.removeEventListener(ev, triggerOnFirstGesture, { capture: true });
+            });
             unlockAudioContext();
             startMusicPlayback();
           };
-          window.addEventListener('pointerdown', triggerOnFirstTouch, { capture: true, once: true });
-          window.addEventListener('touchstart', triggerOnFirstTouch, { capture: true, once: true });
-          window.addEventListener('click', triggerOnFirstTouch, { capture: true, once: true });
+          ['pointerdown', 'mousedown', 'touchstart', 'click', 'keydown', 'wheel'].forEach((ev) => {
+            window.addEventListener(ev, triggerOnFirstGesture, { capture: true, once: true });
+            document.addEventListener(ev, triggerOnFirstGesture, { capture: true, once: true });
+          });
         } else {
           // Genuine media error: safely try next track with retry cap
           console.warn('[JPC Audio] Playback error on start:', err.name, err.message);
