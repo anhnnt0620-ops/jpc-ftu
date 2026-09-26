@@ -46,9 +46,9 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
     accentRed: 0xff1e46,
     goldLight: 0xf6d382,
     particleCount: window.innerWidth <= 768 ? 55 : 105,
-    bloomStrength: 0.52,
-    bloomRadius: 0.40,
-    bloomThreshold: 0.32
+    bloomStrength: 0.30,
+    bloomRadius: 0.12,
+    bloomThreshold: 0.50
   };
 
   // Core Engine State
@@ -283,7 +283,7 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
     scene.add(goldLight);
 
     // Refined Crimson Silhouette Rim Light from back-left (softened so aura is clean without harsh glare)
-    rimLight = new THREE.PointLight(0xff2855, 4.8, 32, 1.2);
+    rimLight = new THREE.PointLight(0xff2855, 2.0, 30, 1.4);
     rimLight.position.set(-3.5, 1.8, 2.5);
     scene.add(rimLight);
 
@@ -1243,13 +1243,13 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
       opacity: 0.72
     });
 
-    // Rare glowing sakura petals (only ~20% of petals glow, soft subtle emissive glow = 0.32)
+    // Rare glowing sakura petals (soft subtle warm blossom glow = 0.16)
     const glowingSakuraMaterial = new THREE.MeshStandardMaterial({
       color: 0xffb7c5,
-      emissive: 0xff8098,
-      emissiveIntensity: 0.32,
-      roughness: 0.35,
-      metalness: 0.1,
+      emissive: 0xff8ca0,
+      emissiveIntensity: 0.16,
+      roughness: 0.40,
+      metalness: 0.08,
       side: THREE.DoubleSide,
       transparent: true,
       opacity: 0.85
@@ -1258,14 +1258,14 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
     const goldDustMaterial = new THREE.MeshStandardMaterial({
       color: 0xffe28a,
       emissive: 0x8a5e0d,
-      emissiveIntensity: 0.45,
-      roughness: 0.25,
+      emissiveIntensity: 0.35,
+      roughness: 0.30,
       metalness: 0.80,
       transparent: true,
       opacity: 0.80
     });
 
-    const sphereGeo = new THREE.SphereGeometry(0.042, 8, 8);
+    const sphereGeo = new THREE.SphereGeometry(0.035, 8, 8);
 
     for (let i = 0; i < count; i++) {
       const isSakura = i % 3 !== 0;
@@ -1282,12 +1282,13 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
 
       const x = (Math.random() - 0.5) * 24;
       const y = (Math.random() - 0.5) * 18;
-      const z = (Math.random() - 0.5) * 14 - 1;
+      const z = (Math.random() - 0.5) * 8 - 2;
 
       mesh.position.set(x, y, z);
       mesh.rotation.set(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2);
 
-      const scale = isSakura ? (0.35 + Math.random() * 0.45) : (0.35 + Math.random() * 0.65);
+      // Delicate, cute petals: 0.16 to 0.34 for sakura petals (bé bé xinh xinh)
+      const scale = isSakura ? (0.16 + Math.random() * 0.18) : (0.22 + Math.random() * 0.32);
       mesh.scale.set(scale, scale, scale);
 
       particleSystem.add(mesh);
@@ -1297,7 +1298,7 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
         baseY: y,
         isSakura,
         isGlowing: isGlowingSakura,
-        baseGlow: isGlowingSakura ? 0.32 : 0,
+        baseGlow: isGlowingSakura ? 0.16 : 0,
         speedY: 0.006 + Math.random() * 0.012,
         speedX: (Math.random() - 0.5) * 0.005,
         speedZ: (Math.random() - 0.5) * 0.004,
@@ -1812,7 +1813,7 @@ const gsap = typeof gsapModule !== 'undefined' ? gsapModule : window.gsap;
       if (m.position.y < -10) {
         m.position.y = 10;
         m.position.x = (Math.random() - 0.5) * 24;
-        m.position.z = (Math.random() - 0.5) * 14 - 1;
+        m.position.z = (Math.random() - 0.5) * 8 - 2;
         if (p.isGlowing && m.material) {
           m.material.emissiveIntensity = p.baseGlow;
         }
