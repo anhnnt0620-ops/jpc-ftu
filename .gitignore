@@ -57,3 +57,4 @@ dist-ssr/
 ehthumbs.db
 Thumbs.db
 .env
+.firebase
