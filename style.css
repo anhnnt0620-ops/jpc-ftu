@@ -3049,38 +3049,89 @@ body.modal-scroll-lock .admin-portal * {
    ========================================================== */
 @media (max-width: 900px) {
   .event-modal-dialog {
+    width: 94% !important;
+    max-width: 480px !important;
     min-height: auto !important;
     max-height: 88svh !important;
-    overflow-y: auto !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
   }
 
   .event-modal-close {
-    width: 44px;
-    height: 44px;
-    top: 12px;
-    right: 12px;
+    width: 42px;
+    height: 42px;
+    top: 10px;
+    right: 10px;
+    z-index: 25;
   }
 
   .event-modal-body {
-    grid-template-columns: 1fr;
-    gap: 1.8rem;
-    padding: 2.2rem 1.6rem;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    grid-template-columns: none !important;
+    gap: 1rem !important;
+    padding: 1.5rem 1.3rem 1.6rem !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    max-height: calc(88svh - 20px) !important;
+  }
+
+  .event-modal-col--left {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+  }
+
+  .event-modal-thumb-wrap {
+    width: 100% !important;
+    max-width: 220px !important;
+    aspect-ratio: 16 / 10 !important;
+    height: auto !important;
+    border-radius: 12px !important;
+    margin: 0 auto !important;
+  }
+
+  .event-modal-title {
+    font-size: 1.15rem !important;
+    margin: 0.75rem 0 0.2rem !important;
+    line-height: 1.35 !important;
+    text-align: center !important;
+  }
+
+  .event-modal-date {
+    font-size: 0.78rem !important;
+    text-align: center !important;
+    margin-bottom: 0.2rem !important;
   }
 
   .event-modal-star-divider {
-    flex-direction: row;
-    height: auto;
-    width: 100%;
+    flex-direction: row !important;
+    height: auto !important;
+    width: 100% !important;
+    margin: 0.2rem 0 !important;
+    gap: 12px !important;
   }
 
   .event-modal-star-ray {
-    width: 80px;
-    height: 1px;
+    width: 60px !important;
+    height: 1px !important;
     background: linear-gradient(90deg, transparent, rgba(207, 159, 63, 0.7), transparent);
   }
 
+  .event-modal-col--right {
+    width: 100% !important;
+  }
+
   .event-modal-desc {
-    max-height: 260px;
+    max-height: none !important;
+    overflow-y: visible !important;
+    padding-right: 0 !important;
+    font-size: 0.86rem !important;
+    line-height: 1.65 !important;
   }
 
   /* Admin Studio Responsive */
@@ -3817,14 +3868,18 @@ body.modal-scroll-lock .admin-portal * {
   .join-modal .event-modal-dialog {
     min-height: auto !important;
     max-height: 88svh !important;
-    overflow-y: auto !important;
+    overflow: hidden !important;
+    width: 94% !important;
+    max-width: 480px !important;
   }
 
   .join-modal .event-modal-body {
     flex-direction: column;
-    gap: 1.5rem;
-    padding: 2.2rem 1.6rem;
+    gap: 1.2rem;
+    padding: 1.8rem 1.4rem;
     min-height: auto;
+    max-height: 88svh !important;
+    overflow-y: auto;
   }
 
   .join-modal .event-modal-col--right {
@@ -3834,12 +3889,128 @@ body.modal-scroll-lock .admin-portal * {
 
   .join-modal-desc {
     height: auto;
-    max-height: 240px;
+    max-height: calc(88svh - 220px);
   }
 
   .join-modal .event-modal-star-divider {
     height: auto;
     width: 100%;
+  }
+}
+
+/* Smartphone UI: Mascot side-by-side with Round Name & Description occupies 3/4 of the card */
+@media (max-width: 680px) {
+  .join-modal .event-modal-dialog {
+    width: 94% !important;
+    max-width: 440px !important;
+    max-height: 88svh !important;
+    overflow: hidden !important;
+  }
+
+  .join-modal .event-modal-body {
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 1.15rem 1.15rem 1.35rem !important;
+    gap: 0.45rem !important;
+    max-height: 88svh !important;
+    overflow: hidden !important;
+  }
+
+  .join-modal .event-modal-col--left {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 14px !important;
+    width: 100% !important;
+    height: 88px !important;
+    min-height: 88px !important;
+    padding: 0 0.2rem !important;
+    flex-shrink: 0 !important;
+  }
+
+  .join-modal-thumb-wrap {
+    width: 72px !important;
+    height: 88px !important;
+    max-width: 72px !important;
+    margin: 0 !important;
+    flex-shrink: 0 !important;
+  }
+
+  .join-modal-thumb {
+    width: 72px !important;
+    height: 88px !important;
+    max-width: 72px !important;
+    max-height: 88px !important;
+  }
+
+  .join-modal-glow {
+    width: 80px !important;
+    height: 80px !important;
+  }
+
+  .join-modal-info {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    text-align: left !important;
+    flex: 1 !important;
+    min-width: 0 !important;
+    height: 88px !important;
+  }
+
+  .join-modal-step-badge {
+    font-size: 0.65rem !important;
+    padding: 2px 10px !important;
+    margin-bottom: 3px !important;
+    align-self: flex-start !important;
+  }
+
+  .join-modal-title {
+    font-size: 1.15rem !important;
+    margin: 0 0 2px !important;
+    text-align: left !important;
+    line-height: 1.25 !important;
+  }
+
+  .join-modal .event-modal-date {
+    font-size: 0.74rem !important;
+    text-align: left !important;
+    margin: 0 !important;
+  }
+
+  .join-modal .event-modal-star-divider {
+    flex-direction: row !important;
+    height: auto !important;
+    width: 100% !important;
+    margin: 0.25rem 0 0.45rem !important;
+    gap: 8px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .join-modal .event-modal-star-ray {
+    height: 1px !important;
+    width: 45px !important;
+  }
+
+  .join-modal .event-modal-col--right {
+    width: 100% !important;
+    flex: 1 !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .join-modal-desc {
+    height: auto !important;
+    max-height: calc(88svh - 175px) !important;
+    min-height: 220px !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    padding-right: 0.75rem !important;
+    font-size: 0.86rem !important;
+    line-height: 1.65 !important;
   }
 }
 
@@ -4519,27 +4690,31 @@ body.modal-scroll-lock .admin-portal * {
   justify-content: center;
   position: relative;
   margin-bottom: 0.75rem;
-  background: radial-gradient(circle at center, rgba(238, 205, 126, 0.16) 0%, transparent 68%);
+  overflow: visible;
 }
 
 /* Vầng sáng gradient nhẹ (Soft radiant glow) xung quanh kokeshi tương tự highlight mascot Tuyển thành viên */
 .dept-card__art::before {
   content: '';
   position: absolute;
-  inset: 16px 18px 4px;
+  width: 130px;
+  height: 130px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(238, 205, 126, 0.32) 0%, rgba(168, 35, 56, 0.20) 50%, transparent 72%);
-  filter: blur(14px);
+  background: radial-gradient(circle, rgba(238, 205, 126, 0.35) 0%, rgba(168, 35, 56, 0.18) 52%, transparent 70%);
+  filter: blur(16px);
   pointer-events: none;
-  transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease, background 0.5s ease;
+  transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
   will-change: transform, opacity;
   z-index: 0;
 }
 
 .dept-card:hover .dept-card__art::before {
-  transform: scale(1.25);
+  transform: translate(-50%, -50%) scale(1.22);
   opacity: 1;
-  background: radial-gradient(circle, rgba(238, 205, 126, 0.60) 0%, rgba(207, 159, 63, 0.36) 50%, transparent 72%);
+  background: radial-gradient(circle, rgba(238, 205, 126, 0.55) 0%, rgba(207, 159, 63, 0.32) 50%, transparent 70%);
   filter: blur(18px);
 }
 
@@ -6467,9 +6642,9 @@ body.ban-transition-active .falling-cards {
 }
 
 .ban-vortex-card.is-selected {
-  transform: rotate(var(--card-angle, 0deg)) translateY(calc(-1 * var(--vortex-radius-selected))) scale(1.32);
+  transform: rotate(var(--card-angle, 0deg)) translateY(calc(-1 * var(--vortex-radius-selected))) scale(1.22);
   border-color: #fef08a !important;
-  border-width: 2.5px !important;
+  border-width: 2px !important;
   z-index: 100 !important;
   opacity: 1 !important;
   filter: brightness(1.18) !important;
@@ -6477,17 +6652,13 @@ body.ban-transition-active .falling-cards {
 }
 
 .ban-vortex-card.is-selected .ban-vortex-card__jp {
-  font-family: 'HK Gokukaikk', 'Noto Serif JP', serif;
-  font-size: 1.18rem;
-  font-weight: 700;
   color: #fef08a;
-  text-shadow: 0 0 18px rgba(254, 240, 138, 1);
+  text-shadow: 0 0 14px rgba(254, 240, 138, 0.95);
 }
 
 .ban-vortex-card.is-selected .ban-vortex-card__name {
-  font-family: var(--font-title);
   color: #ffffff;
-  text-shadow: 0 0 14px rgba(254, 240, 138, 0.95), 0 0 24px rgba(204, 20, 54, 0.8);
+  text-shadow: 0 0 10px rgba(254, 240, 138, 0.85), 0 0 18px rgba(204, 20, 54, 0.7);
 }
 
 .ban-vortex-card.is-dimmed {

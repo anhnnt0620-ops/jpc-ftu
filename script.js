@@ -1038,17 +1038,16 @@ function initHeroIntroTimeline() {
 
   // Any tap or click on the hero banner primes audio & user gesture without canceling 3D intro!
   if (hero) {
-    hero.addEventListener('click', (e) => {
-      // Don't interfere if clicking on explicit links, buttons or interactive controls
+    const onHeroInteract = (e) => {
       if (e.target.closest('a, button, input, textarea, #musicPlayer')) return;
       hasUserInteracted = true;
       unlockAudioContext();
-      if (pendingAutoPlay || document.body.classList.contains('cards-extracting') || document.body.classList.contains('cards-complete')) {
-        if (!isMusicPlaying) {
-          startMusicPlayback();
-        }
+      if (!isMusicPlaying) {
+        startMusicPlayback();
       }
-    });
+    };
+    hero.addEventListener('click', onHeroInteract);
+    hero.addEventListener('touchstart', onHeroInteract, { passive: true });
   }
 
   // Pressing Escape skips intro if user explicitly wishes to skip
@@ -1072,7 +1071,7 @@ let currentTrackIndex = 0;
 let nextPreloadedIndex = 1;
 let isMusicPlaying = false;
 let isIntroAnimationFinished = false;
-let pendingAutoPlay = false;
+let pendingAutoPlay = true;
 let hasUserInteracted = false;
 const playedTrackIndices = new Set();
 let consecutiveAudioErrors = 0;
@@ -1463,7 +1462,16 @@ function handleGlobalUserGesture(e) {
 
   hasUserInteracted = true;
   unlockAudioContext();
-  removeGlobalUnlockListeners();
+
+  // Synchronously prime the background audio element on mobile user gesture
+  if (bgAudio && (!bgAudio.src || bgAudio.src === '')) {
+    const playlist = getPlaylist();
+    const track = playlist[currentTrackIndex] || playlist[0];
+    if (track) {
+      bgAudio.src = encodeURI(track.src);
+      bgAudio.load();
+    }
+  }
 
   // Trigger music whenever autoplay is pending
   if (pendingAutoPlay && !isMusicPlaying) {
@@ -1474,12 +1482,14 @@ function handleGlobalUserGesture(e) {
 function setupAudioUnlock() {
   unlockEvents.forEach((evt) => {
     window.addEventListener(evt, handleGlobalUserGesture, { passive: true, capture: true });
+    document.addEventListener(evt, handleGlobalUserGesture, { passive: true, capture: true });
   });
 }
 
 function removeGlobalUnlockListeners() {
   unlockEvents.forEach((evt) => {
     window.removeEventListener(evt, handleGlobalUserGesture, { capture: true });
+    document.removeEventListener(evt, handleGlobalUserGesture, { capture: true });
   });
 }
 
