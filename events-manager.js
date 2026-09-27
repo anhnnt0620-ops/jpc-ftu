@@ -9,6 +9,8 @@
  * 4. Hidden Admin CMS (CRUD, file upload to base64, JSON export/import, PIN protection)
  */
 
+import { saveEventsToFirebase, listenEventsFromFirebase } from './firebase.js';
+
 const STORAGE_KEY = 'jpc_events_list_v2';
 const ADMIN_PIN_KEY = 'jpc_admin_pin_v1';
 const DEFAULT_PIN = 'jpc2026';
@@ -72,10 +74,11 @@ class EventsManager {
     this.bindDOM();
     this.bindShortcuts();
     this.renderTimeline();
+    this.initFirebaseSync();
   }
 
   /* ==========================================================
-     1. DATA STORAGE & SORTING LOGIC
+     1. DATA STORAGE, REALTIME DB & SORTING LOGIC
      ========================================================== */
   loadEvents() {
     try {
@@ -94,15 +97,68 @@ class EventsManager {
     // Default fallback
     this.events = JSON.parse(JSON.stringify(DEFAULT_EVENTS));
     this.sortEvents();
-    this.saveEvents();
+    this.saveEventsToLocalStorage();
+  }
+
+  initFirebaseSync() {
+    listenEventsFromFirebase(
+      (remoteEvents) => {
+        if (Array.isArray(remoteEvents) && remoteEvents.length > 0) {
+          console.info('[EventsManager] Nhận dữ liệu sự kiện từ Firebase Realtime Database:', remoteEvents.length);
+          this.events = remoteEvents;
+          this.sortEvents();
+          this.saveEventsToLocalStorage();
+          this.renderTimeline();
+          this.renderAdminList();
+          this.updateFirebaseStatus('connected');
+        }
+      },
+      () => {
+        // Firebase RTDB is empty / null -> push initial default events
+        console.info('[EventsManager] Firebase RTDB chưa có dữ liệu sự kiện. Đang khởi tạo dữ liệu mẫu...');
+        this.saveEventsToFirebase();
+        this.updateFirebaseStatus('connected');
+      }
+    );
   }
 
   saveEvents() {
+    this.saveEventsToLocalStorage();
+    this.saveEventsToFirebase();
+  }
+
+  saveEventsToLocalStorage() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(this.events));
     } catch (err) {
-      console.error('[EventsManager] Failed to save events:', err);
-      alert('Không thể lưu dữ liệu (có thể do dung lượng ảnh tải lên quá lớn). Vui lòng nén bớt ảnh trước khi lưu!');
+      console.error('[EventsManager] Failed to save events to localStorage:', err);
+      alert('Không thể lưu dữ liệu vào localStorage (có thể do dung lượng ảnh tải lên quá lớn). Vui lòng nén bớt ảnh trước khi lưu!');
+    }
+  }
+
+  async saveEventsToFirebase() {
+    this.updateFirebaseStatus('saving');
+    const result = await saveEventsToFirebase(this.events);
+    if (result.success) {
+      this.updateFirebaseStatus('connected');
+    } else {
+      this.updateFirebaseStatus('error');
+    }
+    return result;
+  }
+
+  updateFirebaseStatus(status) {
+    const badge = document.getElementById('adminFirebaseStatus');
+    if (!badge) return;
+    if (status === 'saving') {
+      badge.textContent = '🔄 Đang lưu Realtime DB...';
+      badge.className = 'admin-portal__badge admin-portal__badge--sync is-syncing';
+    } else if (status === 'connected') {
+      badge.textContent = '🟢 Realtime DB: Đã kết nối';
+      badge.className = 'admin-portal__badge admin-portal__badge--sync is-connected';
+    } else if (status === 'error') {
+      badge.textContent = '⚠️ Realtime DB: Lỗi kết nối';
+      badge.className = 'admin-portal__badge admin-portal__badge--sync is-error';
     }
   }
 
