@@ -2521,6 +2521,28 @@ body.modal-scroll-lock .admin-portal * {
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
+.admin-portal__badge--sync {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(52, 211, 153, 0.4);
+  color: #34d399;
+  text-transform: none;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  transition: all 0.3s ease;
+}
+
+.admin-portal__badge--sync.is-syncing {
+  background: rgba(238, 205, 126, 0.2);
+  border-color: rgba(238, 205, 126, 0.6);
+  color: #ffd700;
+}
+
+.admin-portal__badge--sync.is-error {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.6);
+  color: #f87171;
+}
+
 .admin-portal__actions {
   display: flex;
   align-items: center;

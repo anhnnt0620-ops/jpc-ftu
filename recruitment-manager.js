@@ -13,6 +13,8 @@
  *    - Backup JSON export & restore defaults
  */
 
+import { saveRecruitmentToFirebase, listenRecruitmentFromFirebase } from './firebase.js';
+
 export const RECRUIT_STORAGE_KEY = 'jpc_recruitment_rounds_v3';
 
 export const DEFAULT_ROUNDS = [
@@ -130,10 +132,11 @@ export class RecruitmentManager {
     this.preloadImages();
     this.renderUI();
     this.bindDOM();
+    this.initFirebaseSync();
   }
 
   /* ==========================================================
-     1. DATA STORAGE & PRELOADING
+     1. DATA STORAGE, REALTIME DB & PRELOADING
      ========================================================== */
   loadRounds() {
     try {
@@ -152,7 +155,7 @@ export class RecruitmentManager {
               round.popupUrl = def.popupUrl;
             }
           });
-          this.saveRounds();
+          this.saveRoundsToLocalStorage();
           return;
         }
       }
@@ -160,7 +163,27 @@ export class RecruitmentManager {
       console.warn('[RecruitmentManager] Could not read localStorage:', err);
     }
     this.rounds = JSON.parse(JSON.stringify(DEFAULT_ROUNDS));
-    this.saveRounds();
+    this.saveRoundsToLocalStorage();
+  }
+
+  initFirebaseSync() {
+    listenRecruitmentFromFirebase(
+      (remoteRounds) => {
+        if (Array.isArray(remoteRounds) && remoteRounds.length > 0) {
+          console.info('[RecruitmentManager] Nhận dữ liệu tuyển thành viên từ Firebase Realtime Database:', remoteRounds.length);
+          this.rounds = remoteRounds;
+          this.preloadImages();
+          this.saveRoundsToLocalStorage();
+          this.renderUI();
+          this.renderAdminRoundsList();
+        }
+      },
+      () => {
+        // Firebase RTDB is empty / null -> push initial default rounds
+        console.info('[RecruitmentManager] Firebase RTDB chưa có dữ liệu tuyển thành viên. Đang khởi tạo dữ liệu mẫu...');
+        this.saveRoundsToFirebase();
+      }
+    );
   }
 
   preloadImages() {
@@ -177,12 +200,28 @@ export class RecruitmentManager {
   }
 
   saveRounds() {
+    this.saveRoundsToLocalStorage();
+    this.saveRoundsToFirebase();
+  }
+
+  saveRoundsToLocalStorage() {
     try {
       localStorage.setItem(RECRUIT_STORAGE_KEY, JSON.stringify(this.rounds));
     } catch (err) {
-      console.error('[RecruitmentManager] Failed to save rounds:', err);
-      alert('Không thể lưu dữ liệu (có thể do dung lượng ảnh tải lên quá lớn). Vui lòng nén bớt ảnh trước khi lưu!');
+      console.error('[RecruitmentManager] Failed to save rounds to localStorage:', err);
+      alert('Không thể lưu dữ liệu vào localStorage (có thể do dung lượng ảnh tải lên quá lớn). Vui lòng nén bớt ảnh trước khi lưu!');
     }
+  }
+
+  async saveRoundsToFirebase() {
+    window.EventsManager?.updateFirebaseStatus?.('saving');
+    const result = await saveRecruitmentToFirebase(this.rounds);
+    if (result.success) {
+      window.EventsManager?.updateFirebaseStatus?.('connected');
+    } else {
+      window.EventsManager?.updateFirebaseStatus?.('error');
+    }
+    return result;
   }
 
   /* ==========================================================

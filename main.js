@@ -185,7 +185,8 @@ if (document.readyState === 'loading') {
   bootstrapApp();
 }
 
-// Import subordinate modules (Three.js Scene, Playlist, Application Scripts)
+// Import subordinate modules (Three.js Scene, Playlist, Application Scripts, Firebase Backend)
+import './firebase.js';
 import './three-scene.js';
 import JPC_PLAYLIST from './playlist.js';
 if (typeof window !== 'undefined') {
