@@ -1,0 +1,1437 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>JPC FTU — CLB Tiếng Nhật Trường Đại học Ngoại Thương</title>
+  <meta name="description" content="CLB Tiếng Nhật Trường Đại học Ngoại Thương (JPC FTU) — tuyển thành viên thế hệ 22.">
+  <link rel="icon" type="image/png" href="Image/Logo.png">
+  <link rel="shortcut icon" type="image/png" href="Image/Logo.png">
+  <link rel="apple-touch-icon" href="Image/Logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;900&family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Noto+Serif+JP:wght@600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <!-- Preload 4 Popup Representative Mascots -->
+  <link rel="preload" as="image" href="Image/Khung Popup - Tuyển Gen/Vòng 1 - Popup.png?v=20260925_rev3">
+  <link rel="preload" as="image" href="Image/Khung Popup - Tuyển Gen/Vòng 2 - Popup.png?v=20260925_rev3">
+  <link rel="preload" as="image" href="Image/Khung Popup - Tuyển Gen/Vòng 3.1 - Popup.png?v=20260925_rev3">
+  <link rel="preload" as="image" href="Image/Khung Popup - Tuyển Gen/Vòng 3.2 - Popup.png?v=20260925_rev3">
+  <!-- Modern 3D & Animation Bundle (Three.js, GSAP, Lenis, Confetti via Node.js / Vite) -->
+  <script type="module" src="./main.js"></script>
+  <!-- Safety Watchdog: Guarantees the loading screen never gets stuck in black under any network or WebGL condition -->
+  <script>
+    (function () {
+      function dismissLoader() {
+        if (document.body && document.body.classList.contains('is-loading')) {
+          document.body.classList.remove('is-loading');
+          var loader = document.getElementById('appLoader');
+          if (loader) {
+            loader.style.opacity = '0';
+            loader.style.pointerEvents = 'none';
+            setTimeout(function () {
+              if (loader && loader.parentNode) loader.parentNode.removeChild(loader);
+            }, 600);
+          }
+        }
+      }
+      setTimeout(dismissLoader, 2500);
+      window.addEventListener('load', function () {
+        setTimeout(dismissLoader, 1500);
+      });
+    })();
+  </script>
+</head>
+<body class="is-loading play-intro">
+
+  <!-- Initial Blank Loading Screen (Màn hình trơn trống trước khi intro bắt đầu) -->
+  <div class="app-loader" id="appLoader" aria-hidden="true"></div>
+
+  <!-- 3D WebGL Graphics Canvas -->
+  <canvas id="threeCanvas" class="three-canvas" aria-hidden="true"></canvas>
+  <div class="snap-flash" id="snapFlash" aria-hidden="true"></div>
+
+  <!-- Ambient Atmospheric FX (Organic Wandering Light & Shadow) -->
+  <div class="bg-ambience" id="bgAmbience" aria-hidden="true">
+    <div class="bg-orb bg-orb--gold"></div>
+    <div class="bg-orb bg-orb--crimson"></div>
+    <div class="bg-orb bg-orb--amber"></div>
+    <div class="bg-orb bg-orb--lantern"></div>
+  </div>
+  <div class="gold-needles" id="goldNeedles" aria-hidden="true"></div>
+  <div class="falling-cards" id="fallingCards" aria-hidden="true"></div>
+  <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+
+  <!-- ============ NAV ============ -->
+  <header class="nav" id="top">
+    <div class="nav__inner">
+      <a href="#home" class="nav__brand">
+        <img src="Image/Logo.png" class="nav__badge" alt="JPC FTU Logo">
+        <span class="nav__brand-text">
+          <strong>JPC FTU</strong>
+          <em>CLB Tiếng Nhật — Trường Đại học Ngoại Thương</em>
+        </span>
+      </a>
+
+      <button class="nav__toggle" id="navToggle" aria-label="Mở menu" aria-expanded="false" aria-controls="navMenu">
+        <span></span><span></span><span></span>
+      </button>
+
+      <nav class="nav__menu" id="navMenu">
+        <!-- Về JPC with Dropdown -->
+        <div class="nav__item nav__item--dropdown" id="navAboutDropdown">
+          <a href="#about" class="nav__link nav__link--parent" id="navAboutParent">
+            <span>Về JPC</span>
+            <span class="nav__arrow" aria-hidden="true">▾</span>
+          </a>
+
+          <!-- Primary Dropdown: Compact single vertical menu, không có ô vuông và không bung ngang tràn màn hình -->
+          <div class="nav__dropdown" role="menu" aria-label="Menu Về JPC">
+            <!-- Option 1: Giới thiệu chung -->
+            <a href="#about" class="nav__dropdown-item" role="menuitem">
+              <div class="nav__dropdown-info">
+                <strong class="nav__dropdown-title">Giới thiệu chung về JPC</strong>
+                <small class="nav__dropdown-sub">Sứ mệnh, tầm nhìn &amp; 3 trụ cột</small>
+              </div>
+            </a>
+
+            <!-- Option 2: Cơ cấu tổ chức (Click để di chuyển tới phần Cơ cấu tổ chức, bấm mũi tên để mở 5 Ban) -->
+            <div class="nav__dropdown-branch" id="navBranchOrg">
+              <div class="nav__dropdown-item nav__dropdown-item--branch nav__branch-trigger">
+                <a href="#about-org" class="nav__branch-link" role="menuitem">
+                  <div class="nav__dropdown-info">
+                    <strong class="nav__dropdown-title">Cơ cấu tổ chức</strong>
+                    <small class="nav__dropdown-sub">5 Ban chuyên trách vận hành</small>
+                  </div>
+                </a>
+                <button type="button" class="nav__branch-arrow-btn" id="navBranchArrowBtn" aria-label="Mở rộng danh sách 5 Ban" aria-expanded="false">
+                  <span class="nav__branch-arrow" aria-hidden="true">▾</span>
+                </button>
+              </div>
+
+              <!-- Sub-dropdown: 5 Ban (xổ dọc bên trong cùng panel, không tràn màn hình) -->
+              <div class="nav__subdropdown" role="menu" aria-label="5 Ban chuyên trách">
+                <a href="#dept-btc" class="nav__sub-item" role="menuitem">
+                  <span class="nav__sub-name">Ban Tổ chức</span>
+                  <span class="nav__sub-jp">企画部</span>
+                </a>
+                <a href="#dept-bcm" class="nav__sub-item" role="menuitem">
+                  <span class="nav__sub-name">Ban Chuyên môn</span>
+                  <span class="nav__sub-jp">専門部</span>
+                </a>
+                <a href="#dept-btt" class="nav__sub-item" role="menuitem">
+                  <span class="nav__sub-name">Ban Thông tin</span>
+                  <span class="nav__sub-jp">情報部</span>
+                </a>
+                <a href="#dept-bns" class="nav__sub-item" role="menuitem">
+                  <span class="nav__sub-name">Ban Nhân sự</span>
+                  <span class="nav__sub-jp">人事部</span>
+                </a>
+                <a href="#dept-bdn" class="nav__sub-item" role="menuitem">
+                  <span class="nav__sub-name">Ban Đối ngoại</span>
+                  <span class="nav__sub-jp">対外部</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <a href="#events">Sự kiện</a>
+        <a href="#join">Tuyển thành viên</a>
+        <a href="#contact">Liên hệ</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ============ MINI CD MUSIC PLAYER ============ -->
+  <aside class="music-player" id="musicPlayer" aria-label="JPC Mini Music Player">
+    <audio id="jpcBgAudio" src="Playlist/Inazuma.m4a" preload="auto" autoplay playsinline style="display:none;"></audio>
+    <div class="music-player__inner">
+      <!-- Spinning CD Disc (Click to Toggle Play/Pause) -->
+      <button class="music-player__cd-btn" id="musicPlayerCdBtn" type="button" aria-label="Phát hoặc tạm dừng nhạc" title="Nhấn để phát / tạm dừng">
+        <div class="music-player__cd" id="musicPlayerCd">
+          <div class="music-player__cd-center">
+            <div class="music-player__cd-hole"></div>
+          </div>
+        </div>
+        <div class="music-player__play-badge" id="musicPlayerBadge" aria-hidden="true">
+          <svg class="music-player__badge-icon music-player__badge-icon--play" viewBox="0 0 24 24">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+          <svg class="music-player__badge-icon music-player__badge-icon--pause" viewBox="0 0 24 24">
+            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+          </svg>
+        </div>
+      </button>
+
+      <!-- Track Info & Equalizer -->
+      <div class="music-player__track-info">
+        <div class="music-player__meta">
+          <span class="music-player__tag">JPC BGM</span>
+          <div class="music-player__equalizer" id="musicPlayerEqualizer" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </div>
+        </div>
+        <div class="music-player__title-wrap" id="musicPlayerTitleWrap">
+          <div class="music-player__title-track" id="musicPlayerTitleTrack">
+            <span class="music-player__title" id="musicPlayerTitle" title="Inazuma">Inazuma</span>
+            <span class="music-player__title-clone" id="musicPlayerTitleClone" aria-hidden="true"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Random Shuffle Button -->
+      <button class="music-player__btn--shuffle" id="musicPlayerShuffleBtn" type="button" aria-label="Đổi bài nhạc ngẫu nhiên" title="Đổi bài nhạc ngẫu nhiên">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="music-player__shuffle-icon" aria-hidden="true">
+          <polyline points="16 3 21 3 21 8"></polyline>
+          <line x1="4" y1="20" x2="21" y2="3"></line>
+          <polyline points="21 16 21 21 16 21"></polyline>
+          <line x1="15" y1="15" x2="21" y2="21"></line>
+          <line x1="4" y1="4" x2="9" y2="9"></line>
+        </svg>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ============ HOME / HERO ============ -->
+  <section class="view hero is-active" id="home">
+    <!-- 12 Initial Cards: 8 Exit Cards on Arc + 4 Picked Cards that Transform to Home Layout -->
+    <div class="hero__cards" id="heroCards" aria-hidden="true">
+      <!-- Card 0 (Exit 1) -->
+      <div class="deck-card deck-card--exit" style="--stream-x:-286px; --stream-y:72px; --stream-r:-28deg; --stream-delay:0.00s; --exit-delay:0.00s;">
+        <div class="card__face card__face--back"></div>
+      </div>
+      <!-- Card 1 (Exit 2) -->
+      <div class="deck-card deck-card--exit" style="--stream-x:-234px; --stream-y:48px; --stream-r:-23deg; --stream-delay:0.08s; --exit-delay:0.04s;">
+        <div class="card__face card__face--back"></div>
+      </div>
+      <!-- Card 2 (Exit 3) -->
+      <div class="deck-card deck-card--exit" style="--stream-x:-182px; --stream-y:28px; --stream-r:-18deg; --stream-delay:0.16s; --exit-delay:0.08s;">
+        <div class="card__face card__face--back"></div>
+      </div>
+
+      <!-- Card 3 (Picked 1: 一期 - Back) -->
+      <div class="deck-card deck-card--picked card-p1" style="--stream-x:-126px; --stream-y:14px; --stream-r:-12deg; --stream-delay:0.24s; --exit-delay:0.00s; --fx:-190px; --fy:14px; --fr:-16deg;">
+        <div class="card__float">
+          <div class="card__flipper">
+            <div class="card__face card__face--back">
+              <span class="card__kanji">一期</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4 (Exit 4) -->
+      <div class="deck-card deck-card--exit" style="--stream-x:-74px; --stream-y:4px; --stream-r:-6deg; --stream-delay:0.32s; --exit-delay:0.12s;">
+        <div class="card__face card__face--back"></div>
+      </div>
+
+      <!-- Card 5 (Picked 2: JPC - Face Flip) -->
+      <div class="deck-card deck-card--picked card-p2" style="--stream-x:-24px; --stream-y:0px; --stream-r:-2deg; --stream-delay:0.40s; --exit-delay:0.05s; --fx:-66px; --fy:-10px; --fr:-6deg;">
+        <div class="card__float">
+          <div class="card__flipper">
+            <div class="card__face card__face--back"></div>
+            <div class="card__face card__face--front">
+              <span class="card__pip card__pip--tl">J</span>
+              <span class="card__mark">JPC</span>
+              <span class="card__pip card__pip--br">J</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 6 (Exit 5) -->
+      <div class="deck-card deck-card--exit" style="--stream-x:28px; --stream-y:0px; --stream-r:2deg; --stream-delay:0.48s; --exit-delay:0.16s;">
+        <div class="card__face card__face--back"></div>
+      </div>
+
+      <!-- Card 7 (Picked 3: FTU - Face Flip) -->
+      <div class="deck-card deck-card--picked card-p3" style="--stream-x:78px; --stream-y:4px; --stream-r:7deg; --stream-delay:0.56s; --exit-delay:0.10s; --fx:66px; --fy:-10px; --fr:6deg;">
+        <div class="card__float">
+          <div class="card__flipper">
+            <div class="card__face card__face--back"></div>
+            <div class="card__face card__face--front">
+              <span class="card__pip card__pip--tl">F</span>
+              <span class="card__mark">FTU</span>
+              <span class="card__pip card__pip--br">F</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 8 (Exit 6) -->
+      <div class="deck-card deck-card--exit" style="--stream-x:130px; --stream-y:14px; --stream-r:13deg; --stream-delay:0.64s; --exit-delay:0.20s;">
+        <div class="card__face card__face--back"></div>
+      </div>
+
+      <!-- Card 9 (Picked 4: 一会 - Back) -->
+      <div class="deck-card deck-card--picked card-p4" style="--stream-x:182px; --stream-y:28px; --stream-r:19deg; --stream-delay:0.72s; --exit-delay:0.15s; --fx:190px; --fy:14px; --fr:16deg;">
+        <div class="card__float">
+          <div class="card__flipper">
+            <div class="card__face card__face--back">
+              <span class="card__kanji">一会</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 10 (Exit 7) -->
+      <div class="deck-card deck-card--exit" style="--stream-x:234px; --stream-y:48px; --stream-r:24deg; --stream-delay:0.80s; --exit-delay:0.24s;">
+        <div class="card__face card__face--back"></div>
+      </div>
+      <!-- Card 11 (Exit 8) -->
+      <div class="deck-card deck-card--exit" style="--stream-x:286px; --stream-y:72px; --stream-r:29deg; --stream-delay:0.88s; --exit-delay:0.28s;">
+        <div class="card__face card__face--back"></div>
+      </div>
+    </div>
+
+    <div class="hero__content">
+      <p class="hero__eyebrow">CLB Tiếng Nhật Trường Đại học Ngoại Thương</p>
+      <h1 class="hero__title">
+        <span class="hero__title-text" id="heroTitleText"></span>
+        <span class="hero__title-cursor is-hidden" id="heroTitleCursor" aria-hidden="true"></span>
+      </h1>
+      <a href="#about" class="hero__cta">
+        <span>Hiểu thêm về JPC</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ============ VỀ JPC ============ -->
+  <!-- ============ GIỚI THIỆU CHUNG VỀ JPC ============ -->
+  <section class="view about" id="about">
+    <div class="dept__breadcrumb" aria-label="Breadcrumb">
+      <a href="#home">Trang chủ</a>
+      <span aria-hidden="true">›</span>
+      <span class="is-current">Giới thiệu chung về JPC</span>
+    </div>
+
+    <div class="section__head">
+      <p class="section__tag">【 <span class="tag-latin">JPC FTU</span> について 】</p>
+      <h2>Giới thiệu chung về JPC</h2>
+      <p class="section__lede">CLB Tiếng Nhật Trường Đại học Ngoại Thương (JPC FTU) là mái nhà chung gắn kết những tâm hồn yêu tiếng Nhật và đam mê nét đẹp văn hóa xứ Phù Tang suốt hơn hai thập kỷ qua.</p>
+    </div>
+
+    <div class="pillars">
+      <article class="pillar">
+        <div class="pillar__rank">一</div>
+        <h3>Văn hóa Nhật Bản</h3>
+        <p>Từ những lăng kính văn hóa đa chiều đến các hoạt động giao lưu thú vị, JPC là nhịp cầu đưa vẻ đẹp truyền thống lẫn hiện đại của Nhật Bản hòa nhịp cùng sự năng động của sinh viên Ngoại Thương.</p>
+      </article>
+      <article class="pillar">
+        <div class="pillar__rank">二</div>
+        <h3>Cộng đồng &amp; Kết nối</h3>
+        <p>Một tập thể bền chặt, nơi các thành viên không chỉ sẻ chia đam mê về Nhật Bản mà còn cùng nhau mài giũa chuyên môn, hỗ trợ nhau phát triển toàn diện trong những năm tháng đại học.</p>
+      </article>
+      <article class="pillar">
+        <div class="pillar__rank">三</div>
+        <h3>Trải nghiệm &amp; Sự kiện</h3>
+        <p>Là nơi biến ý tưởng thành hiện thực qua chuỗi sự kiện, dự án nổi bật như Nhật Bản trong tôi là.... JPC mang đến môi trường làm việc chuyên nghiệp để mỗi cá nhân được thỏa sức bùng nổ đam mê và cống hiến hết mình.</p>
+      </article>
+    </div>
+
+    <!-- Org Structure Teaser in About Page -->
+    <div class="about-org-teaser" id="about-org">
+      <div class="about-org-teaser__head">
+        <h3>Cơ cấu tổ chức — 5 Ban Chuyên trách</h3>
+        <p>Bộ máy vận hành bài bản giúp JPC FTU phát triển vững mạnh và không ngừng bứt phá qua từng thế hệ.</p>
+      </div>
+      <div class="about-org-grid">
+        <a href="#dept-btc" class="about-org-card dept-card dept-card--float-1" data-dept="dept-btc">
+          <div class="dept-card__inner">
+            <div class="dept-card__art">
+              <img src="Image/Kokeshi 5 Ban/Ban Tổ Chức.png" alt="Kokeshi Ban Tổ chức" class="dept-card__kokeshi" width="145" height="145" loading="lazy" />
+            </div>
+            <div class="dept-card__content">
+              <span class="about-org-card__jp dept-card__jp">企画部</span>
+              <h4 class="dept-card__title">Ban Tổ chức</h4>
+              <p class="dept-card__desc">Kế hoạch, hậu cần, ngân sách &amp; điều phối sự kiện</p>
+              <span class="about-org-card__arrow dept-card__arrow">Xem chi tiết ›</span>
+            </div>
+          </div>
+        </a>
+        <a href="#dept-bcm" class="about-org-card dept-card dept-card--float-2" data-dept="dept-bcm">
+          <div class="dept-card__inner">
+            <div class="dept-card__art">
+              <img src="Image/Kokeshi 5 Ban/Ban Chuyên Môn.png" alt="Kokeshi Ban Chuyên môn" class="dept-card__kokeshi" width="145" height="145" loading="lazy" />
+            </div>
+            <div class="dept-card__content">
+              <span class="about-org-card__jp dept-card__jp">専門部</span>
+              <h4 class="dept-card__title">Ban Chuyên môn</h4>
+              <p class="dept-card__desc">Học thuật tiếng Nhật, văn hóa, biên phiên dịch &amp; giao lưu</p>
+              <span class="about-org-card__arrow dept-card__arrow">Xem chi tiết ›</span>
+            </div>
+          </div>
+        </a>
+        <a href="#dept-btt" class="about-org-card dept-card dept-card--float-3" data-dept="dept-btt">
+          <div class="dept-card__inner">
+            <div class="dept-card__art">
+              <img src="Image/Kokeshi 5 Ban/Ban Thông Tin.png" alt="Kokeshi Ban Thông tin" class="dept-card__kokeshi" width="145" height="145" loading="lazy" />
+            </div>
+            <div class="dept-card__content">
+              <span class="about-org-card__jp dept-card__jp">情報部</span>
+              <h4 class="dept-card__title">Ban Thông tin</h4>
+              <p class="dept-card__desc">Sáng tạo nội dung, thiết kế đồ họa &amp; sản xuất media</p>
+              <span class="about-org-card__arrow dept-card__arrow">Xem chi tiết ›</span>
+            </div>
+          </div>
+        </a>
+        <a href="#dept-bns" class="about-org-card dept-card dept-card--float-4" data-dept="dept-bns">
+          <div class="dept-card__inner">
+            <div class="dept-card__art">
+              <img src="Image/Kokeshi 5 Ban/Ban Nhân Sự.png" alt="Kokeshi Ban Nhân sự" class="dept-card__kokeshi" width="145" height="145" loading="lazy" />
+            </div>
+            <div class="dept-card__content">
+              <span class="about-org-card__jp dept-card__jp">人事部</span>
+              <h4 class="dept-card__title">Ban Nhân sự</h4>
+              <p class="dept-card__desc">Văn nghệ, gắn kết văn hóa nội bộ &amp; đào tạo</p>
+              <span class="about-org-card__arrow dept-card__arrow">Xem chi tiết ›</span>
+            </div>
+          </div>
+        </a>
+        <a href="#dept-bdn" class="about-org-card dept-card dept-card--float-5" data-dept="dept-bdn">
+          <div class="dept-card__inner">
+            <div class="dept-card__art">
+              <img src="Image/Kokeshi 5 Ban/Ban Đối Ngoại.png" alt="Kokeshi Ban Đối ngoại" class="dept-card__kokeshi" width="145" height="145" loading="lazy" />
+            </div>
+            <div class="dept-card__content">
+              <span class="about-org-card__jp dept-card__jp">対外部</span>
+              <h4 class="dept-card__title">Ban Đối ngoại</h4>
+              <p class="dept-card__desc">Hợp tác doanh nghiệp, vận động tài trợ &amp; diễn giả</p>
+              <span class="about-org-card__arrow dept-card__arrow">Xem chi tiết ›</span>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ BAN TỔ CHỨC ============ -->
+  <section class="view dept" id="dept-btc">
+    <div class="dept__inner">
+      <nav class="dept__breadcrumb" aria-label="Breadcrumb">
+        <a href="#home">Trang chủ</a>
+        <span aria-hidden="true">›</span>
+        <a href="#about">Về JPC</a>
+        <span aria-hidden="true">›</span>
+        <span class="is-current">Ban Tổ chức</span>
+      </nav>
+
+      <div class="dept__hero">
+        <div class="dept__kanji-seal" aria-hidden="true">企画</div>
+        <p class="dept__badge">BAN TỔ CHỨC — PLANNING &amp; LOGISTICS</p>
+        <p class="dept__jp-title">企画部</p>
+        <h2 class="dept__title">Ban Tổ chức</h2>
+        <p class="dept__desc">
+          Ban Tổ chức là xương sống vận hành của mọi chương trình lớn tại JPC FTU — nơi biến những ý tưởng táo bạo thành kế hoạch hành động chi tiết, quản lý ngân sách, chuẩn bị hậu cần chu đáo và điều phối nguồn lực để kiến tạo nên những sự kiện chỉn chu và bùng nổ nhất.
+        </p>
+      </div>
+
+      <div class="dept__grid">
+        <article class="dept__card">
+          <span class="dept__card-rank">一</span>
+          <h3 class="dept__card-title">Kế hoạch &amp; Điều phối Sự kiện</h3>
+          <p class="dept__card-desc">Lên kịch bản tổng thể (Master Plan), quản lý timeline từng phút và điều phối sự phối hợp nhịp nhàng giữa các ban trong ngày diễn ra chương trình.</p>
+        </article>
+        <article class="dept__card">
+          <span class="dept__card-rank">二</span>
+          <h3 class="dept__card-title">Hậu cần &amp; Quản trị Hiện trường</h3>
+          <p class="dept__card-desc">Quản lý kho đạo cụ, bài trí không gian sự kiện đậm chất Nhật Bản, tiền trạm địa điểm và xây dựng phương án dự phòng cho mọi tình huống phát sinh.</p>
+        </article>
+        <article class="dept__card">
+          <span class="dept__card-rank">三</span>
+          <h3 class="dept__card-title">Tài chính &amp; Dự toán Ngân sách</h3>
+          <p class="dept__card-desc">Lập dự trù ngân sách chi tiết cho từng sự kiện, kiểm soát dòng tiền hoạt động của CLB và thực hiện quyết toán minh bạch, chuẩn xác.</p>
+        </article>
+      </div>
+
+      <div class="dept__skills">
+        <h3 class="dept__skills-title">Tố chất &amp; Kỹ năng bạn sẽ rèn luyện</h3>
+        <div class="dept__skill-tags">
+          <span class="dept__tag">Quản trị dự án sự kiện</span>
+          <span class="dept__tag">Tư duy xử lý khủng hoảng</span>
+          <span class="dept__tag">Quản lý tài chính &amp; ngân sách</span>
+          <span class="dept__tag">Điều phối nhân sự hiện trường</span>
+          <span class="dept__tag">Lập kế hoạch đa nhiệm</span>
+        </div>
+      </div>
+
+      <div class="dept__action">
+        <a href="#join" class="dept__cta">Ứng tuyển Ban Tổ chức Gen 22</a>
+      </div>
+
+      <div class="dept__nav-bar">
+        <span class="dept__nav-label">Khám phá các Ban chuyên trách khác:</span>
+        <div class="dept__nav-links">
+          <a href="#dept-bcm" class="dept__nav-pill">Ban Chuyên môn ›</a>
+          <a href="#dept-btt" class="dept__nav-pill">Ban Thông tin ›</a>
+          <a href="#dept-bns" class="dept__nav-pill">Ban Nhân sự ›</a>
+          <a href="#dept-bdn" class="dept__nav-pill">Ban Đối ngoại ›</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ BAN CHUYÊN MÔN ============ -->
+  <section class="view dept" id="dept-bcm">
+    <div class="dept__inner">
+      <nav class="dept__breadcrumb" aria-label="Breadcrumb">
+        <a href="#home">Trang chủ</a>
+        <span aria-hidden="true">›</span>
+        <a href="#about">Về JPC</a>
+        <span aria-hidden="true">›</span>
+        <span class="is-current">Ban Chuyên môn</span>
+      </nav>
+
+      <div class="dept__hero">
+        <div class="dept__kanji-seal" aria-hidden="true">専門</div>
+        <p class="dept__badge">BAN CHUYÊN MÔN — ACADEMIC &amp; CULTURE</p>
+        <p class="dept__jp-title">専門部</p>
+        <h2 class="dept__title">Ban Chuyên môn</h2>
+        <p class="dept__desc">
+          Ban Chuyên môn là trí tuệ và linh hồn học thuật của JPC FTU — nơi quy tụ những người yêu tiếng Nhật sâu sắc, phụ trách nội dung kiến thức, tổ chức các lớp học bổ ích và lan tỏa những giá trị văn hóa truyền thống nguyên bản của xứ sở Phù Tang.
+        </p>
+
+        <!-- Cơ cấu 2 Tiểu ban trực thuộc -->
+        <div class="dept__subunits" aria-label="Cơ cấu 2 Tiểu ban trực thuộc">
+          <div class="dept__subunits-divider">
+            <span class="dept__subunits-line"></span>
+            <span class="dept__subunits-badge">
+              <span class="dept__subunits-gem">❖</span>
+              <span>2 TIỂU BAN TRỰC THUỘC</span>
+              <span class="dept__subunits-gem">❖</span>
+            </span>
+            <span class="dept__subunits-line"></span>
+          </div>
+          <div class="dept__subunits-grid">
+            <div class="dept__subunit-card">
+              <div class="dept__subunit-glow" aria-hidden="true"></div>
+              <h3 class="dept__subunit-title">Tiểu Ban Nội dung</h3>
+              <p class="dept__subunit-desc">Học thuật, nghiên cứu văn hóa và phát triển tài liệu chuyên môn</p>
+            </div>
+            <div class="dept__subunit-card">
+              <div class="dept__subunit-glow" aria-hidden="true"></div>
+              <h3 class="dept__subunit-title">Tiểu Ban Dịch thuật</h3>
+              <p class="dept__subunit-desc">Biên phiên dịch văn bản, ấn phẩm và giao lưu song ngữ Nhật — Việt</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dept__grid">
+        <article class="dept__card">
+          <span class="dept__card-rank">一</span>
+          <h3 class="dept__card-title">Học thuật &amp; Đào tạo Tiếng Nhật</h3>
+          <p class="dept__card-desc">Phụ trách các lớp học tiếng Nhật nội bộ (Kaiwa giao tiếp, Kanji, ngữ pháp JLPT N3-N2), biên soạn cẩm nang học tập bổ ích và giải đáp thắc mắc cho hội viên.</p>
+        </article>
+        <article class="dept__card">
+          <span class="dept__card-rank">二</span>
+          <h3 class="dept__card-title">Văn hóa &amp; Workshop Trải nghiệm</h3>
+          <p class="dept__card-desc">Nghiên cứu chuyên sâu phong tục tập quán Nhật Bản; thiết kế các workshop truyền thống đặc sắc: Trà đạo (Sadou), Nghệ thuật gấp giấy (Origami), Thư pháp (Shodou).</p>
+        </article>
+        <article class="dept__card">
+          <span class="dept__card-rank">三</span>
+          <h3 class="dept__card-title">Biên phiên dịch - Giao lưu</h3>
+          <p class="dept__card-desc">Rèn luyện kỹ năng dịch thuật tài liệu, biên dịch nội dung song ngữ Nhật — Việt, tham gia phiên dịch hỗ trợ các sự kiện và điều phối những buổi giao lưu ngôn ngữ, văn hóa cùng khách mời người Nhật.</p>
+        </article>
+      </div>
+
+      <div class="dept__skills">
+        <h3 class="dept__skills-title">Tố chất &amp; Kỹ năng bạn sẽ rèn luyện</h3>
+        <div class="dept__skill-tags">
+          <span class="dept__tag">Nâng cao trình độ tiếng Nhật</span>
+          <span class="dept__tag">Kỹ năng biên phiên dịch Nhật — Việt</span>
+          <span class="dept__tag">Giao lưu &amp; kết nối ngôn ngữ</span>
+          <span class="dept__tag">Hiểu biết sâu sắc văn hóa Nhật</span>
+          <span class="dept__tag">Kỹ năng sư phạm &amp; thuyết trình</span>
+        </div>
+      </div>
+
+      <div class="dept__action">
+        <a href="#join" class="dept__cta">Ứng tuyển Ban Chuyên môn Gen 22</a>
+      </div>
+
+      <div class="dept__nav-bar">
+        <span class="dept__nav-label">Khám phá các Ban chuyên trách khác:</span>
+        <div class="dept__nav-links">
+          <a href="#dept-btc" class="dept__nav-pill">Ban Tổ chức ›</a>
+          <a href="#dept-btt" class="dept__nav-pill">Ban Thông tin ›</a>
+          <a href="#dept-bns" class="dept__nav-pill">Ban Nhân sự ›</a>
+          <a href="#dept-bdn" class="dept__nav-pill">Ban Đối ngoại ›</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ BAN THÔNG TIN ============ -->
+  <section class="view dept" id="dept-btt">
+    <div class="dept__inner">
+      <nav class="dept__breadcrumb" aria-label="Breadcrumb">
+        <a href="#home">Trang chủ</a>
+        <span aria-hidden="true">›</span>
+        <a href="#about">Về JPC</a>
+        <span aria-hidden="true">›</span>
+        <span class="is-current">Ban Thông tin</span>
+      </nav>
+
+      <div class="dept__hero">
+        <div class="dept__kanji-seal" aria-hidden="true">情報</div>
+        <p class="dept__badge">BAN THÔNG TIN — MEDIA &amp; COMMUNICATIONS</p>
+        <p class="dept__jp-title">情報部</p>
+        <h2 class="dept__title">Ban Thông tin</h2>
+        <p class="dept__desc">
+          Ban Thông tin là tiếng nói và diện mạo thẩm mỹ của JPC FTU — nơi biến những ý tưởng thành ngôn từ lay động, thiết kế thị giác đậm chất Phù Tang và lan tỏa hình ảnh CLB đến hàng chục nghìn sinh viên qua hệ thống kênh truyền thông đa nền tảng.
+        </p>
+
+        <!-- Cơ cấu 2 Tiểu ban trực thuộc -->
+        <div class="dept__subunits" aria-label="Cơ cấu 2 Tiểu ban trực thuộc">
+          <div class="dept__subunits-divider">
+            <span class="dept__subunits-line"></span>
+            <span class="dept__subunits-badge">
+              <span class="dept__subunits-gem">❖</span>
+              <span>2 TIỂU BAN TRỰC THUỘC</span>
+              <span class="dept__subunits-gem">❖</span>
+            </span>
+            <span class="dept__subunits-line"></span>
+          </div>
+          <div class="dept__subunits-grid">
+            <div class="dept__subunit-card">
+              <div class="dept__subunit-glow" aria-hidden="true"></div>
+              <h3 class="dept__subunit-title">Tiểu Ban Truyền thông</h3>
+              <p class="dept__subunit-desc">Sáng tạo thông điệp, xây dựng nội dung và quản trị truyền thông đa kênh</p>
+            </div>
+            <div class="dept__subunit-card">
+              <div class="dept__subunit-glow" aria-hidden="true"></div>
+              <h3 class="dept__subunit-title">Tiểu Ban Kỹ thuật</h3>
+              <p class="dept__subunit-desc">Thiết kế đồ họa Key Visual, quay dựng video ngắn và kỹ thuật media</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dept__grid">
+        <article class="dept__card">
+          <span class="dept__card-rank">一</span>
+          <h3 class="dept__card-title">Sáng tạo Nội dung (Content Writing)</h3>
+          <p class="dept__card-desc">Lên kế hoạch nội dung truyền thông cho Fanpage, chấp bút các tuyến bài văn hóa, tin tức sự kiện và thông điệp tuyển quân giàu cảm xúc, bắt kịp xu hướng.</p>
+        </article>
+        <article class="dept__card">
+          <span class="dept__card-rank">二</span>
+          <h3 class="dept__card-title">Thiết kế Đồ họa (Graphic Design)</h3>
+          <p class="dept__card-desc">Định hình phong cách nhận diện hình ảnh (Key Visual), thiết kế bộ ấn phẩm truyền thông, poster, banner, avatar và merchandise độc quyền của CLB.</p>
+        </article>
+        <article class="dept__card">
+          <span class="dept__card-rank">三</span>
+          <h3 class="dept__card-title">Sản xuất Media &amp; Video TikTok</h3>
+          <p class="dept__card-desc">Bắt trọn từng khoảnh khắc đáng nhớ qua ống kính nhiếp ảnh, quay dựng video ngắn TikTok triệu view và sản xuất video recap sự kiện chuyên nghiệp.</p>
+        </article>
+      </div>
+
+      <div class="dept__skills">
+        <h3 class="dept__skills-title">Tố chất &amp; Kỹ năng bạn sẽ rèn luyện</h3>
+        <div class="dept__skill-tags">
+          <span class="dept__tag">Tư duy truyền thông &amp; tiếp thị số</span>
+          <span class="dept__tag">Viết lách sáng tạo (Copywriting)</span>
+          <span class="dept__tag">Thành thạo công cụ thiết kế (Ps, Ai)</span>
+          <span class="dept__tag">Kỹ năng quay dựng video ngắn</span>
+          <span class="dept__tag">Nhiếp ảnh &amp; xử lý hậu kỳ</span>
+        </div>
+      </div>
+
+      <div class="dept__action">
+        <a href="#join" class="dept__cta">Ứng tuyển Ban Thông tin Gen 22</a>
+      </div>
+
+      <div class="dept__nav-bar">
+        <span class="dept__nav-label">Khám phá các Ban chuyên trách khác:</span>
+        <div class="dept__nav-links">
+          <a href="#dept-btc" class="dept__nav-pill">Ban Tổ chức ›</a>
+          <a href="#dept-bcm" class="dept__nav-pill">Ban Chuyên môn ›</a>
+          <a href="#dept-bns" class="dept__nav-pill">Ban Nhân sự ›</a>
+          <a href="#dept-bdn" class="dept__nav-pill">Ban Đối ngoại ›</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ BAN NHÂN SỰ ============ -->
+  <section class="view dept" id="dept-bns">
+    <div class="dept__inner">
+      <nav class="dept__breadcrumb" aria-label="Breadcrumb">
+        <a href="#home">Trang chủ</a>
+        <span aria-hidden="true">›</span>
+        <a href="#about">Về JPC</a>
+        <span aria-hidden="true">›</span>
+        <span class="is-current">Ban Nhân sự</span>
+      </nav>
+
+      <div class="dept__hero">
+        <div class="dept__kanji-seal" aria-hidden="true">人事</div>
+        <p class="dept__badge">BAN NHÂN SỰ — HUMAN RESOURCES</p>
+        <p class="dept__jp-title">人事部</p>
+        <h2 class="dept__title">Ban Nhân sự</h2>
+        <p class="dept__desc">
+          Ban Nhân sự là trái tim ấm áp giữ lửa yêu thương và thấu hiểu của đại gia đình JPC — nơi chăm lo từng thành viên, xây dựng văn hóa gắn kết, đào tạo kỹ năng mềm và đảm bảo mỗi cá nhân đều tìm thấy niềm vui, sự phát triển và tình bạn chân thành suốt những năm tháng thanh xuân.
+        </p>
+      </div>
+
+      <div class="dept__grid">
+        <article class="dept__card">
+          <span class="dept__card-rank">一</span>
+          <h3 class="dept__card-title">Văn nghệ &amp; Lan tỏa Niềm vui</h3>
+          <p class="dept__card-desc">Cháy hết mình với các tiết mục biểu diễn văn nghệ đặc sắc, khuấy động các sân khấu sự kiện và đem lại tiếng cười, niềm vui rạng rỡ cùng nguồn năng lượng tích cực cho đại gia đình JPC.</p>
+        </article>
+        <article class="dept__card">
+          <span class="dept__card-rank">二</span>
+          <h3 class="dept__card-title">Văn hóa Nội bộ &amp; Teambuilding</h3>
+          <p class="dept__card-desc">Tổ chức các hoạt động gắn kết tình cảm: sinh nhật hàng tháng, dã ngoại cắm trại thường niên, ngày hội gia đình JPC và các buổi bonding đầm ấm.</p>
+        </article>
+        <article class="dept__card">
+          <span class="dept__card-rank">三</span>
+          <h3 class="dept__card-title">Đào tạo &amp; Phát triển Kỹ năng</h3>
+          <p class="dept__card-desc">Theo dõi tiến độ tham gia của thành viên, tổ chức các buổi training kỹ năng mềm, lắng nghe tâm tư và định hướng phát triển cá nhân cho từng hội viên.</p>
+        </article>
+      </div>
+
+      <div class="dept__skills">
+        <h3 class="dept__skills-title">Tố chất &amp; Kỹ năng bạn sẽ rèn luyện</h3>
+        <div class="dept__skill-tags">
+          <span class="dept__tag">Biểu diễn &amp; hoạt náo văn nghệ</span>
+          <span class="dept__tag">Lắng nghe, thấu cảm &amp; gắn kết</span>
+          <span class="dept__tag">Tổ chức hoạt động teambuilding</span>
+          <span class="dept__tag">Quản trị nhân sự &amp; hiệu suất</span>
+          <span class="dept__tag">Xây dựng văn hóa tổ chức</span>
+        </div>
+      </div>
+
+      <div class="dept__action">
+        <a href="#join" class="dept__cta">Ứng tuyển Ban Nhân sự Gen 22</a>
+      </div>
+
+      <div class="dept__nav-bar">
+        <span class="dept__nav-label">Khám phá các Ban chuyên trách khác:</span>
+        <div class="dept__nav-links">
+          <a href="#dept-btc" class="dept__nav-pill">Ban Tổ chức ›</a>
+          <a href="#dept-bcm" class="dept__nav-pill">Ban Chuyên môn ›</a>
+          <a href="#dept-btt" class="dept__nav-pill">Ban Thông tin ›</a>
+          <a href="#dept-bdn" class="dept__nav-pill">Ban Đối ngoại ›</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ BAN ĐỐI NGOẠI ============ -->
+  <section class="view dept" id="dept-bdn">
+    <div class="dept__inner">
+      <nav class="dept__breadcrumb" aria-label="Breadcrumb">
+        <a href="#home">Trang chủ</a>
+        <span aria-hidden="true">›</span>
+        <a href="#about">Về JPC</a>
+        <span aria-hidden="true">›</span>
+        <span class="is-current">Ban Đối ngoại</span>
+      </nav>
+
+      <div class="dept__hero">
+        <div class="dept__kanji-seal" aria-hidden="true">対外</div>
+        <p class="dept__badge">BAN ĐỐI NGOẠI — EXTERNAL RELATIONS</p>
+        <p class="dept__jp-title">対外部</p>
+        <h2 class="dept__title">Ban Đối ngoại</h2>
+        <p class="dept__desc">
+          Ban Đối ngoại là đại sứ uy tín và gương mặt đại diện của JPC trước các đối tác — cầu nối vững chắc đưa thương hiệu CLB đến với các doanh nghiệp, trường đại học, nhà tài trợ, và các tổ chức khác.
+        </p>
+      </div>
+
+      <div class="dept__grid">
+        <article class="dept__card">
+          <span class="dept__card-rank">一</span>
+          <h3 class="dept__card-title">Vận động Tài trợ (Sponsorship)</h3>
+          <p class="dept__card-desc">Nghiên cứu đối tác, xây dựng hồ sơ mời tài trợ (Proposal) chuẩn quốc tế, đàm phán hợp đồng và bảo đảm quyền lợi hợp tác cho các sự kiện quy mô.</p>
+        </article>
+        <article class="dept__card">
+          <span class="dept__card-rank">二</span>
+          <h3 class="dept__card-title">Khách mời, Diễn giả &amp; Đối tác</h3>
+          <p class="dept__card-desc">Thiết lập quan hệ với các chuyên gia Nhật Bản, nghệ nhân văn hóa, giảng viên uy tín và những người có tầm ảnh hưởng tham gia cố vấn, chia sẻ.</p>
+        </article>
+        <article class="dept__card">
+          <span class="dept__card-rank">三</span>
+          <h3 class="dept__card-title">Mạng lưới Alumni &amp; Giao lưu CLB</h3>
+          <p class="dept__card-desc">Duy trì mạng lưới cựu thành viên thành đạt (Alumni Network), tăng cường giao lưu hợp tác với các CLB tiếng Nhật trên cả nước và các tổ chức văn hóa.</p>
+        </article>
+      </div>
+
+      <div class="dept__skills">
+        <h3 class="dept__skills-title">Tố chất &amp; Kỹ năng bạn sẽ rèn luyện</h3>
+        <div class="dept__skill-tags">
+          <span class="dept__tag">Nghệ thuật đàm phán &amp; thuyết phục</span>
+          <span class="dept__tag">Tác phong ngoại giao chuyên nghiệp</span>
+          <span class="dept__tag">Kỹ năng viết hồ sơ mời tài trợ</span>
+          <span class="dept__tag">Mở rộng mạng lưới quan hệ (Networking)</span>
+          <span class="dept__tag">Giao tiếp đối ngoại tiếng Nhật / Anh</span>
+        </div>
+      </div>
+
+      <div class="dept__action">
+        <a href="#join" class="dept__cta">Ứng tuyển Ban Đối ngoại Gen 22</a>
+      </div>
+
+      <div class="dept__nav-bar">
+        <span class="dept__nav-label">Khám phá các Ban chuyên trách khác:</span>
+        <div class="dept__nav-links">
+          <a href="#dept-btc" class="dept__nav-pill">Ban Tổ chức ›</a>
+          <a href="#dept-bcm" class="dept__nav-pill">Ban Chuyên môn ›</a>
+          <a href="#dept-btt" class="dept__nav-pill">Ban Thông tin ›</a>
+          <a href="#dept-bns" class="dept__nav-pill">Ban Nhân sự ›</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SỰ KIỆN ============ -->
+  <section class="view events" id="events">
+    <div class="section__head">
+      <h2>Sự kiện</h2>
+      <p class="section__lede">Cùng nhìn lại một trong những sân chơi tiêu biểu của JPC — sự kiện quy tụ những người trẻ đam mê tìm hiểu văn hóa Nhật Bản.</p>
+    </div>
+
+    <!-- Dynamic Timeline & Event Cards rendered by EventsManager -->
+    <div class="events-timeline-container" id="eventsTimelineContainer"></div>
+
+    <p class="events__follow">
+      Không muốn bỏ lỡ sự kiện tiếp theo? Theo dõi Fanpage và TikTok của JPC FTU ở cuối trang để cập nhật lịch mới nhất.
+    </p>
+  </section>
+
+  <!-- ============ TUYỂN THÀNH VIÊN ============ -->
+  <section class="view join" id="join">
+    <div class="section__head section__head--light">
+      <div class="join__theme-badge-wrap">
+        <span class="join__theme-badge"><span class="badge-jp">こけし画記</span> · <span class="badge-latin">KOKESHI HỌA KÝ</span></span>
+      </div>
+      <h2 class="join__heading">Tuyển Thành Viên Thế Hệ 22</h2>
+      <p class="section__lede">JPC đang tìm kiếm những gương mặt mới cho gia đình thế hệ 22. Không cần giỏi tiếng Nhật — chỉ cần bạn muốn học và muốn thuộc về một cộng đồng.</p>
+      <div class="join__dept-more">
+        <a href="#about-org" class="join__dept-link"><u>Xem thêm về các Ban</u></a>
+      </div>
+    </div>
+
+    <div class="join__container">
+      <!-- 4 Vòng chính ở 1 hàng ngang (Grid 4 cột) -->
+      <div class="join__rounds-grid" id="joinRoundsGrid">
+        <article class="join__step" data-round-id="round-1" tabindex="0" role="button" aria-label="Xem chi tiết Vòng 1: Khai Nhãn">
+          <div class="join__mascot-wrapper">
+            <div class="join__mascot-glow" aria-hidden="true"></div>
+            <div class="join__mascot-card">
+              <div class="join__mascot-face join__mascot-face--mono">
+                <img src="Image/Monochrome/Vòng 1 - Mono.png" alt="Vòng 1 - Mono" class="join__mascot-img" loading="lazy">
+              </div>
+              <div class="join__mascot-face join__mascot-face--color">
+                <img src="Image/Color/Vòng 1 - Color.png" alt="Vòng 1 - Color" class="join__mascot-img" loading="lazy">
+              </div>
+            </div>
+          </div>
+          <span class="join__step-no">Vòng 1</span>
+          <span class="join__step-date">01/10 – 20/10/2026</span>
+          <h3 class="join__step-title">Khai Nhãn</h3>
+          <p class="join__step-desc">Điền form đăng ký trực tuyến với thông tin cơ bản &amp; nguyện vọng chọn Ban.</p>
+          <div class="join__step-action" aria-hidden="true">
+            <span>Chi tiết vòng</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </div>
+        </article>
+
+        <article class="join__step" data-round-id="round-2" tabindex="0" role="button" aria-label="Xem chi tiết Vòng 2: Hòa Nhịp">
+          <div class="join__mascot-wrapper">
+            <div class="join__mascot-glow" aria-hidden="true"></div>
+            <div class="join__mascot-card">
+              <div class="join__mascot-face join__mascot-face--mono">
+                <img src="Image/Monochrome/Vòng 2 - Mono.png" alt="Vòng 2 - Mono" class="join__mascot-img" loading="lazy">
+              </div>
+              <div class="join__mascot-face join__mascot-face--color">
+                <img src="Image/Color/Vòng 2 - Color.png" alt="Vòng 2 - Color" class="join__mascot-img" loading="lazy">
+              </div>
+            </div>
+          </div>
+          <span class="join__step-no">Vòng 2</span>
+          <span class="join__step-date">23/10 – 25/10/2026</span>
+          <h3 class="join__step-title">Hòa Nhịp</h3>
+          <p class="join__step-desc">Gặp gỡ, thảo luận nhóm để thể hiện cá tính, bản lĩnh và tinh thần đồng đội.</p>
+          <div class="join__step-action" aria-hidden="true">
+            <span>Chi tiết vòng</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </div>
+        </article>
+
+        <article class="join__step" data-round-id="round-3-1" tabindex="0" role="button" aria-label="Xem chi tiết Vòng 3.1: Phá Phong">
+          <div class="join__mascot-wrapper">
+            <div class="join__mascot-glow" aria-hidden="true"></div>
+            <div class="join__mascot-card">
+              <div class="join__mascot-face join__mascot-face--mono">
+                <img src="Image/Monochrome/Vòng 3.1 - Mono.png" alt="Vòng 3.1 - Mono" class="join__mascot-img" loading="lazy">
+              </div>
+              <div class="join__mascot-face join__mascot-face--color">
+                <img src="Image/Color/Vòng 3.1 - Color.png" alt="Vòng 3.1 - Color" class="join__mascot-img" loading="lazy">
+              </div>
+            </div>
+          </div>
+          <span class="join__step-no">Vòng 3.1</span>
+          <span class="join__step-date">27/10 – 04/11/2026</span>
+          <h3 class="join__step-title">Phá Phong</h3>
+          <p class="join__step-desc">Thực chiến cùng đồng đội đến từ các Ban qua đề bài được giao.</p>
+          <div class="join__step-action" aria-hidden="true">
+            <span>Chi tiết vòng</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </div>
+        </article>
+
+        <article class="join__step" data-round-id="round-3-2" tabindex="0" role="button" aria-label="Xem chi tiết Vòng 3.2: Chân diện">
+          <div class="join__mascot-wrapper">
+            <div class="join__mascot-glow" aria-hidden="true"></div>
+            <div class="join__mascot-card">
+              <div class="join__mascot-face join__mascot-face--mono">
+                <img src="Image/Monochrome/Vòng 3.2 - Mono.png" alt="Vòng 3.2 - Mono" class="join__mascot-img" loading="lazy">
+              </div>
+              <div class="join__mascot-face join__mascot-face--color">
+                <img src="Image/Color/Vòng 3.2 - Color.png" alt="Vòng 3.2 - Color" class="join__mascot-img" loading="lazy">
+              </div>
+            </div>
+          </div>
+          <span class="join__step-no">Vòng 3.2</span>
+          <span class="join__step-date">08/11 – 09/11/2026</span>
+          <h3 class="join__step-title">Chân diện</h3>
+          <p class="join__step-desc">Trò chuyện chuyên sâu cùng Trưởng - Phó Ban các ban chuyên trách.</p>
+          <div class="join__step-action" aria-hidden="true">
+            <span>Chi tiết vòng</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </div>
+        </article>
+      </div>
+
+      <!-- Khung KẾT QUẢ tách xuống hàng dưới thành khối banner trải dài theo chiều ngang -->
+      <div class="join__result-wrap" id="joinResultContainer">
+        <article class="join__result-banner" id="joinResultBanner">
+          <div class="join__result-banner-glow" aria-hidden="true"></div>
+          <div class="join__result-col join__result-col--badge">
+            <div class="join__result-pill">
+              <span class="join__result-pill-icon" aria-hidden="true">🎊</span>
+              <div class="join__result-pill-text">
+                <span class="join__result-tag">Kết quả</span>
+                <span class="join__result-date">12/11/2026</span>
+              </div>
+            </div>
+          </div>
+          <div class="join__result-col join__result-col--info">
+            <h3 class="join__result-title">Công Bố Kết Quả</h3>
+            <p class="join__result-desc">Chào đón các gương mặt xuất sắc chính thức trở thành thế hệ Gen 22 của JPC - FTU!</p>
+          </div>
+        </article>
+      </div>
+    </div>
+
+    <a href="https://forms.gle/LDYVHCrKjsjvj2jv6" class="join__cta" id="joinCtaBtn" target="_blank" rel="noopener noreferrer">Đăng ký ngay</a>
+  </section>
+
+  <!-- ============ FOOTER / CONTACT ============ -->
+  <footer class="contact" id="contact">
+    <div class="contact__inner">
+      <p class="contact__heading">MỌI THẮC MẮC XIN VUI LÒNG LIÊN HỆ<br>JPC FTU — CLB TIẾNG NHẬT TRƯỜNG ĐẠI HỌC NGOẠI THƯƠNG</p>
+
+      <ul class="contact__list">
+        <li>
+          <span class="contact__icon" aria-hidden="true">📢</span>
+          Fanpage: <a href="https://www.facebook.com/Japaneseclub.ftu" target="_blank" rel="noopener">facebook.com/Japaneseclub.ftu</a>
+        </li>
+        <li>
+          <span class="contact__icon" aria-hidden="true">📩</span>
+          Email: <a href="mailto:japaneseclubftu@gmail.com">japaneseclubftu@gmail.com</a>
+        </li>
+        <li>
+          <span class="contact__icon" aria-hidden="true">📞</span>
+          Hotline: <a href="tel:0979565043">097 956 5043</a> (Miss Thu Trang)
+        </li>
+        <li>
+          <span class="contact__icon" aria-hidden="true">🎶</span>
+          TikTok: <a href="https://www.tiktok.com/@jpc_ftu_" target="_blank" rel="noopener">@jpc_ftu_</a>
+        </li>
+      </ul>
+
+      <p class="contact__credit">
+        Website made by Nguyễn Ánh · Zuki
+        <button type="button" class="admin-secret-lock" id="adminSecretLock" aria-label="Cổng quản trị sự kiện JPC" title="Cổng quản trị sự kiện (Ctrl+Shift+A)">🔒</button>
+      </p>
+    </div>
+  </footer>
+
+  <!-- ============ EVENT DETAIL MODAL (MÀN HÌNH NHỎ) ============ -->
+  <div class="event-modal" id="eventDetailModal" role="dialog" aria-modal="true" aria-labelledby="eventModalTitle" data-lenis-prevent>
+    <div class="event-modal-backdrop" id="eventModalBackdrop" aria-hidden="true"></div>
+    <div class="event-modal-dialog" data-lenis-prevent>
+      <!-- Animated Fluid / Ripple Background Layer -->
+      <div class="event-modal-bg" aria-hidden="true"></div>
+      <div class="event-modal-overlay" aria-hidden="true"></div>
+
+      <!-- Close Button ('X') -->
+      <button type="button" class="event-modal-close" id="eventModalCloseBtn" aria-label="Đóng cửa sổ chi tiết">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <!-- Modal Body (2 Columns matching Màn hình nhỏ.png) -->
+      <div class="event-modal-body">
+        <!-- Left Column: 1:1 Thumbnail + Title + Date -->
+        <div class="event-modal-col event-modal-col--left">
+          <div class="event-modal-thumb-wrap">
+            <img src="" alt="Thumbnail sự kiện" class="event-modal-thumb" id="eventModalThumb">
+          </div>
+          <h3 class="event-modal-title" id="eventModalTitle">Tên sự kiện</h3>
+          <p class="event-modal-date" id="eventModalDate">DD/MM/YYYY</p>
+        </div>
+
+        <!-- Center Decorative Glowing Gradient 4-point Star Divider -->
+        <div class="event-modal-star-divider" aria-hidden="true">
+          <span class="event-modal-star-ray"></span>
+          <div class="event-modal-star">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 0L14.2 9.8L24 12L14.2 14.2L12 24L9.8 14.2L0 12L9.8 9.8L12 0Z" fill="url(#starGradient)"/>
+              <defs>
+                <radialGradient id="starGradient" cx="0.5" cy="0.5" r="0.5" fx="0.5" fy="0.5">
+                  <stop offset="0%" stop-color="#ffffff"/>
+                  <stop offset="40%" stop-color="#eecd7e"/>
+                  <stop offset="85%" stop-color="#cf9f3f"/>
+                  <stop offset="100%" stop-color="#a82338"/>
+                </radialGradient>
+              </defs>
+            </svg>
+          </div>
+          <span class="event-modal-star-ray"></span>
+        </div>
+
+        <!-- Right Column: Detailed Description with Custom Scrollbar (max-height = thumbnail height) -->
+        <div class="event-modal-col event-modal-col--right">
+          <div class="event-modal-desc" id="eventModalDesc" data-lenis-prevent>
+            <!-- Dynamic Paragraphs -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ RECRUITMENT ROUND DETAIL MODAL (KẾ THỪA TỪ EVENT MODAL) ============ -->
+  <div class="event-modal join-modal" id="joinDetailModal" role="dialog" aria-modal="true" aria-labelledby="joinModalTitle" data-lenis-prevent>
+    <div class="event-modal-backdrop" id="joinModalBackdrop" aria-hidden="true"></div>
+    <div class="event-modal-dialog" data-lenis-prevent>
+      <!-- Animated Fluid / Ripple Background Layer (Chảy mực) -->
+      <div class="event-modal-bg" aria-hidden="true"></div>
+      <div class="event-modal-overlay" aria-hidden="true"></div>
+
+      <!-- Close Button ('X') -->
+      <button type="button" class="event-modal-close" id="joinModalCloseBtn" aria-label="Đóng cửa sổ chi tiết vòng thi">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <!-- Modal Body (2 Columns matching Màn hình nhỏ.png) -->
+      <div class="event-modal-body join-modal-body">
+        <!-- Left Column: Transparent Popup Mascot with Floating Animation & Soft Outer Glow -->
+        <div class="event-modal-col event-modal-col--left">
+          <div class="join-modal-thumb-wrap">
+            <div class="join-modal-glow" aria-hidden="true"></div>
+            <img src="Image/Khung Popup - Tuyển Gen/Vòng 1 - Popup.png?v=20260925_rev3" alt="Khung Popup Tuyển Gen" class="join-modal-thumb" id="joinModalThumb" width="136" height="178" loading="eager" decoding="async">
+          </div>
+          <div class="join-modal-info">
+            <span class="join-modal-step-badge" id="joinModalStepNo">Vòng 1</span>
+            <h3 class="event-modal-title join-modal-title" id="joinModalTitle">Khai Nhãn</h3>
+            <p class="event-modal-date" id="joinModalDate">01/10 – 20/10/2026</p>
+          </div>
+        </div>
+
+        <!-- Center Decorative Glowing Gradient 4-point Star Divider -->
+        <div class="event-modal-star-divider" aria-hidden="true">
+          <span class="event-modal-star-ray"></span>
+          <div class="event-modal-star">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 0L14.2 9.8L24 12L14.2 14.2L12 24L9.8 14.2L0 12L9.8 9.8L12 0Z" fill="url(#starGradientJoin)"/>
+              <defs>
+                <radialGradient id="starGradientJoin" cx="0.5" cy="0.5" r="0.5" fx="0.5" fy="0.5">
+                  <stop offset="0%" stop-color="#ffffff"/>
+                  <stop offset="40%" stop-color="#eecd7e"/>
+                  <stop offset="85%" stop-color="#cf9f3f"/>
+                  <stop offset="100%" stop-color="#a82338"/>
+                </radialGradient>
+              </defs>
+            </svg>
+          </div>
+          <span class="event-modal-star-ray"></span>
+        </div>
+
+        <!-- Right Column: Detailed Description with Custom Scrollbar -->
+        <div class="event-modal-col event-modal-col--right">
+          <div class="event-modal-desc join-modal-desc" id="joinModalDesc" data-lenis-prevent>
+            <!-- Dynamic Paragraphs -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ ADMIN PIN LOGIN MODAL ============ -->
+  <div class="admin-login-modal" id="adminLoginModal" role="dialog" aria-modal="true" aria-labelledby="adminLoginMainTitle" data-lenis-prevent>
+    <div class="admin-login-modal__backdrop" id="adminLoginBackdrop" aria-hidden="true"></div>
+    <div class="admin-login-modal__dialog" data-lenis-prevent>
+      <button type="button" class="admin-login-modal__close" id="adminLoginCloseBtn" aria-label="Đóng xác thực">✕</button>
+      <div class="admin-login-box">
+        <div class="admin-login-icon" aria-hidden="true">🔐</div>
+        <h3 class="admin-login-title" id="adminLoginMainTitle">Cổng Quản Trị Sự Kiện JPC</h3>
+        <p class="admin-login-sub">Nhập mã PIN xác thực để truy cập giao diện quản trị CMS:</p>
+        <form id="adminLoginForm" class="admin-login-form">
+          <input type="password" id="adminPinInput" class="admin-input admin-input--pin" placeholder="••••••••" autocomplete="current-password" required>
+          <button type="submit" class="admin-btn admin-btn--primary">Đăng nhập Quản trị</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ DEDICATED FULLSCREEN ADMIN STUDIO UI ============ -->
+  <div class="admin-portal" id="adminPortal" role="region" aria-label="Giao diện quản trị sự kiện JPC Event Studio" data-lenis-prevent hidden>
+    <!-- Top Header Bar -->
+    <header class="admin-portal__header">
+      <div class="admin-portal__brand">
+        <span class="admin-portal__logo-icon">⛩️</span>
+        <div class="admin-portal__brand-text">
+          <h2 class="admin-portal__title">JPC CMS Studio</h2>
+          <span class="admin-portal__badge">Quản Trị Hệ Thống</span>
+          <span class="admin-portal__badge admin-portal__badge--sync is-connected" id="adminFirebaseStatus" title="Trạng thái kết nối Firebase Realtime Database">🟢 Realtime DB: Đang kết nối...</span>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs: Sự Kiện vs Tuyển Thành Viên -->
+      <nav class="admin-portal__nav-tabs" aria-label="Khu vực quản trị">
+        <button type="button" class="admin-nav-tab is-active" id="adminTabEvents" data-target="events">
+          <span class="admin-nav-tab__icon">📅</span>
+          <span>Sự Kiện</span>
+        </button>
+        <button type="button" class="admin-nav-tab" id="adminTabRecruitment" data-target="recruitment">
+          <span class="admin-nav-tab__icon">🎎</span>
+          <span>Tuyển Thành Viên (Kokeshi Họa Ký)</span>
+        </button>
+      </nav>
+
+      <div class="admin-portal__actions">
+        <button type="button" class="admin-portal__btn admin-portal__btn--outline" id="adminBtnExportJSON" title="Sao lưu dữ liệu sự kiện & tuyển gen thành file JSON">📥 Xuất JSON</button>
+        <button type="button" class="admin-portal__btn admin-portal__btn--outline" id="adminBtnImportJSON" title="Nhập dữ liệu từ file JSON">📤 Nhập JSON</button>
+        <input type="file" id="adminInputImportFile" accept=".json" style="display:none;">
+        <button type="button" class="admin-portal__btn admin-portal__btn--danger-outline" id="adminBtnResetDefaults" title="Khôi phục về dữ liệu mặc định">↺ Khôi phục gốc</button>
+        <button type="button" class="admin-portal__btn admin-portal__btn--viewsite" id="adminBtnViewSite" title="Xem giao diện website bên ngoài">🌐 Xem Trang Chủ</button>
+        <button type="button" class="admin-portal__btn admin-portal__btn--logout" id="adminBtnLogout" title="Đăng xuất khỏi CMS">🚪 Thoát Admin</button>
+      </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <div class="admin-portal__body">
+      <!-- PANE 1: EVENT CMS -->
+      <div class="admin-portal__tab-pane is-active" id="adminTabPaneEvents">
+        <!-- Left Panel: Event Master List -->
+        <section class="admin-portal__sidebar" data-lenis-prevent>
+          <div class="admin-portal__sidebar-header">
+            <div class="admin-portal__sidebar-meta">
+              <h3 class="admin-portal__sidebar-title">Danh Sách Sự Kiện</h3>
+              <span class="admin-portal__count" id="adminEventCount">2 sự kiện</span>
+            </div>
+            <button type="button" class="admin-portal__btn-create" id="adminBtnAddNew">
+              <span class="admin-portal__btn-icon">＋</span> Thêm Sự Kiện Mới
+            </button>
+          </div>
+
+          <div class="admin-portal__list-scroll" id="adminEventList" data-lenis-prevent>
+            <!-- Dynamic Event Cards injected via JS -->
+          </div>
+        </section>
+
+        <!-- Right Panel: Event Detail Editor Form -->
+        <section class="admin-portal__editor-area" data-lenis-prevent>
+          <div class="admin-portal__editor-header">
+            <div>
+              <span class="admin-portal__editor-tag" id="adminEditorTag">Chế độ chỉnh sửa</span>
+              <h3 class="admin-portal__editor-title" id="adminFormTitle">Chỉnh Sửa Sự Kiện</h3>
+            </div>
+            <div class="admin-portal__editor-quick">
+              <button type="button" class="admin-portal__btn admin-portal__btn--ghost" id="adminBtnCancelForm">✕ Hủy / Tạo mới</button>
+              <button type="button" class="admin-portal__btn admin-portal__btn--save-top" id="adminBtnSaveEventTop">💾 Lưu Sự Kiện</button>
+            </div>
+          </div>
+
+          <div class="admin-portal__editor-scroll" data-lenis-prevent>
+            <form id="adminEventForm" class="admin-portal__form">
+              <div class="admin-portal__form-grid">
+                <!-- Event Title -->
+                <div class="admin-form-group admin-form-group--full">
+                  <label for="formEventTitle">Tên sự kiện <span class="req">*</span></label>
+                  <input type="text" id="formEventTitle" class="admin-input" placeholder="Ví dụ: 和の決戦 — QUYẾT CHIẾN NHẬT BẢN" required>
+                </div>
+
+                <!-- Event Date for sorting -->
+                <div class="admin-form-group">
+                  <label for="formEventDate">Ngày tổ chức (Dùng để SẮP XẾP TỰ ĐỘNG) <span class="req">*</span></label>
+                  <input type="date" id="formEventDate" class="admin-input" required>
+                  <small class="admin-field-hint">Sự kiện có ngày mới hơn sẽ tự động hiển thị trên cùng.</small>
+                </div>
+
+                <!-- Date Display Text -->
+                <div class="admin-form-group">
+                  <label for="formEventDateDisplay">Văn bản ngày hiển thị (Tùy chọn)</label>
+                  <input type="text" id="formEventDateDisplay" class="admin-input" placeholder="Ví dụ: 15/02 – 04/04/2026 hoặc 18/10/2026">
+                  <small class="admin-field-hint">Nếu để trống, hệ thống tự định dạng ngày DD/MM/YYYY.</small>
+                </div>
+
+                <!-- Timeframe Badge -->
+                <div class="admin-form-group admin-form-group--full">
+                  <label for="formEventTimeframe">Mốc Timeframe trên thanh dọc (Tùy chọn)</label>
+                  <input type="text" id="formEventTimeframe" class="admin-input" placeholder="Ví dụ: 04/2026 hoặc 10/2026">
+                  <small class="admin-field-hint">Hiển thị trên trục thời gian dọc ở mép trái màn hình.</small>
+                </div>
+
+                <!-- Short Description -->
+                <div class="admin-form-group admin-form-group--full">
+                  <label for="formEventShortDesc">Mô tả ngắn (Hiển thị ở trang chính dưới ảnh cover) <span class="req">*</span></label>
+                  <textarea id="formEventShortDesc" class="admin-textarea" rows="2" placeholder="Tóm tắt ngắn gọn 1-2 câu về sự kiện... (Tối đa 2 dòng hiển thị trên card)" required data-lenis-prevent></textarea>
+                </div>
+
+                <!-- Cover Image Upload -->
+                <div class="admin-form-group">
+                  <label>Ảnh Cover / Banner (Khung trang chính — Không mất góc) <span class="req">*</span></label>
+                  <div class="admin-file-upload-box">
+                    <input type="file" id="formCoverFile" accept="image/*" class="admin-file-input">
+                    <div class="admin-img-preview admin-img-preview--cover" id="formCoverPreview">
+                      <span class="admin-file-placeholder">Chưa chọn ảnh</span>
+                    </div>
+                    <small class="admin-file-tip">Upload ảnh từ máy tính (Tỷ lệ ~2.56:1 hoặc 16:9, khung hiển thị trọn vẹn không xén góc).</small>
+                  </div>
+                </div>
+
+                <!-- Thumbnail 1:1 Image Upload -->
+                <div class="admin-form-group">
+                  <label>Ảnh Thumbnail vuông 1:1 (Modal chi tiết) <span class="req">*</span></label>
+                  <div class="admin-file-upload-box">
+                    <input type="file" id="formThumbFile" accept="image/*" class="admin-file-input">
+                    <div class="admin-img-preview admin-img-preview--square" id="formThumbPreview">
+                      <span class="admin-file-placeholder">Chưa chọn ảnh</span>
+                    </div>
+                    <small class="admin-file-tip">Ảnh đại diện vuông chuẩn 1:1 cho popup chi tiết sự kiện.</small>
+                  </div>
+                </div>
+
+                <!-- Full Detailed Description -->
+                <div class="admin-form-group admin-form-group--full">
+                  <label for="formEventFullDesc">Thông tin chi tiết sự kiện (Khung cuộn của Modal) <span class="req">*</span></label>
+                  <textarea id="formEventFullDesc" class="admin-textarea" rows="7" placeholder="Nội dung chi tiết, thể lệ, thời gian, các vòng thi, quyền lợi tham gia... (Xuống dòng tự động tạo đoạn văn mới)" required data-lenis-prevent></textarea>
+                </div>
+              </div>
+
+              <!-- Action Bar -->
+              <div class="admin-portal__form-actions">
+                <button type="button" class="admin-portal__btn admin-portal__btn--ghost" id="adminBtnCancelForm2">✕ Hủy bỏ</button>
+                <button type="button" class="admin-portal__btn admin-portal__btn--danger" id="adminBtnDeleteEvent" style="display:none;">🗑️ Xóa Sự Kiện Này</button>
+                <button type="submit" class="admin-portal__btn admin-portal__btn--primary admin-portal__btn--lg" id="adminBtnSaveEvent">💾 Lưu Sự Kiện</button>
+              </div>
+            </form>
+          </div>
+        </section>
+      </div>
+
+      <!-- PANE 2: RECRUITMENT CMS (KOKESHI HỌA KÝ) -->
+      <div class="admin-portal__tab-pane" id="adminTabPaneRecruitment" style="display: none;">
+        <!-- Left Panel: Recruitment Rounds List -->
+        <section class="admin-portal__sidebar" data-lenis-prevent>
+          <div class="admin-portal__sidebar-header">
+            <div class="admin-portal__sidebar-meta">
+              <h3 class="admin-portal__sidebar-title">Vòng Tuyển Thành Viên</h3>
+              <span class="admin-portal__count">5 vòng</span>
+            </div>
+          </div>
+
+          <div class="admin-portal__list-scroll" id="adminRecruitList" data-lenis-prevent>
+            <!-- Injected via recruitment-manager.js -->
+          </div>
+        </section>
+
+        <!-- Right Panel: Recruitment Round Editor Form -->
+        <section class="admin-portal__editor-area" data-lenis-prevent>
+          <div class="admin-portal__editor-header">
+            <div>
+              <span class="admin-portal__editor-tag">Chỉnh sửa vòng thi tuyển Gen</span>
+              <h3 class="admin-portal__editor-title" id="adminRecruitFormTitle">Chỉnh Sửa: Vòng 1 — Khai Nhãn</h3>
+            </div>
+            <div class="admin-portal__editor-quick">
+              <button type="button" class="admin-portal__btn admin-portal__btn--save-top" id="adminBtnSaveRecruitTop">💾 Lưu Vòng Thi</button>
+            </div>
+          </div>
+
+          <div class="admin-portal__editor-scroll" id="adminRecruitEditorScroll" data-lenis-prevent>
+            <form id="adminRecruitForm" class="admin-portal__form">
+              <div class="admin-portal__form-grid">
+                <!-- Step Number / Label -->
+                <div class="admin-form-group">
+                  <label for="formRecruitStepNo">Tên / Số thứ tự vòng <span class="req">*</span></label>
+                  <input type="text" id="formRecruitStepNo" class="admin-input" placeholder="Ví dụ: Vòng 1, Vòng 2, Vòng 3.1, Vòng 3.2, Kết quả" required>
+                </div>
+
+                <!-- Official Round Name -->
+                <div class="admin-form-group">
+                  <label for="formRecruitTitle">Tên chính thức vòng thi <span class="req">*</span></label>
+                  <input type="text" id="formRecruitTitle" class="admin-input" placeholder="Ví dụ: Khai Nhãn, Hòa Nhịp, Phá Phong, Chân diện..." required>
+                </div>
+
+                <!-- Date Range -->
+                <div class="admin-form-group admin-form-group--full">
+                  <label for="formRecruitDate">Thời gian diễn ra <span class="req">*</span></label>
+                  <input type="text" id="formRecruitDate" class="admin-input" placeholder="Ví dụ: 01/10 – 20/10/2026 hoặc 12/11/2026" required>
+                </div>
+
+                <!-- Short Description -->
+                <div class="admin-form-group admin-form-group--full">
+                  <label for="formRecruitShortDesc">Đoạn text ngắn ở ngoài UI (Thẻ vòng thi) <span class="req">*</span></label>
+                  <textarea id="formRecruitShortDesc" class="admin-textarea" rows="2" placeholder="Tóm tắt ngắn gọn 1-2 câu hiển thị trực tiếp trên thẻ card ngoài trang chính..." required data-lenis-prevent></textarea>
+                </div>
+
+                <!-- Mascot Mono Upload -->
+                <div class="admin-form-group">
+                  <label>Mascot Bản Mono (Đen - Đỏ mặc định) <span class="req">*</span></label>
+                  <div class="admin-file-upload-box">
+                    <input type="file" id="formRecruitMonoFile" accept="image/*" class="admin-file-input">
+                    <div class="admin-img-preview admin-img-preview--contain" id="formRecruitMonoPreview">
+                      <span class="admin-file-placeholder">Chưa chọn ảnh</span>
+                    </div>
+                    <small class="admin-file-tip">Upload mascot bản Mono (Đen - Đỏ, file PNG trong suốt).</small>
+                  </div>
+                </div>
+
+                <!-- Mascot Color Upload -->
+                <div class="admin-form-group">
+                  <label>Mascot Bản Color (Lật 3D Flip khi hover) <span class="req">*</span></label>
+                  <div class="admin-file-upload-box">
+                    <input type="file" id="formRecruitColorFile" accept="image/*" class="admin-file-input">
+                    <div class="admin-img-preview admin-img-preview--contain" id="formRecruitColorPreview">
+                      <span class="admin-file-placeholder">Chưa chọn ảnh</span>
+                    </div>
+                    <small class="admin-file-tip">Upload mascot bản Color (Bản màu sắc nét, file PNG trong suốt).</small>
+                  </div>
+                </div>
+
+                <!-- Popup Artwork Upload -->
+                <div class="admin-form-group admin-form-group--full">
+                  <label>Ảnh Khung Popup (Hiển thị lơ lửng trong Modal chi tiết) <span class="req">*</span></label>
+                  <div class="admin-file-upload-box">
+                    <input type="file" id="formRecruitPopupFile" accept="image/*" class="admin-file-input">
+                    <div class="admin-img-preview admin-img-preview--contain admin-img-preview--tall" id="formRecruitPopupPreview">
+                      <span class="admin-file-placeholder">Chưa chọn ảnh</span>
+                    </div>
+                    <small class="admin-file-tip">Upload ảnh khung Popup đại diện (File trong thư mục "Khung Popup - Tuyển Gen", PNG nền trong suốt).</small>
+                  </div>
+                </div>
+
+                <!-- Full Modal Description -->
+                <div class="admin-form-group admin-form-group--full">
+                  <label for="formRecruitFullDesc">Nội dung text dài hiển thị trong Modal chi tiết <span class="req">*</span></label>
+                  <textarea id="formRecruitFullDesc" class="admin-textarea" rows="8" placeholder="Thông tin chi tiết về vòng thi, ý nghĩa biểu tượng, thể lệ, các thử thách, lưu ý... (Xuống dòng tự động chia đoạn)" required data-lenis-prevent></textarea>
+                </div>
+              </div>
+
+              <!-- Form Actions -->
+              <div class="admin-portal__form-actions">
+                <button type="button" class="admin-portal__btn admin-portal__btn--danger-outline" id="adminBtnResetRound">↺ Khôi phục gốc vòng này</button>
+                <button type="submit" class="admin-portal__btn admin-portal__btn--primary admin-portal__btn--lg" id="adminBtnSaveRecruit">💾 Lưu Thay Đổi</button>
+              </div>
+            </form>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ BAN PAGE TRANSITION OVERLAY ============ -->
+  <div class="ban-transition" id="banTransitionOverlay" aria-hidden="true">
+    <div class="ban-transition__backdrop"></div>
+
+    <!-- Concentric Water Ripples (Sóng Gợn Nước Lan Tỏa) -->
+    <div class="ban-transition__ripples" id="banTransitionRipples" aria-hidden="true">
+      <div class="ban-transition__ripple ban-transition__ripple--1"></div>
+      <div class="ban-transition__ripple ban-transition__ripple--2"></div>
+      <div class="ban-transition__ripple ban-transition__ripple--3"></div>
+      <div class="ban-transition__ripple ban-transition__ripple--pulse" id="banTransitionPulseRipple"></div>
+    </div>
+
+    <!-- Center Aura Shockwave Wave -->
+    <div class="ban-transition__aura" id="banTransitionAura"></div>
+
+    <!-- Rotating Pentagonal Vortex Stage (Xoay load & Lá bài ban được chọn) -->
+    <div class="ban-transition__stage" id="banTransitionStage">
+      <div class="ban-transition__ring" id="banTransitionRing">
+        <!-- 5 Cards: Bottom/Text oriented inward towards center -->
+        <div class="ban-vortex-card" data-dept="dept-btc" style="--card-angle: 0deg;">
+          <div class="ban-vortex-card__inner">
+            <div class="ban-vortex-card__art">
+              <img src="Image/Kokeshi 5 Ban/Ban Tổ Chức.png" alt="Kokeshi Ban Tổ chức" />
+            </div>
+            <div class="ban-vortex-card__info">
+              <span class="ban-vortex-card__jp">企画部</span>
+              <span class="ban-vortex-card__name">Ban Tổ chức</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="ban-vortex-card" data-dept="dept-bcm" style="--card-angle: 72deg;">
+          <div class="ban-vortex-card__inner">
+            <div class="ban-vortex-card__art">
+              <img src="Image/Kokeshi 5 Ban/Ban Chuyên Môn.png" alt="Kokeshi Ban Chuyên môn" />
+            </div>
+            <div class="ban-vortex-card__info">
+              <span class="ban-vortex-card__jp">専門部</span>
+              <span class="ban-vortex-card__name">Ban Chuyên môn</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="ban-vortex-card" data-dept="dept-btt" style="--card-angle: 144deg;">
+          <div class="ban-vortex-card__inner">
+            <div class="ban-vortex-card__art">
+              <img src="Image/Kokeshi 5 Ban/Ban Thông Tin.png" alt="Kokeshi Ban Thông tin" />
+            </div>
+            <div class="ban-vortex-card__info">
+              <span class="ban-vortex-card__jp">情報部</span>
+              <span class="ban-vortex-card__name">Ban Thông tin</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="ban-vortex-card" data-dept="dept-bns" style="--card-angle: 216deg;">
+          <div class="ban-vortex-card__inner">
+            <div class="ban-vortex-card__art">
+              <img src="Image/Kokeshi 5 Ban/Ban Nhân Sự.png" alt="Kokeshi Ban Nhân sự" />
+            </div>
+            <div class="ban-vortex-card__info">
+              <span class="ban-vortex-card__jp">人事部</span>
+              <span class="ban-vortex-card__name">Ban Nhân sự</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="ban-vortex-card" data-dept="dept-bdn" style="--card-angle: 288deg;">
+          <div class="ban-vortex-card__inner">
+            <div class="ban-vortex-card__art">
+              <img src="Image/Kokeshi 5 Ban/Ban Đối Ngoại.png" alt="Kokeshi Ban Đối ngoại" />
+            </div>
+            <div class="ban-vortex-card__info">
+              <span class="ban-vortex-card__jp">対外部</span>
+              <span class="ban-vortex-card__name">Ban Đối ngoại</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

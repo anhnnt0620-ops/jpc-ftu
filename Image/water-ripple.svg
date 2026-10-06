@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600" fill="none">
+  <defs>
+    <!-- Soft Gaussian blur filters for liquid feathering -->
+    <filter id="rippleBlurSoft" x="-25%" y="-25%" width="150%" height="150%">
+      <feGaussianBlur stdDeviation="3.5" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    <filter id="rippleBlurDeep" x="-25%" y="-25%" width="150%" height="150%">
+      <feGaussianBlur stdDeviation="6"/>
+    </filter>
+    
+    <!-- Central soft white & crimson core glow (matching finger snap flash) -->
+    <radialGradient id="centerWhiteCrimsonGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.45"/>
+      <stop offset="18%" stop-color="#ff4d6d" stop-opacity="0.30"/>
+      <stop offset="38%" stop-color="#cc1436" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#0a0104" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Concentric wave highlight gradient: Crisp Pure White crest with Deep Blood Crimson body -->
+    <linearGradient id="waveHighlightWhiteCrimson" x1="30%" y1="20%" x2="70%" y2="80%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.98"/> <!-- Crisp pure white crest -->
+      <stop offset="30%" stop-color="#ff758f" stop-opacity="0.85"/> <!-- Luminous crimson-white transition -->
+      <stop offset="65%" stop-color="#cc1436" stop-opacity="0.90"/> <!-- Deep occult crimson -->
+      <stop offset="100%" stop-color="#881337" stop-opacity="0.60"/> <!-- Dark ruby base -->
+    </linearGradient>
+
+    <!-- Liquid depth shadow gradient: Deep Obsidian Black for 3D water trough -->
+    <linearGradient id="waveShadowObsidian" x1="28%" y1="20%" x2="72%" y2="80%">
+      <stop offset="0%" stop-color="#0a0104" stop-opacity="0.35"/>
+      <stop offset="50%" stop-color="#000000" stop-opacity="0.65"/>
+      <stop offset="100%" stop-color="#140206" stop-opacity="0.80"/>
+    </linearGradient>
+
+    <!-- Concentric water wave ramp: Crisp White wave crests on Deep Crimson & Obsidian Black base -->
+    <radialGradient id="concentricWhiteCrimsonRamp" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#cc1436" stop-opacity="0"/>
+      <stop offset="10%" stop-color="#cc1436" stop-opacity="0.08"/>
+      <!-- Wave 1 (Inner crest & trough) -->
+      <stop offset="18%" stop-color="#cc1436" stop-opacity="0.65"/>
+      <stop offset="22%" stop-color="#ffffff" stop-opacity="0.95"/> <!-- Crisp pure white crest -->
+      <stop offset="26%" stop-color="#991b1b" stop-opacity="0.35"/>
+      <stop offset="32%" stop-color="#0a0104" stop-opacity="0.15"/>
+      <!-- Wave 2 (Mid-inner crest & trough) -->
+      <stop offset="40%" stop-color="#e11d48" stop-opacity="0.70"/>
+      <stop offset="44%" stop-color="#ffffff" stop-opacity="0.98"/> <!-- Crisp pure white crest -->
+      <stop offset="48%" stop-color="#be123c" stop-opacity="0.40"/>
+      <stop offset="58%" stop-color="#0a0104" stop-opacity="0.18"/>
+      <!-- Wave 3 (Main outer crest & trough) -->
+      <stop offset="68%" stop-color="#f43f5e" stop-opacity="0.75"/>
+      <stop offset="72%" stop-color="#ffffff" stop-opacity="1.00"/> <!-- Crisp pure white crest -->
+      <stop offset="76%" stop-color="#9f1239" stop-opacity="0.45"/>
+      <stop offset="84%" stop-color="#0a0104" stop-opacity="0.20"/>
+      <!-- Wave 4 (Outer soft dissipating wave) -->
+      <stop offset="89%" stop-color="#e11d48" stop-opacity="0.55"/>
+      <stop offset="92%" stop-color="#ffffff" stop-opacity="0.75"/>
+      <stop offset="96%" stop-color="#881337" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#0a0104" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Central water dispersion in crisp crimson-white -->
+  <circle cx="300" cy="300" r="285" fill="url(#centerWhiteCrimsonGlow)"/>
+
+  <!-- Radial wave ramp in Deep Crimson & Pure White -->
+  <circle cx="300" cy="300" r="285" fill="url(#concentricWhiteCrimsonRamp)"/>
+
+  <!-- 3D Liquid Ridge Shadows & Crisp White Highlights -->
+  <!-- Wave 1 (Inner Ring: r ~ 68) -->
+  <circle cx="300" cy="303" r="72" stroke="url(#waveShadowObsidian)" stroke-width="8" opacity="0.6" filter="url(#rippleBlurDeep)"/>
+  <circle cx="300" cy="300" r="68" stroke="url(#waveHighlightWhiteCrimson)" stroke-width="11" opacity="0.85" filter="url(#rippleBlurSoft)"/>
+  <circle cx="300" cy="298.5" r="68" stroke="#ffffff" stroke-width="2.8" opacity="0.95"/>
+
+  <!-- Wave 2 (Middle Ring: r ~ 136) -->
+  <circle cx="300" cy="304" r="142" stroke="url(#waveShadowObsidian)" stroke-width="11" opacity="0.65" filter="url(#rippleBlurDeep)"/>
+  <circle cx="300" cy="300" r="136" stroke="url(#waveHighlightWhiteCrimson)" stroke-width="15" opacity="0.9" filter="url(#rippleBlurSoft)"/>
+  <circle cx="300" cy="298" r="136" stroke="#ffffff" stroke-width="3.2" opacity="0.98"/>
+
+  <!-- Wave 3 (Main Outer Ring: r ~ 216) -->
+  <circle cx="300" cy="305" r="224" stroke="url(#waveShadowObsidian)" stroke-width="15" opacity="0.7" filter="url(#rippleBlurDeep)"/>
+  <circle cx="300" cy="300" r="216" stroke="url(#waveHighlightWhiteCrimson)" stroke-width="19" opacity="0.95" filter="url(#rippleBlurSoft)"/>
+  <circle cx="300" cy="298" r="216" stroke="#ffffff" stroke-width="3.8" opacity="1.00"/>
+
+  <!-- Wave 4 (Outermost Soft Ripple: r ~ 272) -->
+  <circle cx="300" cy="306" r="280" stroke="url(#waveShadowObsidian)" stroke-width="13" opacity="0.5" filter="url(#rippleBlurDeep)"/>
+  <circle cx="300" cy="300" r="272" stroke="url(#waveHighlightWhiteCrimson)" stroke-width="17" opacity="0.7" filter="url(#rippleBlurSoft)"/>
+  <circle cx="300" cy="298.5" r="272" stroke="#ffffff" stroke-width="2.6" opacity="0.85"/>
+</svg>

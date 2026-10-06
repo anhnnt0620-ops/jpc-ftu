@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 220" width="100%" height="100%">
+  <defs>
+    <!-- Gradients for Ban Nhan Su (Warm Peach Coral & Sakura Blossom) -->
+    <radialGradient id="faceGradBNS" cx="45%" cy="40%" r="55%">
+      <stop offset="0%" stop-color="#fff8f0" />
+      <stop offset="70%" stop-color="#faeed9" />
+      <stop offset="100%" stop-color="#ebd8be" />
+    </radialGradient>
+    <linearGradient id="hairGradBNS" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2d1f24" />
+      <stop offset="60%" stop-color="#191014" />
+      <stop offset="100%" stop-color="#0a0507" />
+    </linearGradient>
+    <linearGradient id="kimonoGradBNS" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f43f5e" />
+      <stop offset="45%" stop-color="#be123c" />
+      <stop offset="100%" stop-color="#4c0519" />
+    </linearGradient>
+    <linearGradient id="sakuraTrimBNS" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#fecdd3" />
+      <stop offset="50%" stop-color="#fb7185" />
+      <stop offset="100%" stop-color="#e11d48" />
+    </linearGradient>
+    <linearGradient id="obiGradBNS" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fb923c" />
+      <stop offset="50%" stop-color="#ea580c" />
+      <stop offset="100%" stop-color="#9a3412" />
+    </linearGradient>
+    <filter id="kokeshiShadowBNS" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="4" flood-color="#000000" flood-opacity="0.35" />
+    </filter>
+  </defs>
+
+  <g filter="url(#kokeshiShadowBNS)">
+    <!-- Base Shadow -->
+    <ellipse cx="80" cy="210" rx="36" ry="7" fill="#0d0408" opacity="0.4" />
+
+    <!-- Wooden Torso / Kimono (Ban Nhan Su - Peach Coral & Rose) -->
+    <path d="M 52 110 C 44 135, 42 175, 46 205 C 54 212, 106 212, 114 205 C 118 175, 116 135, 108 110 Z" 
+          fill="url(#kimonoGradBNS)" stroke="url(#sakuraTrimBNS)" stroke-width="1.8" />
+
+    <!-- Kimono Lapels (Eri) -->
+    <path d="M 62 108 L 80 142 L 72 142 Z" fill="#fff8f0" opacity="0.9" />
+    <path d="M 98 108 L 78 144 L 84 144 Z" fill="url(#sakuraTrimBNS)" />
+    <path d="M 64 110 L 80 142 L 96 110" fill="none" stroke="url(#sakuraTrimBNS)" stroke-width="2" />
+
+    <!-- Kimono Pattern (Cherry Blossoms / Sakura In Bloom & Harmony Knot) -->
+    <g transform="translate(80, 175)" opacity="0.95">
+      <!-- 5-Petal Sakura Blossom -->
+      <g>
+        <circle cx="0" cy="-6" r="4.2" fill="#ffe4e6" stroke="#fb7185" stroke-width="0.8" />
+        <circle cx="6" cy="-2" r="4.2" fill="#ffe4e6" stroke="#fb7185" stroke-width="0.8" />
+        <circle cx="4" cy="5" r="4.2" fill="#ffe4e6" stroke="#fb7185" stroke-width="0.8" />
+        <circle cx="-4" cy="5" r="4.2" fill="#ffe4e6" stroke="#fb7185" stroke-width="0.8" />
+        <circle cx="-6" cy="-2" r="4.2" fill="#ffe4e6" stroke="#fb7185" stroke-width="0.8" />
+        <circle cx="0" cy="0" r="2.5" fill="#f43f5e" />
+      </g>
+      <!-- Floating Petals -->
+      <path d="M -18 -8 Q -15 -14 -12 -9 Q -15 -5 -18 -8 Z" fill="#fecdd3" />
+      <path d="M 18 -6 Q 21 -12 24 -7 Q 21 -3 18 -6 Z" fill="#fecdd3" />
+      <path d="M -15 15 Q -12 10 -9 14 Q -12 18 -15 15 Z" fill="#fecdd3" />
+      <path d="M 14 14 Q 17 9 20 13 Q 17 17 14 14 Z" fill="#fecdd3" />
+    </g>
+
+    <!-- Obi Sash (Coral Tangerine) -->
+    <rect x="50" y="140" width="60" height="15" rx="3" fill="url(#obiGradBNS)" stroke="url(#sakuraTrimBNS)" stroke-width="1" />
+    <!-- Obi-jime Cord -->
+    <line x1="50" y1="147.5" x2="110" y2="147.5" stroke="#fff8f0" stroke-width="1.5" />
+    <circle cx="80" cy="147.5" r="3" fill="#ffe4e6" stroke="#e11d48" stroke-width="1" />
+
+    <!-- Wooden Head (Spherical Kokeshi) -->
+    <circle cx="80" cy="68" r="36" fill="url(#faceGradBNS)" stroke="url(#sakuraTrimBNS)" stroke-width="1.2" />
+
+    <!-- Sweet Hairstyle with Flowing Side Locks -->
+    <path d="M 45 68 C 45 35, 60 22, 80 22 C 100 22, 115 35, 115 68 C 115 76, 113 88, 110 94 C 106 82, 104 60, 104 55 C 96 50, 64 50, 56 55 C 56 60, 54 82, 50 94 C 47 88, 45 76, 45 68 Z" 
+          fill="url(#hairGradBNS)" />
+    <!-- Side Buns with Sakura pins -->
+    <circle cx="80" cy="22" r="13" fill="url(#hairGradBNS)" />
+    <!-- Bangs -->
+    <path d="M 56 55 Q 80 62 104 55 Q 80 44 56 55 Z" fill="url(#hairGradBNS)" />
+
+    <!-- Double Sakura Hairpins -->
+    <g transform="translate(68, 26)">
+      <circle cx="0" cy="0" r="4" fill="#fb7185" />
+      <circle cx="0" cy="0" r="1.8" fill="#ffffff" />
+    </g>
+    <g transform="translate(92, 26)">
+      <circle cx="0" cy="0" r="4" fill="#fb7185" />
+      <circle cx="0" cy="0" r="1.8" fill="#ffffff" />
+    </g>
+
+    <!-- Eyes (Warm, Smiling, Engaging) -->
+    <path d="M 64 68 Q 70 63 74 68" fill="none" stroke="#2b141b" stroke-width="2.2" stroke-linecap="round" />
+    <path d="M 86 68 Q 90 63 96 68" fill="none" stroke="#2b141b" stroke-width="2.2" stroke-linecap="round" />
+
+    <!-- Soft Pink Blush -->
+    <ellipse cx="63" cy="75" rx="6" ry="3.5" fill="#f43f5e" opacity="0.4" />
+    <ellipse cx="97" cy="75" rx="6" ry="3.5" fill="#f43f5e" opacity="0.4" />
+
+    <!-- Sweet Open Smile -->
+    <path d="M 76 80 Q 80 85 84 80" fill="none" stroke="#e11d48" stroke-width="2" stroke-linecap="round" />
+    <!-- Eyebrows -->
+    <path d="M 66 60 Q 70 57 74 60" fill="none" stroke="#44222c" stroke-width="1.4" stroke-linecap="round" />
+    <path d="M 86 60 Q 90 57 94 60" fill="none" stroke="#44222c" stroke-width="1.4" stroke-linecap="round" />
+  </g>
+</svg>
